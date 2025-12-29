@@ -25,16 +25,48 @@ Initially, I planned to avoid a more complex multi-service approach, since it's 
 The `daemon` subfolder contains the analysis daemon code, that is, the Python application that does the following:
 
 1. Periodically check for new tasks via Echolalia's REST API, and if needed spawns new runners and publish Redis events
-2. Respond to published Redis events from runners
+2. Respond to published Redis events from runners, typically by sending POST requests to update task statuses
 
 ### Setup
+#### Poetry
 We use `poetry` for package management. `cd` into the daemon folder and run `poetry env activate` to print the full `source` bash command needed to activate the Python virtual environment. Then activate the environment with, for example
 
 ```bash
-source /Users/Me/Library/Caches/pypoetry/virtualenvs/analysis-service-daemon-W3oKvO0O-py3.13/bin/activate
+eval $(poetry env activate)
 ```
 
 To install packages use `poetry add [package name]` and to update the lock file use `poetry lock`.
+
+Note the following
+1. If a suitable Python version cannot be found, it's recommended to use `pyenv` to install it, e.g., `pyenv install 3.13.0`.
+2. Conda–which we too often use–does not always play well with other package managers simultaneously in the same shell, so conda may need to be deactivated (not only the conda environment) during development or, more simply, a fresh shell can be used.
+3. Activating doesn't spawn a subshell, so `exit` will close your shell entirely. You could use the poetry shell plugin for more control. Finally, it is important to enter the virtual environment before installing dependencies.
+
+To build the project just run
+
+```bash
+poetry build
+```
+
+And the source and binary distributions will appear in the `dist/` folder.
+
+#### Testing
+Run pytest as usual. In the root of the project run
+```bash
+pytest
+```
+
+To run the tests in various fresh virtual environments you can use tox. You can install tox via pipx `pipx install tox`.
+
+And tox tests in python 3.13 can be run with, say
+```bash
+tox -e py313 -- --randomly-seed=1234
+```
+The seed is optional, and will shuffle the order of the tests and is good practice.
+To run the full suite with linting, formatting and type-checking, you will need to install black, isort, autoflake, flake8 and mypy with pipx, and run `tox`.
+
+#### Lint and Typecheck Locally
+Install `black`, `isort`, `autoflake`, `flake8`, `mypy`, system-wide with `pipx`. Go to the repository root and run `black .`, `isort .`, `autoflake .`, `flake8 .` and `mypy .` to lint, format or type-check.
 
 ## References
 
