@@ -68,6 +68,15 @@ To run the full suite with linting, formatting and type-checking, you will need 
 #### Lint and Typecheck Locally
 Install `black`, `isort`, `autoflake`, `flake8`, `mypy`, system-wide with `pipx`. Go to the repository root and run `black .`, `isort .`, `autoflake .`, `flake8 .` and `mypy .` to lint, format or type-check.
 
+#### Commits and Semantic Versioning
+We bump our releases and update our changelog automatically, but this requires commits to follow the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) scheme. We use a combination of [release-please](https://github.com/googleapis/release-please) and [commitlint](https://commitlint.js.org/).
+
+We recommend using squash-merge for pull requests for many reasons. Rebase-merge works too, but if you're doing something like red/green development, or did not validate all your individual commits against the actions, the main branch may not be clean after a rebase-merge (in the sense that every snapshot be clean).
+
+```note
+Note: if squashing or rebasing, the commit message must conform to commitlint's rules, otherwise release-please will not create a PR.
+```
+
 ## References
 
 <a id="1">[1]</a>
