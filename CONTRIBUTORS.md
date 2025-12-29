@@ -21,6 +21,21 @@ The third requirement turned out to be incorrect, and the fourth was changed whe
 
 Initially, I planned to avoid a more complex multi-service approach, since it's easier to understand and debug a single Python application. The benefits, however, of leveraging Docker containers, Redis as a message queue, and potentially Kubernetes are significant.
 
+## Analysis Daemon
+The `daemon` subfolder contains the analysis daemon code, that is, the Python application that does the following:
+
+1. Periodically check for new tasks via Echolalia's REST API, and if needed spawns new runners and publish Redis events
+2. Respond to published Redis events from runners
+
+### Setup
+We use `poetry` for package management. `cd` into the daemon folder and run `poetry env activate` to print the full `source` bash command needed to activate the Python virtual environment. Then activate the environment with, for example
+
+```bash
+source /Users/Me/Library/Caches/pypoetry/virtualenvs/analysis-service-daemon-W3oKvO0O-py3.13/bin/activate
+```
+
+To install packages use `poetry add [package name]` and to update the lock file use `poetry lock`.
+
 ## References
 
 <a id="1">[1]</a>
