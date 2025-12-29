@@ -21,6 +21,62 @@ The third requirement turned out to be incorrect, and the fourth was changed whe
 
 Initially, I planned to avoid a more complex multi-service approach, since it's easier to understand and debug a single Python application. The benefits, however, of leveraging Docker containers, Redis as a message queue, and potentially Kubernetes are significant.
 
+## Analysis Daemon
+The `daemon` subfolder contains the analysis daemon code, that is, the Python application that does the following:
+
+1. Periodically check for new tasks via Echolalia's REST API, and if needed spawns new runners and publish Redis events
+2. Respond to published Redis events from runners, typically by sending POST requests to update task statuses
+
+### Setup
+#### Poetry
+We use `poetry` for package management. `cd` into the daemon folder and run `poetry env activate` to print the full `source` bash command needed to activate the Python virtual environment. Then activate the environment with, for example
+
+```bash
+eval $(poetry env activate)
+```
+
+To install packages use `poetry add [package name]` and to update the lock file use `poetry lock`.
+
+Note the following
+1. If a suitable Python version cannot be found, it's recommended to use `pyenv` to install it, e.g., `pyenv install 3.13.0`.
+2. Conda–which we too often use–does not always play well with other package managers simultaneously in the same shell, so conda may need to be deactivated (not only the conda environment) during development or, more simply, a fresh shell can be used.
+3. Activating doesn't spawn a subshell, so `exit` will close your shell entirely. You could use the poetry shell plugin for more control. Finally, it is important to enter the virtual environment before installing dependencies.
+
+To build the project just run
+
+```bash
+poetry build
+```
+
+And the source and binary distributions will appear in the `dist/` folder.
+
+#### Testing
+Run pytest as usual. In the root of the project run
+```bash
+pytest
+```
+
+To run the tests in various fresh virtual environments you can use tox. You can install tox via pipx `pipx install tox`.
+
+And tox tests in python 3.13 can be run with, say
+```bash
+tox -e py313 -- --randomly-seed=1234
+```
+The seed is optional, and will shuffle the order of the tests and is good practice.
+To run the full suite with linting, formatting and type-checking, you will need to install black, isort, autoflake, flake8 and mypy with pipx, and run `tox`.
+
+#### Lint and Typecheck Locally
+Install `black`, `isort`, `autoflake`, `flake8`, `mypy`, system-wide with `pipx`. Go to the repository root and run `black .`, `isort .`, `autoflake .`, `flake8 .` and `mypy .` to lint, format or type-check.
+
+#### Commits and Semantic Versioning
+We bump our releases and update our changelog automatically, but this requires commits to follow the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) scheme. We use a combination of [release-please](https://github.com/googleapis/release-please) and [commitlint](https://commitlint.js.org/).
+
+We recommend using squash-merge for pull requests for many reasons. Rebase-merge works too, but if you're doing something like red/green development, or did not validate all your individual commits against the actions, the main branch may not be clean after a rebase-merge (in the sense that every snapshot be clean).
+
+```note
+Note: if squashing or rebasing, the commit message must conform to commitlint's rules, otherwise release-please will not create a PR.
+```
+
 ## References
 
 <a id="1">[1]</a>

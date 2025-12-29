@@ -1,0 +1,10 @@
+# -- bitcode -- #
+__pycache__/
+
+# -- build -- #
+dist/
+
+# -- created by tox -- #
+.tox
+.mypy_cache
+.pytest_cache
