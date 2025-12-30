@@ -1,18 +1,20 @@
-"""
-Generic entrypoint
+import redis
 
-TODO: get rid of this boilerplate
-"""
+from src.config import get_redis_host_and_port
+from src.service.handlers.event_handlers import get_event_handlers
+from src.service.queue.channels import get_channels
+from src.service.service import Service
 
 
 def run_app() -> None:
-    print(add_numbers(1, 2))
+    channels = get_channels()
+    r = redis.Redis(**get_redis_host_and_port())
+    event_handlers = get_event_handlers()
+
+    service = Service(r, channels, event_handlers)
+    service.start()
 
     return
-
-
-def add_numbers(a: int, b: int) -> int:
-    return a + b
 
 
 if __name__ == "__main__":
