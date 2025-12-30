@@ -13,6 +13,7 @@ jobs:
   format:
     name: Check Formatting
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4.0.0
@@ -33,12 +34,14 @@ jobs:
   test:
     name: Test
     runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
         python:
         - version: "3.13"
           toxenv: "py313"
+
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4.0.0
@@ -46,6 +49,17 @@ jobs:
         python-version: ${{ matrix.python.version }}
     - name: Install tox
       run: python -m pip install tox
+    - name: Install and start Redis
+      run: |
+        if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+          sudo apt-get update
+          sudo apt-get install -y redis-server
+        elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+          brew install redis
+        fi
     - name: Run pytest
       run: tox -e ${{ matrix.python.toxenv }} -- --randomly-seed=$RANDOM
       working-directory: daemon
+      env:
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
