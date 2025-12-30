@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.1.0...v0.2.0) (2025-12-30)
+
+
+### Features
+
+* setup redis ([a7fe2dc](https://github.com/LAAC-LSCP/analysis-service/commit/a7fe2dccf22c09d9b3565c5dfd9a37b7a8304647))
+
 ## 0.1.0 (2025-12-29)
 
 
