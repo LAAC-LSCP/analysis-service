@@ -3,11 +3,7 @@ from typing import Tuple
 
 import redis
 
-from src.config.config import (
-    ANALYSIS_SERVICE_DIR,
-    CONFIG_FILE,
-    load_config,
-)
+from src.config.config import ANALYSIS_SERVICE_DIR, CONFIG_FILE, load_config
 from src.redis_utils import get_redis_host_and_port
 from src.service.handlers.event_handlers import EventHandlers, get_event_handlers
 from src.service.http_client import HTTPClient

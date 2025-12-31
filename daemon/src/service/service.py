@@ -38,10 +38,11 @@ class Service:
         self._http_client = http_client
 
     async def start(self) -> None:
-        await asyncio.gather(
-            self._external_api_loop(),
-            self._listen_and_handle_redis(),
-        )
+        loop = asyncio.get_event_loop()
+        redis_task = loop.run_in_executor(None, self._listen_and_handle_redis)
+        api_task = self._external_api_loop()
+
+        await asyncio.gather(redis_task, api_task)
 
     async def _external_api_loop(self) -> None:
         while True:
@@ -66,7 +67,7 @@ class Service:
 
             self._r.publish(ChannelName.CREATE_TASK, json.dumps(message.to_dict()))
 
-    async def _listen_and_handle_redis(self) -> None:
+    def _listen_and_handle_redis(self) -> None:
         for message in self._pubsub.listen():
             self._handle_message(message)
 
