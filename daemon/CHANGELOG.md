@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.2.0...v0.3.0) (2025-12-31)
+
+
+### Features
+
+* use external api ([a8e9648](https://github.com/LAAC-LSCP/analysis-service/commit/a8e9648679bd1b69ce22d5029b2d990e04b836ec))
+
 ## [0.2.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.1.0...v0.2.0) (2025-12-30)
 
 
