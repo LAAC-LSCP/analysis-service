@@ -1,0 +1,40 @@
+import tomllib
+from pathlib import Path
+
+from pydantic import (
+    BaseModel,
+    Field,
+    HttpUrl,
+    ValidationError,
+)
+
+ANALYSIS_SERVICE_DIR: Path = Path.home() / "analysis-service"
+CONFIG_FILE: Path = ANALYSIS_SERVICE_DIR / "config.toml"
+
+
+class HTTPConfig(BaseModel):
+    base_url: HttpUrl = Field(description="Base URL of the site")
+    client_id: str = Field(description="Client ID")
+    client_secret: str = Field(description="Secret access key (do NOT share)")
+
+
+class ConfigModel(BaseModel):
+    http: HTTPConfig
+
+
+def load_config(file_path: Path) -> ConfigModel:
+    """
+    loads the config for the service from a toml file
+    Args:
+        file_path: path of the toml config file
+    Returns: a config object
+    """
+    with open(file_path, "rb") as f:
+        raw = tomllib.load(f)
+
+    try:
+        return ConfigModel.model_validate(raw)
+    except ValidationError as e:
+        print("Invalid configuration:")
+        print(e)
+        raise
