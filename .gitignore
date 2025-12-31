@@ -4,3 +4,6 @@
 # -- Created by VSCode -- #
 settings.json
 .vscode
+
+# -- redis -- #
+dump.rdb

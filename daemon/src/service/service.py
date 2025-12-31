@@ -1,29 +1,73 @@
+import asyncio
 import json
+from datetime import datetime, timedelta
 from typing import Type
 
 from redis import Redis
 from tenacity import Retrying, stop_after_attempt, wait_fixed
 
+from src.core.types import TaskStatus
+from src.domain.commands import CreateTask
 from src.domain.events import Event
 from src.service.handlers.types import EventHandlers
-from src.service.queue.channels import Channels
+from src.service.http_client import HTTPClient
+from src.service.queue.channels import ChannelName, Channels
 
 
 class Service:
+    S_PER_UPDATE: int = 10
+
     _channels: Channels
     _r: Redis
     _event_handlers: EventHandlers
+    _http_client: HTTPClient
 
-    def __init__(self, r: Redis, channels: Channels, event_handlers: EventHandlers):
-        channel_names = {channel.name.value for channel in channels}
-
+    def __init__(
+        self,
+        r: Redis,
+        channels: Channels,
+        event_handlers: EventHandlers,
+        http_client: HTTPClient,
+    ):
         self._pubsub = r.pubsub(ignore_subscribe_messages=True)
-        self._pubsub.subscribe(*tuple(channel_names))
+        self._pubsub.subscribe(*tuple(channels.channel_names))
 
+        self._r = r
         self._channels = channels
         self._event_handlers = event_handlers
+        self._http_client = http_client
 
-    def start(self) -> None:
+    async def start(self) -> None:
+        loop = asyncio.get_event_loop()
+        redis_task = loop.run_in_executor(None, self._listen_and_handle_redis)
+        api_task = self._external_api_loop()
+
+        await asyncio.gather(redis_task, api_task)
+
+    async def _external_api_loop(self) -> None:
+        while True:
+            current_t = datetime.now()
+
+            self.tick()
+
+            sleep_t: float = (
+                current_t + timedelta(seconds=self.S_PER_UPDATE) - datetime.now()
+            ).total_seconds()
+
+            await asyncio.sleep(sleep_t if sleep_t > 0 else 0)
+
+    def tick(self) -> None:
+        all_tasks = self._http_client.get_all_tasks()
+        new_tasks = {
+            task for task in all_tasks if task.status_label == TaskStatus.PENDING
+        }
+
+        for task in new_tasks:
+            message: CreateTask = CreateTask(task_id=task.task_uid)
+
+            self._r.publish(ChannelName.CREATE_TASK, json.dumps(message.to_dict()))
+
+    def _listen_and_handle_redis(self) -> None:
         for message in self._pubsub.listen():
             self._handle_message(message)
 
@@ -50,9 +94,6 @@ class Service:
 
         return
 
-    def stop(self) -> None:
-        self._pubsub.close()
-
     def _handle_message(self, message: dict) -> None:
         channel_name = message["channel"].decode("utf-8")
         data = json.loads(message["data"].decode("utf-8"))
@@ -60,7 +101,7 @@ class Service:
         event_cls: Type[Event] | None = next(
             (
                 channel.event
-                for channel in self._channels
+                for channel in self._channels.channels
                 if channel.name.value == channel_name
             ),
             None,
@@ -71,7 +112,7 @@ class Service:
         self._handle_event(event_cls, data)
 
     def _handle_event(self, event_cls: Type[Event], data: dict) -> None:
-        event = event_cls(**data)
+        event = event_cls.from_dict(dict_repr=data)
 
         for handler in self._event_handlers.get(event_cls, []):
             handler(event)
