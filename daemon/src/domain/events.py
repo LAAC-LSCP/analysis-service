@@ -15,12 +15,24 @@ class Event(ABC):
 
 
 @dataclass
-class TaskCreated(Event):
+class TaskStarted(Event):
     task_id: UUID
 
     def to_dict(self) -> dict:
         return {"task_id": str(self.task_id)}
 
     @classmethod
-    def from_dict(self, dict_repr: dict) -> "TaskCreated":
-        return TaskCreated(task_id=UUID(dict_repr["task_id"]))
+    def from_dict(self, dict_repr: dict) -> "TaskStarted":
+        return TaskStarted(task_id=UUID(dict_repr["task_id"]))
+
+
+@dataclass
+class TaskCompleted(Event):
+    task_id: UUID
+
+    def to_dict(self) -> dict:
+        return {"task_id": str(self.task_id)}
+
+    @classmethod
+    def from_dict(self, dict_repr: dict) -> "TaskStarted":
+        return TaskStarted(task_id=UUID(dict_repr["task_id"]))

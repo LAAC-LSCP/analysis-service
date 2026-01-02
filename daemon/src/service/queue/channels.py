@@ -6,7 +6,8 @@ import src.domain.events as events
 
 
 class ChannelName(StrEnum):
-    CREATE_TASK = "create_task"
+    RUN_VTC = "run_vtc"
+    COMPLETE_TASK = "complete_task"
 
 
 @dataclass(frozen=True)
@@ -42,8 +43,12 @@ def get_channels() -> Channels:
     return Channels(
         {
             ChannelDict(
-                name=ChannelName.CREATE_TASK,
-                event=events.TaskCreated,
+                name=ChannelName.RUN_VTC,
+                event=events.TaskStarted,
+            ),
+            ChannelDict(
+                name=ChannelName.COMPLETE_TASK,
+                event=events.TaskCompleted,
             ),
         }
     )
