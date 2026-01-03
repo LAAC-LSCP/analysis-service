@@ -7,3 +7,6 @@ settings.json
 
 # -- redis -- #
 dump.rdb
+
+# -- local env file for if I want to skip containers while debugging -- #
+.local-env
