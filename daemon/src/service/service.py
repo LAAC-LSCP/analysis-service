@@ -7,7 +7,7 @@ from redis import Redis
 from tenacity import Retrying, stop_after_attempt, wait_fixed
 
 from src.core.types import TaskStatus
-from src.domain.commands import CreateTask
+from src.domain.commands import RunTask
 from src.domain.events import Event
 from src.service.handlers.types import EventHandlers
 from src.service.http_client import HTTPClient
@@ -63,9 +63,9 @@ class Service:
         }
 
         for task in new_tasks:
-            message: CreateTask = CreateTask(task_id=task.task_uid)
+            message: RunTask = RunTask(task_id=task.task_uid)
 
-            self._r.publish(ChannelName.CREATE_TASK, json.dumps(message.to_dict()))
+            self._r.publish(ChannelName.RUN_VTC, json.dumps(message.to_dict()))
 
     def _listen_and_handle_redis(self) -> None:
         for message in self._pubsub.listen():

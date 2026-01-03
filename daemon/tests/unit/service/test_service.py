@@ -40,13 +40,13 @@ def test_service_get_new_task(task_factory: TaskFactory):
     service.get_next_message_and_handle()
 
     assert len(event_tester.calls) == 2
-    assert event_tester.calls[0]["type"] == events.TaskCreated
+    assert event_tester.calls[0]["type"] == events.TaskStarted
     assert event_tester.calls[0]["handler_name"] == "handle_task_created"
-    assert event_tester.calls[0]["message"] == events.TaskCreated(
+    assert event_tester.calls[0]["message"] == events.TaskStarted(
         task_id=UUID("70a1acc6-f5fd-44ea-8b41-bc4b3e4cfc02")
     )
-    assert event_tester.calls[1]["type"] == events.TaskCreated
+    assert event_tester.calls[1]["type"] == events.TaskStarted
     assert event_tester.calls[1]["handler_name"] == "send_update"
-    assert event_tester.calls[1]["message"] == events.TaskCreated(
+    assert event_tester.calls[1]["message"] == events.TaskStarted(
         task_id=UUID("70a1acc6-f5fd-44ea-8b41-bc4b3e4cfc02")
     )

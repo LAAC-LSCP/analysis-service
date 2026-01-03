@@ -1,13 +1,11 @@
-name: Pull Request Checks
+name: PR Checks (Reusable)
 
 on:
-- pull_request
-- merge_group
-
-concurrency:
-  # Only allow one run at a time of this workflow per PR
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
+  workflow_call:
+    inputs:
+      working-directory:
+        required: true
+        type: string
 
 jobs:
   format:
@@ -23,13 +21,13 @@ jobs:
       run: python -m pip install tox
     - name: Run linting checks
       run: tox -e lint
-      working-directory: daemon
+      working-directory: ${{ inputs.working-directory }}
     - name: Run formatting checks
       run: tox -e format
-      working-directory: daemon
+      working-directory: ${{ inputs.working-directory }}
     - name: Run type checks
       run: tox -e typecheck
-      working-directory: daemon
+      working-directory: ${{ inputs.working-directory }}
 
   test:
     name: Test
@@ -58,14 +56,31 @@ jobs:
           brew install redis
         fi
     - name: Run unit tests
-      run: tox -e ${{ matrix.python.toxenv }} -- tests/unit --randomly-seed=$RANDOM
-      working-directory: daemon
+      run: |
+        if [ -d "tests/unit" ]; then
+          tox -e ${{ matrix.python.toxenv }} -- tests/unit --randomly-seed=$RANDOM
+        else
+          echo "No unit tests found, skipping."
+        fi
+      working-directory: ${{ inputs.working-directory }}
       env:
         REDIS_HOST: localhost
         REDIS_PORT: 6379
+    - name: Run integration tests
+      run: |
+        if [ -d "tests/integration" ]; then
+          tox -e ${{ matrix.python.toxenv }} -- tests/integration --randomly-seed=$RANDOM
+        else
+          echo "No integration tests found, skipping."
+        fi
     - name: Run E2E tests
-      run: tox -e ${{ matrix.python.toxenv }} -- tests/e2e --randomly-seed=$RANDOM
-      working-directory: daemon
+      run: |
+        if [ -d "tests/e2e" ]; then
+          tox -e ${{ matrix.python.toxenv }} -- tests/e2e --randomly-seed=$RANDOM
+        else
+          echo "No e2e tests found, skipping."
+        fi
+      working-directory: ${{ inputs.working-directory }}
       env:
         REDIS_HOST: localhost
         REDIS_PORT: 6379
