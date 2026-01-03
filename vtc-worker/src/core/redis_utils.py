@@ -1,7 +1,8 @@
+import os
 from typing import TypedDict
 
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
+REDIS_HOST: str | None = os.environ.get("REDIS_HOST", None)
+REDIS_PORT: int | None = int(os.environ.get("REDIS_PORT", None))
 
 
 class RedisInfo(TypedDict):
