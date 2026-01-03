@@ -1,6 +1,6 @@
 [project]
 name = "analysis-service-tests"
-version = "0.1.0"
+version = "0.2.0"
 description = "e2e and integration tests for analysis service"
 authors = [
     {name = "Lawrence Borst",email = "laurens.s.borst@gmail.com"}
