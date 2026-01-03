@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.3.0...v0.4.0) (2026-01-03)
+
+
+### Features
+
+* add worker ([35d1024](https://github.com/LAAC-LSCP/analysis-service/commit/35d1024684b448e7b40037d9dc8f28222fa9d87f))
+
 ## [0.3.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.2.0...v0.3.0) (2025-12-31)
 
 
