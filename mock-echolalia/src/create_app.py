@@ -3,7 +3,7 @@ import secrets
 from flask import Flask, jsonify, request
 from flask_httpauth import HTTPTokenAuth
 
-from src.types import Database, FlaskConfig
+from src.app_types import Database, FlaskConfig
 
 
 def create_app(

@@ -5,7 +5,7 @@ import click
 import yaml
 
 from src.create_app import create_app
-from src.types import Database
+from src.app_types import Database
 
 EXPECTED_CLIENT_ID = os.environ.get("EXPECTED_CLIENT_ID", None)
 EXPECTED_CLIENT_SECRET = os.environ.get("EXPECTED_CLIENT_SECRET", None)

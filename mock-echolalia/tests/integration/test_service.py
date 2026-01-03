@@ -6,7 +6,7 @@ from flask import Flask
 from flask.testing import FlaskClient
 
 from src.create_app import create_app
-from src.types import Database, FlaskConfig, Task
+from src.app_types import Database, FlaskConfig, Task
 
 
 @pytest.fixture
