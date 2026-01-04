@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.4.0...v0.5.0) (2026-01-04)
+
+
+### Features
+
+* use docker ([0206489](https://github.com/LAAC-LSCP/analysis-service/commit/0206489dc64f799be02bb1a0028dd02b84010ad7))
+
 ## [0.4.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.3.0...v0.4.0) (2026-01-03)
 
 
