@@ -1,0 +1,59 @@
+services:
+  echoservice-test-redis:
+    image: redis:7-alpine
+    container_name: echoservice-test-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - echoservice-test
+    environment:
+      - REDIS_HOST=echoservice-test-redis
+      - REDIS_PORT=6379
+  echoservice-test-mock-server:
+    container_name: echoservice-test-mock-server
+    build:
+      context: ./mock-echolalia
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      - echoservice-test
+    environment:
+      - EXPECTED_CLIENT_ID=my-client-id
+      - EXPECTED_CLIENT_SECRET=my-client-secret
+      - FLASK_PORT=8080
+  echoservice-test-daemon:
+    container_name: echoservice-test-daemon
+    build:
+      context: ./daemon
+      dockerfile: Dockerfile
+    depends_on:
+      - echoservice-test-redis
+    networks:
+      - echoservice-test
+      - echoservice-external
+    environment:
+      - REDIS_HOST=echoservice-test-redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./test-config.toml:/app/config.toml
+  echoservice-test-e2e:
+    container_name: echoservice-test-e2e
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    depends_on:
+      - echoservice-test-mock-server
+      - echoservice-test-redis
+      - echoservice-test-daemon
+    networks:
+      - echoservice-test
+    environment:
+      - REDIS_HOST=echoservice-test-redis
+      - REDIS_PORT=6379
+networks:
+  echoservice-test:
+    driver: bridge
+    internal: true
+  echoservice-external:
+    external: true

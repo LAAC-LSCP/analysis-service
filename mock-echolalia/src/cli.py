@@ -4,8 +4,8 @@ from pathlib import Path
 import click
 import yaml
 
-from src.create_app import create_app
 from src.app_types import Database
+from src.create_app import create_app
 
 EXPECTED_CLIENT_ID = os.environ.get("EXPECTED_CLIENT_ID", None)
 EXPECTED_CLIENT_SECRET = os.environ.get("EXPECTED_CLIENT_SECRET", None)
