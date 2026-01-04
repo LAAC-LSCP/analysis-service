@@ -17,8 +17,11 @@ def test_run_vtc_sends_to_redis():
     pubsub.subscribe(ChannelName.COMPLETE_TASK)
 
     run_vtc(r, task_id=id)
-    pubsub.get_message()  # subscription confirmation
-    message = pubsub.get_message(timeout=1.0)
+
+    message = pubsub.get_message(timeout=1.0, ignore_subscribe_messages=True)
+
+    # NOTE: bug or misfeature in redis-py. Subscribe message comes through as 'None'
+    message = pubsub.get_message(timeout=1.0, ignore_subscribe_messages=True)
 
     data = RunTask.from_dict(json.loads(message["data"].decode("utf-8")))
     assert data == RunTask(task_id=id)

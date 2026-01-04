@@ -4,7 +4,6 @@ from pathlib import Path
 from pydantic import BaseModel, Field, HttpUrl, ValidationError
 
 ANALYSIS_SERVICE_DIR: Path = Path.home() / "analysis-service"
-CONFIG_FILE: Path = ANALYSIS_SERVICE_DIR / "config.toml"
 
 
 class HTTPConfig(BaseModel):

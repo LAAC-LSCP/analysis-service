@@ -1,17 +1,18 @@
 [project]
-name = "vtc-worker"
+name = "mock-echolalia"
 version = "0.2.0"
-description = "package and associated code for running vtc on a dataset"
+description = "mocked echolalia server for E2E testing"
 authors = [
     {name = "Lawrence Borst",email = "laurens.s.borst@gmail.com"}
 ]
 license = {text = "MIT"}
 requires-python = ">=3.13"
 dependencies = [
-    "redis (>=7.1.0,<8.0.0)",
+    "flask (>=3.1.2,<4.0.0)",
     "click (>=8.3.1,<9.0.0)",
-    "tenacity (>=9.1.2,<10.0.0)",
-    "pytest (>=9.0.2,<10.0.0)"
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "pydantic (>=2.12.5,<3.0.0)",
+    "flask-httpauth (>=4.8.0,<5.0.0)"
 ]
 
 [dependency-groups]

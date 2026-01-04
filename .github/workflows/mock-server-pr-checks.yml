@@ -1,4 +1,4 @@
-name: Daemon Pull Request Checks
+name: Mock Server Pull Request Checks
 
 on:
 - pull_request
@@ -13,5 +13,5 @@ jobs:
   pr-checks:
     uses: ./.github/workflows/pr-checks-reusable.yml
     with:
-      working-directory: daemon
+      working-directory: mock-echolalia
     secrets: inherit

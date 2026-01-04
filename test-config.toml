@@ -1,0 +1,4 @@
+[http]
+base_url = "http://echoservice-test-mock-server:8080"
+client_id = "my-client-id"
+client_secret = "my-client-secret"

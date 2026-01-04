@@ -1,0 +1,48 @@
+name: PR Complete E2E tests
+
+on:
+- pull_request
+- merge_group
+
+concurrency:
+  # Only allow one run at a time of this workflow per PR
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4.0.0
+      with:
+        python-version: "3.13"
+    - name: Install tox
+      run: python -m pip install tox
+    - name: Run linting checks
+      run: tox -e lint
+      working-directory: tests
+    - name: Run formatting checks
+      run: tox -e format
+      working-directory: tests
+    - name: Run type checks
+      run: tox -e typecheck
+      working-directory: tests
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create external network
+      run: docker network create echoservice-external
+    - name: Run full E2E tests with Docker Compose
+      run: |
+        docker compose -f docker-compose.test.yml up \
+        --build \
+        --abort-on-container-exit \
+        --exit-code-from echoservice-test-e2e
+

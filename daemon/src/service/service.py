@@ -83,7 +83,9 @@ class Service:
             reraise=True,
         ):
             with attempt:
-                message = self._pubsub.get_message(timeout=1)
+                message = self._pubsub.get_message(
+                    timeout=1, ignore_subscribe_messages=True
+                )
 
                 if message:
                     self._handle_message(message)

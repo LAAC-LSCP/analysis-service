@@ -12,7 +12,13 @@ dependencies = [
     "tenacity (>=9.1.2,<10.0.0)",
     "pydantic (>=2.12.5,<3.0.0)",
     "requests (>=2.32.5,<3.0.0)",
-    "asyncio (>=4.0.0,<5.0.0)"
+    "asyncio (>=4.0.0,<5.0.0)",
+    "click (>=8.3.1,<9.0.0)"
+]
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)"
 ]
 
 
@@ -42,7 +48,3 @@ include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
-[dependency-groups]
-dev = [
-    "pytest (>=9.0.2,<10.0.0)"
-]
