@@ -41,14 +41,54 @@ def create_app(
     def verify_token(token):
         return token in app.config[FlaskConfig.TOKENS]
 
-    @app.route("/tasks", methods=["GET"])
+    @app.route("/api/analytics/services/tasks", methods=["GET"])
     @auth.login_required
-    def show_tasks():
+    def get_tasks():
+        print("Received request to get all tasks")
         db: Database = app.config[FlaskConfig.TASK_DB]
         tasks = db.tasks
 
-        task_dict = [task.dict() for task in tasks]
+        task_dict = [task.model_dump() for task in tasks]
 
         return jsonify(task_dict)
+
+    @app.route("/api/analytics/services/tasks/<task_id>", methods=["GET"])
+    @auth.login_required
+    def get_task(task_id):
+        print(f"Received request to get task with id '{task_id}'")
+        db: Database = app.config[FlaskConfig.TASK_DB]
+
+        task = next((t for t in db.tasks if str(t.task_uid) == task_id), None)
+
+        if task is None:
+            return jsonify({"error": "Task not found"}), 404
+
+        return jsonify(task.model_dump())
+
+    @app.route("/api/analytics/services/tasks/<task_id>", methods=["PUT"])
+    @auth.login_required
+    def update_task(task_id):
+        print(
+            f"Received request to update task with id '{task_id}' and \
+data '{request.json}'"
+        )
+        db: Database = app.config[FlaskConfig.TASK_DB]
+        data = request.json
+
+        if not data:
+            return jsonify({"error": "No JSON data provided"}), 400
+
+        task = next((t for t in db.tasks if str(t.task_uid) == task_id), None)
+
+        if task is None:
+            return jsonify({"error": "Task not found"}), 404
+
+        if "status" in data:
+            task.status_label = data["status"].lower()
+
+        if "estimated_duration" in data:
+            task.estimated_duration = data["estimated_duration"]
+
+        return jsonify(task.model_dump())
 
     return app

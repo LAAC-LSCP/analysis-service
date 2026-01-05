@@ -14,6 +14,12 @@ def update_echolalia(http_client: HTTPClient, task_status: TaskStatus) -> EventH
             },
         )
 
+        print(
+            f"Sent update to Echolalia for task \
+{str(event.task_id)} with status '{str(task_status)}' and \
+estimated duration '{0}'"
+        )
+
     return send_update
 
 

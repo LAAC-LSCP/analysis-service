@@ -50,6 +50,7 @@ def start_app(db):
         expected_client_id=EXPECTED_CLIENT_ID,
         expected_client_secret=EXPECTED_CLIENT_SECRET,
     )
+    print("Running mock server...")
     app.run(debug=True, host="0.0.0.0", port=FLASK_PORT)
 
 

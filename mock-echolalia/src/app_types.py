@@ -6,8 +6,14 @@ from pydantic import BaseModel
 
 
 class Task(BaseModel):
-    uuid: UUID
-    status: Literal["PENDING", "RUNNING", "COMPLETED"]
+    task_uid: UUID
+    model_name: str
+    status_label: Literal["pending", "running", "completed"]
+    user_uid: UUID
+    dataset_name: str
+    dataset_uid_label: str
+    created: str  # TODO: work with datetimes
+    modified: str
     estimated_duration: int
 
 

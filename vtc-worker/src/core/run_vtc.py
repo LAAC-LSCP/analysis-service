@@ -82,7 +82,7 @@ def move_file(rel_path: Path, output_dir: Path, input_file: Path) -> None:
 def run_subprocess(bash_script: str, output_dir: Path, file: Path) -> None:
     # Note that vtc has a quirk that it puts outputs in the current working dir
     result = subprocess.run(
-        bash_script, shell=True, cwd=output_dir, capture_output=True, text=True
+        ["bash", "-c", bash_script], cwd=output_dir, capture_output=True, text=True
     )
 
     if result.returncode == 0:

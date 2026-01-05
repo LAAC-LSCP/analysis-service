@@ -1,10 +1,10 @@
 tasks:
-  - uuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-    status: PENDING
+  - task_uid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    model_name: "vtc"
+    status_label: "pending"
+    user_uid: "d9c30005-ab97-4daa-bc34-c6ffc4caeeac"
+    dataset_name: "simple-test-dataset"
+    dataset_uid_label: "simple-test-dataset"
+    created: "2025-12-18T12:50:45.705711+01:00"
+    modified: "2025-12-31T03:01:25.651183+01:00"
     estimated_duration: 15
-  - uuid: "b2c3d4e5-f6a1-8901-bcde-fa2345678901"
-    status: RUNNING
-    estimated_duration: 30
-  - uuid: "c3d4e5f6-a1b2-9012-cdef-ab3456789012"
-    status: COMPLETED
-    estimated_duration: 10

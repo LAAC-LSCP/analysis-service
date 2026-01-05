@@ -19,4 +19,4 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY tests ./tests
 
 ENTRYPOINT ["pytest"]
-CMD ["tests/"]
+CMD ["-s"]

@@ -23,7 +23,9 @@ def run_vtc():
 
     config = get_config()
 
+    print("Starting vtc...")
     for message in pubsub.listen():
+        print(f"Listening in on channel '{ChannelName.RUN_VTC}'")
         data: dict = json.loads(message["data"].decode("utf-8"))
 
         run_task = RunTask.from_dict(dict_repr=data)
@@ -36,6 +38,7 @@ def run_vtc():
 
         run_vtc_cmd(run_task.task_id, run_task.dataset_uid_label, config)
 
+        print("VTC ran successfully. Publishing to redis...")
         r.publish(
             ChannelName.COMPLETE_TASK,
             json.dumps(CompleteTask(task_id=run_task.task_id).to_dict()),
