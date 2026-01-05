@@ -5,7 +5,8 @@ COPY pyproject.toml poetry.lock ./
 
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 
-RUN pip install --no-cache-dir poetry && \
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir poetry && \
     poetry install --without dev --no-root
 
 FROM python:3.13-slim AS runtime

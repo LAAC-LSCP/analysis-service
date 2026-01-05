@@ -34,5 +34,5 @@ class TaskCompleted(Event):
         return {"task_id": str(self.task_id)}
 
     @classmethod
-    def from_dict(self, dict_repr: dict) -> "TaskStarted":
-        return TaskStarted(task_id=UUID(dict_repr["task_id"]))
+    def from_dict(self, dict_repr: dict) -> "TaskCompleted":
+        return TaskCompleted(task_id=UUID(dict_repr["task_id"]))

@@ -63,7 +63,11 @@ class Service:
         }
 
         for task in new_tasks:
-            message: RunTask = RunTask(task_id=task.task_uid)
+            message: RunTask = RunTask(
+                task_id=task.task_uid,
+                dataset_uid_label=task.dataset_uid_label,
+                operation=task.model_name,
+            )
 
             self._r.publish(ChannelName.RUN_VTC, json.dumps(message.to_dict()))
 
