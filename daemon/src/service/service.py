@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from typing import Type
 
 from redis import Redis
+from redis.client import PubSub
 from tenacity import Retrying, stop_after_attempt, wait_fixed
 
 from src.core.types import TaskStatus
@@ -21,6 +22,7 @@ class Service:
     _r: Redis
     _event_handlers: EventHandlers
     _http_client: HTTPClient
+    _pubsub: PubSub
 
     def __init__(
         self,
@@ -38,6 +40,7 @@ class Service:
         self._http_client = http_client
 
     async def start(self) -> None:
+        print("Daemon started")
         loop = asyncio.get_event_loop()
         redis_task = loop.run_in_executor(None, self._listen_and_handle_redis)
         api_task = self._external_api_loop()
@@ -48,6 +51,7 @@ class Service:
         while True:
             current_t = datetime.now()
 
+            print("Loading new tasks...")
             self.tick()
 
             sleep_t: float = (
@@ -58,13 +62,22 @@ class Service:
 
     def tick(self) -> None:
         all_tasks = self._http_client.get_all_tasks()
+
         new_tasks = {
             task for task in all_tasks if task.status_label == TaskStatus.PENDING
         }
 
-        for task in new_tasks:
-            message: RunTask = RunTask(task_id=task.task_uid)
+        if len(new_tasks) != 0:
+            print(f"Received new tasks: {new_tasks}")
 
+        for task in new_tasks:
+            message: RunTask = RunTask(
+                task_id=task.task_uid,
+                dataset_uid_label=task.dataset_uid_label,
+                operation=task.model_name,
+            )
+
+            print(f"Publishing task with id '{task.task_uid}' to VTC")
             self._r.publish(ChannelName.RUN_VTC, json.dumps(message.to_dict()))
 
     def _listen_and_handle_redis(self) -> None:
@@ -97,6 +110,7 @@ class Service:
         return
 
     def _handle_message(self, message: dict) -> None:
+        print(f"Handling message: {message["data"].decode("utf-8")}")
         channel_name = message["channel"].decode("utf-8")
         data = json.loads(message["data"].decode("utf-8"))
 

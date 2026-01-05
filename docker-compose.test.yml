@@ -22,11 +22,31 @@ services:
       - EXPECTED_CLIENT_ID=my-client-id
       - EXPECTED_CLIENT_SECRET=my-client-secret
       - FLASK_PORT=8080
+      - PYTHONUNBUFFERED=1
   echoservice-test-daemon:
     container_name: echoservice-test-daemon
     build:
       context: ./daemon
       dockerfile: Dockerfile
+    depends_on:
+      - echoservice-test-redis
+      - echoservice-test-vtc-worker
+    networks:
+      - echoservice-test
+      - echoservice-external
+    environment:
+      - REDIS_HOST=echoservice-test-redis
+      - REDIS_PORT=6379
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./tests/dummy_echolalia_folder:/app/echolalia
+      - /app/echolalia/outputs # will ignore it
+  echoservice-test-vtc-worker:
+    container_name: echoservice-test-vtc-worker
+    build:
+      context: ./vtc-worker
+      dockerfile: Dockerfile
+      network: host
     depends_on:
       - echoservice-test-redis
     networks:
@@ -35,8 +55,17 @@ services:
     environment:
       - REDIS_HOST=echoservice-test-redis
       - REDIS_PORT=6379
+      - ECHOLALIA_DIR=/app/echolalia
+      - DATASETS_DIR=/app/datasets
+      - CONDA_ENV_NAME=pyannote
+      - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
+      - PYTHONUNBUFFERED=1
     volumes:
-      - ./test-config.toml:/app/config.toml
+      - ./tests/dummy_echolalia_folder/test-config.toml:/app/echolalia/test-config.toml
+      - ./tests/dummy_datasets:/app/datasets
+      - ./vtc-worker/vtc:/app/vtc
+      - /app/vtc/voice-type-classifier/model/ # will ignore it
+      - /app/vtc/voice-type-classifier/pyannote_tmp_config/ # will ignore it
   echoservice-test-e2e:
     container_name: echoservice-test-e2e
     build:
@@ -46,11 +75,13 @@ services:
       - echoservice-test-mock-server
       - echoservice-test-redis
       - echoservice-test-daemon
+      - echoservice-test-vtc-worker
     networks:
       - echoservice-test
     environment:
       - REDIS_HOST=echoservice-test-redis
       - REDIS_PORT=6379
+      - PYTHONUNBUFFERED=1
 networks:
   echoservice-test:
     driver: bridge

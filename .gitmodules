@@ -1,0 +1,3 @@
+[submodule "vtc-worker/vtc/voice-type-classifier"]
+	path = vtc-worker/vtc/voice-type-classifier
+	url = git@github.com:MarvinLvn/voice-type-classifier.git

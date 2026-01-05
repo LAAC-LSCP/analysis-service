@@ -1,0 +1,4 @@
+experiment,child_id,date_iso,start_time,recording_device_type,recording_filename
+test,1,2011-01-01,08:25:30,lena,child_1/1_1.wav
+test,1,2011-01-01,13:15:00,lena,child_1/1_2.wav
+test,2,2011-01-05,08:23:00,lena,child_2/2_1.wav
