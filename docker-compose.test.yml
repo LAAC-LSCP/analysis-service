@@ -41,6 +41,7 @@ services:
     volumes:
       - ./tests/dummy_echolalia_folder:/app/echolalia
       - /app/echolalia/outputs # will ignore it
+    command: ["-m", "src.cli", "--config", "/app/echolalia/test-config.toml"]
   echoservice-test-vtc-worker:
     container_name: echoservice-test-vtc-worker
     build:
