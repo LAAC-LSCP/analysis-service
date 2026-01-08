@@ -3,8 +3,6 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, HttpUrl, ValidationError
 
-ANALYSIS_SERVICE_DIR: Path = Path.home() / "analysis-service"
-
 
 class HTTPConfig(BaseModel):
     base_url: HttpUrl = Field(description="Base URL of the site")
