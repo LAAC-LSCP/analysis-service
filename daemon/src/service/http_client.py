@@ -77,9 +77,6 @@ class HTTPClient:
             response.raise_for_status()
             data = response.json()
 
-            print(data)
-            print({external_api.Task.from_dict(task) for task in data})
-
             return {external_api.Task.from_dict(task) for task in data}
         except requests.RequestException as exc:
             raise RuntimeError(

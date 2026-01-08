@@ -1,42 +1,36 @@
 import asyncio
-import json
 from datetime import datetime, timedelta
 from typing import Type
 
-from redis import Redis
-from redis.client import PubSub
+from analysis_service_core.src.model import RunTask
+from analysis_service_core.src.redis.channels import ChannelName, Channels
+from analysis_service_core.src.redis.commands import Command
+from analysis_service_core.src.redis.pubsub import PubSub
 from tenacity import Retrying, stop_after_attempt, wait_fixed
 
 from src.core.types import TaskStatus
-from src.domain.commands import RunTask
-from src.domain.events import Event
-from src.service.handlers.types import EventHandlers
+from src.service.command_handlers import CommandHandlers
 from src.service.http_client import HTTPClient
-from src.service.queue.channels import ChannelName, Channels
 
 
 class Service:
     S_PER_UPDATE: int = 10
 
     _channels: Channels
-    _r: Redis
-    _event_handlers: EventHandlers
+    _command_handlers: CommandHandlers
     _http_client: HTTPClient
     _pubsub: PubSub
 
     def __init__(
         self,
-        r: Redis,
+        pubsub: PubSub,
         channels: Channels,
-        event_handlers: EventHandlers,
+        command_handlers: CommandHandlers,
         http_client: HTTPClient,
     ):
-        self._pubsub = r.pubsub(ignore_subscribe_messages=True)
-        self._pubsub.subscribe(*tuple(channels.channel_names))
-
-        self._r = r
+        self._pubsub = pubsub
         self._channels = channels
-        self._event_handlers = event_handlers
+        self._command_handlers = command_handlers
         self._http_client = http_client
 
     async def start(self) -> None:
@@ -78,7 +72,7 @@ class Service:
             )
 
             print(f"Publishing task with id '{task.task_uid}' to VTC")
-            self._r.publish(ChannelName.RUN_VTC, json.dumps(message.to_dict()))
+            self._pubsub.publish(ChannelName.RUN_VTC, message)
 
     def _listen_and_handle_redis(self) -> None:
         for message in self._pubsub.listen():
@@ -96,9 +90,7 @@ class Service:
             reraise=True,
         ):
             with attempt:
-                message = self._pubsub.get_message(
-                    timeout=1, ignore_subscribe_messages=True
-                )
+                message = self._pubsub.get_message(timeout=1)
 
                 if message:
                     self._handle_message(message)
@@ -110,25 +102,25 @@ class Service:
         return
 
     def _handle_message(self, message: dict) -> None:
-        print(f"Handling message: {message["data"].decode("utf-8")}")
-        channel_name = message["channel"].decode("utf-8")
-        data = json.loads(message["data"].decode("utf-8"))
+        print(f"Handling message: {message}")
+        channel_name = self._pubsub.get_channel_from_message(message)
+        data = self._pubsub.get_data_from_message(message)
 
-        event_cls: Type[Event] | None = next(
+        command_cls: Type[Command] | None = next(
             (
-                channel.event
+                channel.command
                 for channel in self._channels.channels
                 if channel.name.value == channel_name
             ),
             None,
         )
-        if event_cls is None:
-            raise ValueError("Event not associated with a channel")
+        if command_cls is None:
+            raise ValueError("Command not associated with a channel")
 
-        self._handle_event(event_cls, data)
+        self._handle_cmd(command_cls, data)
 
-    def _handle_event(self, event_cls: Type[Event], data: dict) -> None:
-        event = event_cls.from_dict(dict_repr=data)
+    def _handle_cmd(self, command_cls: Type[Command], data: dict) -> None:
+        command = command_cls.from_dict(dict_repr=data)
 
-        for handler in self._event_handlers.get(event_cls, []):
-            handler(event)
+        for handler in self._command_handlers.get(command_cls, []):
+            handler(command)

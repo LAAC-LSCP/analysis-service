@@ -13,7 +13,8 @@ dependencies = [
     "pydantic (>=2.12.5,<3.0.0)",
     "requests (>=2.32.5,<3.0.0)",
     "asyncio (>=4.0.0,<5.0.0)",
-    "click (>=8.3.1,<9.0.0)"
+    "click (>=8.3.1,<9.0.0)",
+    "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git@ae562330e3cf2195bb66146d7fd2f0630a48144b"
 ]
 
 [dependency-groups]
@@ -35,6 +36,8 @@ include = [
 ]
 
 
+[tool.poetry.dependencies]
+analysis-service-core = {develop = true}
 [tool.black]
 line-length = 88
 target-version = ["py313"]

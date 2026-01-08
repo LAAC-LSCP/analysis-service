@@ -4,7 +4,7 @@ tasks:
     status_label: "pending"
     user_uid: "d9c30005-ab97-4daa-bc34-c6ffc4caeeac"
     dataset_name: "simple-test-dataset"
-    dataset_uid_label: "simple-test-dataset"
+    dataset_uid_label: "simple-test-dataset_d34200f0-07dc-48e7-8508-8436c5b20ed6"
     created: "2025-12-18T12:50:45.705711+01:00"
     modified: "2025-12-31T03:01:25.651183+01:00"
     estimated_duration: 15
