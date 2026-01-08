@@ -1,0 +1,16 @@
+[project]
+name = "alice-worker"
+version = "0.1.0"
+description = "package and associated code for running alice on a dataset"
+authors = [
+    {name = "Lawrence Borst",email = "laurens.s.borst@gmail.com"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.13"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
