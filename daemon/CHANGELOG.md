@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.6.0...v0.7.0) (2026-01-08)
+
+
+### Features
+
+* add core package ([7843aed](https://github.com/LAAC-LSCP/analysis-service/commit/7843aed54ff105b949f15d53b92b209e832a00e4))
+
 ## [0.6.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.5.0...v0.6.0) (2026-01-05)
 
 
