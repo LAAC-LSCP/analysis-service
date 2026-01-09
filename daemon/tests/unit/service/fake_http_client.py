@@ -3,10 +3,9 @@ from uuid import UUID
 
 from src.core.echolalia_api import PutPayload, Task, Tasks
 from src.core.types import TaskStatus
-from src.service.http_client import HTTPClient
 
 
-class FakeHTTPClient(HTTPClient):
+class FakeHTTPClient:
     """
     Fake HTTP Client
     Everytime the fake client is called it cycles over the results
