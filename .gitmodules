@@ -1,3 +1,6 @@
 [submodule "vtc-worker/vtc/voice-type-classifier"]
 	path = vtc-worker/vtc/voice-type-classifier
 	url = git@github.com:MarvinLvn/voice-type-classifier.git
+[submodule "ALICE_no_vtc"]
+	path = alice-worker/ALICE
+	url = git@github.com:LoannPeurey/ALICE.git
