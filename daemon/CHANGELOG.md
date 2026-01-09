@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.7.0...v0.8.0) (2026-01-09)
+
+
+### Features
+
+* add alice ([0792e60](https://github.com/LAAC-LSCP/analysis-service/commit/0792e60cb7049b027d5bc5b88cf09ba70b083eb0))
+
 ## [0.7.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.6.0...v0.7.0) (2026-01-08)
 
 
