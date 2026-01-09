@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Type
 
 from analysis_service_core.src.model import RunTask
-from analysis_service_core.src.redis.channels import ChannelName, Channels
+from analysis_service_core.src.redis.channels import Channels
 from analysis_service_core.src.redis.commands import Command
 from analysis_service_core.src.redis.pubsub import PubSub
 from tenacity import Retrying, stop_after_attempt, wait_fixed
@@ -71,8 +71,9 @@ class Service:
                 operation=task.model_name,
             )
 
-            print(f"Publishing task with id '{task.task_uid}' to VTC")
-            self._pubsub.publish(ChannelName.RUN_VTC, message)
+            print(f"Publishing task with id '{task.task_uid}' to redis")
+            for handler in self._command_handlers.get(RunTask, []):
+                handler(message)
 
     def _listen_and_handle_redis(self) -> None:
         for message in self._pubsub.listen():

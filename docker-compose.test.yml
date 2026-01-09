@@ -63,6 +63,29 @@ services:
     volumes:
       - ./tests/dummy_echolalia_folder/test-config.toml:/app/echolalia/test-config.toml
       - ./tests/dummy_datasets:/app/datasets
+  echoservice-test-alice-worker:
+    platform: linux/amd64
+    container_name: echoservice-test-alice-worker
+    build:
+      context: ./alice-worker
+      dockerfile: Dockerfile
+      network: host
+    depends_on:
+      - echoservice-test-redis
+    networks:
+      - echoservice-test
+      - echoservice-test-external
+    environment:
+      - REDIS_HOST=echoservice-test-redis
+      - REDIS_PORT=6379
+      - ECHOLALIA_DIR=/app/echolalia
+      - DATASETS_DIR=/app/datasets
+      - CONDA_ENV_NAME=ALICE
+      - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./tests/dummy_echolalia_folder/test-config.toml:/app/echolalia/test-config.toml
+      - ./tests/dummy_datasets:/app/datasets
   echoservice-test-e2e:
     container_name: echoservice-test-e2e
     build:

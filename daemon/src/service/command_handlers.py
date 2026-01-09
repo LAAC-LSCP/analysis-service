@@ -1,8 +1,10 @@
 from typing import Any, Dict, List, Protocol, Type, TypeVar
 
 import analysis_service_core.src.redis.commands as commands
+from analysis_service_core.src.redis.channels import ChannelName
+from analysis_service_core.src.redis.pubsub import PubSub
 
-from src.core.types import TaskStatus
+from src.core.types import Operation, TaskStatus
 from src.service.http_client import HTTPClient
 
 CommandT = TypeVar("CommandT", bound=commands.Command, contravariant=True)
@@ -36,14 +38,20 @@ estimated duration '{0}'"
     return send_update
 
 
-def handle_run_task(command: commands.RunTask) -> None:
-    print(f"Task with id '{command.task_id}' created!")
+def handle_run_task(pubsub: PubSub) -> CommandHandler:
+    def send_request(command: commands.RunTask) -> None:
+        if command.operation == Operation.VTC:
+            pubsub.publish(ChannelName.RUN_VTC, command)
+        elif command.operation == Operation.ALICE:
+            pubsub.publish(ChannelName.RUN_ALICE, command)
+
+    return send_request
 
 
-def get_command_handlers(http_client: HTTPClient) -> CommandHandlers:
+def get_command_handlers(http_client: HTTPClient, pubsub: PubSub) -> CommandHandlers:
     return {
         commands.RunTask: [
-            handle_run_task,
+            handle_run_task(pubsub),
             update_echolalia(http_client, TaskStatus.RUNNING),
         ],
         commands.CompleteTask: [update_echolalia(http_client, TaskStatus.COMPLETED)],

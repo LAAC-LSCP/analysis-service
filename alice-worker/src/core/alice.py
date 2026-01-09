@@ -1,0 +1,90 @@
+import os
+import shutil
+import subprocess
+from pathlib import Path
+from typing import Set
+
+from analysis_service_core.src.model import ModelPlugin
+
+from src.core.file_formats import RecordingFormats
+
+ALICE_DIR: Path = (Path(__file__).parent / ".." / ".." / "ALICE").resolve()
+
+
+class ALICE(ModelPlugin):
+    def run_model(self, dataset_dir: Path, output_dir: Path) -> None:
+        output_dir = output_dir / "output"
+
+        recordings_dir = dataset_dir / "recordings" / "converted"
+
+        if not recordings_dir.exists():
+            raise ValueError(
+                f"Recordings directory at '{recordings_dir}' does not exist"
+            )
+
+        audio_files = self._get_audio_files(recordings_dir)
+
+        for file in audio_files:
+            self._run_alice_on_audio_file(recordings_dir, output_dir, file)
+
+    def _run_alice_on_audio_file(
+        self, recordings_dir: Path, output_dir: Path, file: Path
+    ) -> None:
+        rel_path: Path = file.relative_to(recordings_dir)
+
+        executable: Path = ALICE_DIR / "run_ALICE.sh"
+
+        bash_script = f"""
+        source {self.config.get("CONDA_ACTIVATE_FILE")}
+        conda activate {self.config.get("CONDA_ENV_NAME")}
+        {str(executable)} {str(file)}
+        """
+
+        self._run_subprocess(bash_script, file)
+
+        self._move_file(rel_path, output_dir, file)
+
+        return
+
+    def _run_subprocess(self, bash_script: str, file: Path) -> None:
+        # NOTE: ALICE has a quirk that it cannot run if your PWD is not the
+        # ALICE folder itself
+        result = subprocess.run(
+            ["bash", "-c", bash_script], cwd=ALICE_DIR, capture_output=True, text=True
+        )
+
+        if result.returncode == 0:
+            print(f"Successfully ran VTC on '{str(file)}'")
+        else:
+            print(f"Error running VTC on '{str(file)}: {result.stderr}")
+
+        return
+
+    def _move_file(self, rel_path: Path, output_dir: Path, input_file: Path) -> None:
+        rel_path_dir = rel_path.parent
+        base_name = rel_path.stem
+
+        raw_folder = output_dir / rel_path_dir / "raw"
+        sum_folder = output_dir / rel_path_dir / "extra"
+
+        if not raw_folder.exists():
+            raw_folder.mkdir(parents=True, exist_ok=True)
+        if not sum_folder.exists():
+            sum_folder.mkdir(parents=True, exist_ok=True)
+
+        shutil.move(ALICE_DIR / "ALICE_output.txt", sum_folder / f"{base_name}_sum.txt")
+        shutil.move(
+            ALICE_DIR / "ALICE_output_utterances.txt", raw_folder / f"{base_name}.txt"
+        )
+        os.remove(ALICE_DIR / "diarization_output.rttm")
+
+        return
+
+    def _get_audio_files(self, recordings_dir: Path) -> Set[Path]:
+        recording_formats: Set[str] = {r.value for r in RecordingFormats}
+        audio_files: Set[Path] = set()
+
+        for format in recording_formats:
+            audio_files.update(recordings_dir.rglob(f"*.{format}"))
+
+        return audio_files
