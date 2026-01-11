@@ -1,1 +1,7 @@
 set,recording_filename,time_seek,range_onset,range_offset,raw_filename,format,filter,annotation_filename,imported_at,package_version,error,merged_from
+vtc,child_1/1_1.wav,0,0,29954,child_1/1_1.rttm,vtc_rttm,,child_1/1_1_0_29954.csv,2026-01-09 20:42:33,0.4.5,,
+vtc,child_1/1_2.wav,0,0,29954,child_1/1_2.rttm,vtc_rttm,,child_1/1_2_0_29954.csv,2026-01-09 20:42:33,0.4.5,,
+vtc,child_2/2_1.wav,0,0,29954,child_2/2_1.rttm,vtc_rttm,,child_2/2_1_0_29954.csv,2026-01-09 20:42:33,0.4.5,,
+vtc_acoustic,child_1/1_1.wav,0,0,29954,child_1/1_1.csv,csv,,child_1/1_1_0_29954.csv,2026-01-11 00:08:51,0.4.5,,
+vtc_acoustic,child_1/1_2.wav,0,0,29954,child_1/1_2.csv,csv,,child_1/1_2_0_29954.csv,2026-01-11 00:08:51,0.4.5,,
+vtc_acoustic,child_2/2_1.wav,0,0,29954,child_2/2_1.csv,csv,,child_2/2_1_0_29954.csv,2026-01-11 00:08:51,0.4.5,,

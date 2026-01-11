@@ -1,0 +1,10 @@
+date: '20260109_224539'
+package_version: 0.4.5
+parameters:
+- path: .
+- processor: standard
+- threads: 1
+- func: !!python/name:ChildProject.%3Clambda%3E ''
+- input_profile: null
+- skip_existing: false
+- recordings: null
