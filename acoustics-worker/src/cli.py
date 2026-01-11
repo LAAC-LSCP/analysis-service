@@ -12,6 +12,7 @@ def run_acoustics():
     Run acoustics worker.
     """
     config = Config()
+
     pubsub = PubSub(subscribe_to=[ChannelName.RUN_ACOUSTICS])
 
     acoustics = Acoustics(

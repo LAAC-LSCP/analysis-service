@@ -6,10 +6,3 @@ class TaskStatus(StrEnum):
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
-
-
-class Operation(StrEnum):
-    VTC = "vtc"
-    ALICE = "alice"
-    ACOUSTICS = "acoustics"
-    W2V2 = "w2v2"

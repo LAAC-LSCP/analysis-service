@@ -29,8 +29,8 @@ services:
       context: ./daemon
       dockerfile: Dockerfile
     depends_on:
+      - echoservice-test-mock-server
       - echoservice-test-redis
-      - echoservice-test-vtc-worker
     networks:
       - echoservice-test
       - echoservice-test-external
@@ -59,6 +59,28 @@ services:
       - DATASETS_DIR=/app/datasets
       - CONDA_ENV_NAME=pyannote
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./tests/dummy_echolalia_folder/test-config.toml:/app/echolalia/test-config.toml
+      - ./tests/dummy_datasets:/app/datasets
+  echoservice-test-vtc-2-worker:
+    container_name: echoservice-test-vtc-2-worker
+    build:
+      context: ./vtc-2-worker
+      dockerfile: Dockerfile
+      network: host
+    depends_on:
+      - echoservice-test-redis
+    networks:
+      - echoservice-test
+      - echoservice-test-external
+    environment:
+      - REDIS_HOST=echoservice-test-redis
+      - REDIS_PORT=6379
+      - ECHOLALIA_DIR=/app/echolalia
+      - DATASETS_DIR=/app/datasets
+      - VTC_2_FOLDER=/app/VTC
+      - VTC_2_DEVICE=gpu
       - PYTHONUNBUFFERED=1
     volumes:
       - ./tests/dummy_echolalia_folder/test-config.toml:/app/echolalia/test-config.toml
@@ -111,10 +133,7 @@ services:
       context: ./tests
       dockerfile: Dockerfile
     depends_on:
-      - echoservice-test-mock-server
       - echoservice-test-redis
-      - echoservice-test-daemon
-      - echoservice-test-vtc-worker
     networks:
       - echoservice-test
     environment:

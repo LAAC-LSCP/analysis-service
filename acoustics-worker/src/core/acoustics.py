@@ -19,10 +19,10 @@ class Args:
 
 class Acoustics(ModelPlugin):
     def run_model(self, dataset_dir: Path, output_dir: Path) -> None:
-        print("Running model...")
         project = ChildProject(dataset_dir)
         am = AnnotationManager(project)
 
+        print(f"Running acoustics in ${str(dataset_dir)}...")
         acoustic_derivator = AcousticDerivator()
         am._derive_annotations(
             "vtc",
@@ -33,6 +33,7 @@ class Acoustics(ModelPlugin):
         )
 
         self._make_outputs_raw(output_dir)
+        print(f"Finished running acoustics in ${str(dataset_dir)}!")
 
         return
 

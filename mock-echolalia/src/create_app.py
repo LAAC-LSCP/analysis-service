@@ -60,6 +60,8 @@ def create_app(
 
         task = next((t for t in db.tasks if str(t.task_uid) == task_id), None)
 
+        print(f"Found task: {task}")
+
         if task is None:
             return jsonify({"error": "Task not found"}), 404
 

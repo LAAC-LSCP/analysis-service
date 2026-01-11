@@ -74,14 +74,14 @@ def test_service_task_lifecycle(
     assert command_tester.calls[0]["handler_name"] == "send_request"
     assert command_tester.calls[0]["message"] == commands.RunTask(
         task_id=UUID("70a1acc6-f5fd-44ea-8b41-bc4b3e4cfc02"),
-        operation="vtc",
+        operation=commands.Operation.RUN_VTC,
         dataset_uid_label="my-dataset_4cafe10b-f91c-4f80-9b8c-61fb7fbf8901",
     )
     assert command_tester.calls[1]["type"] == commands.RunTask
     assert command_tester.calls[1]["handler_name"] == "send_update"
     assert command_tester.calls[1]["message"] == commands.RunTask(
         task_id=UUID("70a1acc6-f5fd-44ea-8b41-bc4b3e4cfc02"),
-        operation="vtc",
+        operation=commands.Operation.RUN_VTC,
         dataset_uid_label="my-dataset_4cafe10b-f91c-4f80-9b8c-61fb7fbf8901",
     )
 
