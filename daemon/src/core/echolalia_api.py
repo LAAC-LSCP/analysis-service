@@ -8,7 +8,9 @@ from datetime import datetime
 from typing import Set, TypedDict
 from uuid import UUID
 
-from src.core.types import Operation, TaskStatus
+from analysis_service_core.src.redis.commands import Operation
+
+from src.core.types import TaskStatus
 
 type Tasks = Set["Task"]
 type Statuses = Set["Status"]

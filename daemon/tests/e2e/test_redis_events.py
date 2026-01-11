@@ -27,7 +27,7 @@ def test_redis_updates_lead_to_handler_calls():
         commands.RunTask(
             task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57"),
             dataset_uid_label="",
-            operation="vtc",
+            operation=commands.Operation.RUN_VTC,
         ),
     )
 
@@ -38,7 +38,7 @@ def test_redis_updates_lead_to_handler_calls():
     assert command_tester.calls[0]["message"] == commands.RunTask(
         task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57"),
         dataset_uid_label="",
-        operation="vtc",
+        operation=commands.Operation.RUN_VTC,
     )
 
     pubsub.publish(

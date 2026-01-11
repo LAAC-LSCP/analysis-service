@@ -3,9 +3,10 @@ from datetime import datetime
 from typing import Generator, Optional, Protocol
 
 import pytest
+from analysis_service_core.src.redis.commands import Operation
 
 from src.core.echolalia_api import Task
-from src.core.types import Operation, TaskStatus
+from src.core.types import TaskStatus
 
 
 class TaskFactory(Protocol):
@@ -36,7 +37,7 @@ def task_factory() -> Generator[TaskFactory, None, None]:
     ) -> Task:
         return Task(
             task_uid=task_id or uuid.uuid4(),
-            model_name=model_name or Operation.VTC,
+            model_name=model_name or Operation.RUN_VTC,
             status_label=status_label or TaskStatus.PENDING,
             user_uid=user_id or uuid.uuid4(),
             dataset_name=dataset_name or "",

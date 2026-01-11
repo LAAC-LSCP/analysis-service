@@ -1,0 +1,17 @@
+name: VTC 2.0 Pull Request Checks
+
+on:
+- pull_request
+- merge_group
+
+concurrency:
+  # Only allow one run at a time of this workflow per PR
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  pr-checks:
+    uses: ./.github/workflows/pr-checks-reusable.yml
+    with:
+      working-directory: vtc-2-worker
+    secrets: inherit

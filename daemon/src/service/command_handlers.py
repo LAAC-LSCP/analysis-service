@@ -1,12 +1,10 @@
-import os
-from time import sleep
 from typing import Any, Dict, List, Protocol, Type, TypeVar
 
 import analysis_service_core.src.redis.commands as commands
 from analysis_service_core.src.redis.channels import ChannelName
 from analysis_service_core.src.redis.pubsub import PubSub
 
-from src.core.types import Operation, TaskStatus
+from src.core.types import TaskStatus
 from src.service.http_client import HTTPClient
 
 CommandT = TypeVar("CommandT", bound=commands.Command, contravariant=True)
@@ -43,16 +41,14 @@ estimated duration '{0}'"
 def handle_run_task(pubsub: PubSub) -> CommandHandler:
     def send_request(command: commands.RunTask) -> None:
         print(f"Sending request to redis for task with model: {str(command.operation)}")
-        if command.operation == Operation.VTC:
+        if command.operation == commands.Operation.RUN_VTC:
             pubsub.publish(ChannelName.RUN_VTC, command)
-        elif command.operation == Operation.ALICE:
+        elif command.operation == commands.Operation.RUN_ALICE:
             pubsub.publish(ChannelName.RUN_ALICE, command)
-        elif command.operation == Operation.ACOUSTICS:
-            print(ChannelName.RUN_ACOUSTICS)
-            print(os.environ.get("REDIS_HOST"))
-            print(os.environ.get("REDIS_PORT"))
-            sleep(5)
+        elif command.operation == commands.Operation.RUN_ACOUSTICS:
             pubsub.publish(ChannelName.RUN_ACOUSTICS, command)
+        elif command.operation == commands.Operation.RUN_VTC_2:
+            pubsub.publish(ChannelName.RUN_VTC_2, command)
 
     return send_request
 
