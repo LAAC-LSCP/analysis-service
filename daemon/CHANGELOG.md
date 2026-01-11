@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.9.0...v0.10.0) (2026-01-11)
+
+
+### Features
+
+* add VTC 2 ([80de0d2](https://github.com/LAAC-LSCP/analysis-service/commit/80de0d2af7031bfa4c6ef2e6da4ba18f79b84888))
+
 ## [0.9.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.8.0...v0.9.0) (2026-01-11)
 
 
