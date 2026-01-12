@@ -1,0 +1,12 @@
+date: '20260112_014816'
+package_version: 0.4.5
+parameters:
+- path: !!python/object/apply:pathlib.PosixPath []
+- destination: chunks
+- keyword: maturity
+- segments: ./scripts/segments_all_chi.csv
+- chunks_length: 500
+- chunks_min_amount: 1
+- spectrogram: false
+- profile: standard
+- threads: 16
