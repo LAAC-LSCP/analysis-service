@@ -18,7 +18,7 @@ def flat_dataset_tmp(tmp_path_factory: pytest.TempPathFactory):
 
 @pytest.fixture
 def nested_dataset_tmp(tmp_path_factory: pytest.TempPathFactory):
-    dest = tmp_path_factory.mktemp("nested_recordings")
+    dest = tmp_path_factory.mktemp("nested_dataset")
     shutil.copytree(NESTED_RECORDINGS_DIR, dest, dirs_exist_ok=True)
 
     return dest

@@ -2,7 +2,7 @@
 
 [[package]]
 name = "analysis-service-core"
-version = "0.4.0"
+version = "0.7.0"
 description = "a core library that different parts of the analysis service can borrow from"
 optional = false
 python-versions = ">=3.13"
@@ -17,7 +17,7 @@ redis = ">=7.1.0,<8.0.0"
 type = "git"
 url = "https://github.com/LAAC-LSCP/analysis-service-core.git"
 reference = "HEAD"
-resolved_reference = "03b9badf1d303080aaa293eb23cac47da69b92b7"
+resolved_reference = "3fe2374580636251a0ca0f23429190c611519141"
 
 [[package]]
 name = "audioop-lts"
@@ -369,8 +369,8 @@ tests = ["pytest"]
 [package.source]
 type = "git"
 url = "https://github.com/LAAC-LSCP/ChildProject.git"
-reference = "49b916471553921433470ec769139205a42d702b"
-resolved_reference = "49b916471553921433470ec769139205a42d702b"
+reference = "5fb7f8e983567e349d72068224ca9e5ba1c1c59c"
+resolved_reference = "5fb7f8e983567e349d72068224ca9e5ba1c1c59c"
 
 [[package]]
 name = "click"
@@ -2514,4 +2514,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "1d8c566fb1233baf6c5daf54a07e0620c99c0ff9cebeed4c189830d9f1b101ce"
+content-hash = "c636f2ae8400383c0e7f2ec416b465062fa568f53738008a2948a467b3389f46"

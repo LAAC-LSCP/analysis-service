@@ -4,8 +4,12 @@ from pathlib import Path
 from typing import Set
 
 from analysis_service_core.src.model import ModelPlugin
+from analysis_service_core.src.logger import LoggerFactory
 
 from src.core.file_formats import RecordingFormats
+
+
+logger = LoggerFactory.get_logger(__name__)
 
 VTC_DIR: Path = (
     Path(__file__) / ".." / ".." / ".." / "vtc" / "voice-type-classifier"
@@ -64,7 +68,7 @@ class VTC(ModelPlugin):
         all_rttm = vtc_output_dir / "all.rttm"
 
         if not all_rttm.exists():
-            print(f"WARNING: Expected output file {all_rttm} not found")
+            logger.warning(f"Expected output file {all_rttm} not found")
             return
 
         output_file = (output_dir / rel_path).resolve()
@@ -85,9 +89,9 @@ class VTC(ModelPlugin):
         )
 
         if result.returncode == 0:
-            print(f"Successfully ran VTC on '{str(file)}'")
+            logger.info(f"Successfully ran VTC on '{str(file)}'")
         else:
-            print(f"Error running VTC on '{str(file)}: {result.stderr}")
+            logger.error(f"Error running VTC on '{str(file)}: {result.stderr}")
 
         return
 

@@ -28,13 +28,15 @@ class VTC_2_Mock(VTC_2):
 
         It does NOT recurse into subfolders
         """
+        files = [f for f in input.iterdir() if f.is_file()]
+
+        if len(files) == 0:
+            return
+
         (output / "raw_rttm").mkdir(parents=True, exist_ok=True)
         (output / "rttm").mkdir(parents=True, exist_ok=True)
 
-        for f in input.iterdir():
-            if not f.is_file():
-                continue
-
+        for f in files:
             shutil.copy(f, output / "raw_rttm" / (f.stem + ".rttm"))
             shutil.copy(f, output / "rttm" / (f.stem + ".rttm"))
             (output / "raw_rttm.csv").touch(exist_ok=True)

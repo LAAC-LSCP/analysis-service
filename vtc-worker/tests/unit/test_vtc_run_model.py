@@ -5,24 +5,27 @@ from analysis_service_core.src.config import Config
 from analysis_service_core.src.redis.queue import QueueName
 from analysis_service_core.testing.mocks.queue import QueueMock
 
-from tests.unit.vtc_2_mock import VTC_2_Mock
+from tests.unit.vtc_mock import VTC_Mock
 
 
 @pytest.fixture
-def vtc_2_mock() -> VTC_2_Mock:
-    queue = QueueMock(QueueName.RUN_VTC_2)
+def vtc_mock() -> VTC_Mock:
+    queue = QueueMock(QueueName.RUN_VTC)
     config = Config(check_required=False)
 
-    return VTC_2_Mock(queue, config, skip_moving_files=True)
+    return VTC_Mock(queue, config, skip_moving_files=True)
 
 
-def test_vtc_2_inputs_outputs(
-    vtc_2_mock: VTC_2_Mock,
-    flat_recordings_tmp: Path,
+def test_vtc_inputs_outputs(
+    vtc_mock: VTC_Mock,
+    flat_dataset_tmp: Path,
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
-    tmp_path = tmp_path_factory.mktemp("test_vtc_2", True)
-    vtc_2_mock.run_model(dataset_dir=flat_recordings_tmp, output_dir=tmp_path)
+    """
+    Tests the input-output behaviour of run model on flat datasets
+    """
+    tmp_path = tmp_path_factory.mktemp("test_vtc", True)
+    vtc_mock.run_model(dataset_dir=flat_dataset_tmp, output_dir=tmp_path)
 
     output_files_and_folders = {f for f in tmp_path.rglob("*")}
 
@@ -34,26 +37,30 @@ def test_vtc_2_inputs_outputs(
     }
 
 
-def test_vtc_2_inputs_outputs_nested(
-    vtc_2_mock: VTC_2_Mock,
-    nested_recordings_tmp: Path,
+def test_vtc_inputs_outputs_nested(
+    vtc_mock: VTC_Mock,
+    nested_dataset_tmp: Path,
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
-    tmp_path = tmp_path_factory.mktemp("test_vtc_2", True)
-
-    vtc_2_mock.run_model(dataset_dir=nested_recordings_tmp, output_dir=tmp_path)
+    """
+    Tests the input-output behaviour of run model on nested datasets
+    """
+    tmp_path = tmp_path_factory.mktemp("test_vtc", True)
+    vtc_mock.run_model(dataset_dir=nested_dataset_tmp, output_dir=tmp_path)
 
     output_files_and_folders = {f for f in tmp_path.rglob("*")}
 
-    assert len(output_files_and_folders) == 12
+    assert len(output_files_and_folders) == 14
 
     output_files = {f for f in output_files_and_folders if f.is_file()}
 
-    assert len(output_files) == 4
+    assert len(output_files) == 6
 
     assert output_files == {
+        tmp_path / "child_2" / "day_1" / "recording.rttm",
         tmp_path / "child_1" / "day_1" / "hour_1" / "recording.rttm",
         tmp_path / "child_1" / "day_2" / "recording.rttm",
         tmp_path / "child_2" / "day_1" / "hour_1" / "recording.rttm",
+        tmp_path / "child_1" / "day_1" / "recording.rttm",
         tmp_path / "child_2" / "day_1" / "hour_2" / "recording.rttm",
     }
