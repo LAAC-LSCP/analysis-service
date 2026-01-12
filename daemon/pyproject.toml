@@ -1,6 +1,6 @@
 [project]
 name = "analysis-service-daemon"
-version = "0.10.0"
+version = "0.11.0"
 description = "analysis service daemon for Echolalia"
 authors = [
     {name = "Lawrence Borst",email = "laurens.borst@ens.psl.eu"}
