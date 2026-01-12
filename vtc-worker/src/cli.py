@@ -2,8 +2,7 @@ from pathlib import Path
 
 import click
 from analysis_service_core.src.config import Config, EnvVar
-from analysis_service_core.src.redis.channels import ChannelName
-from analysis_service_core.src.redis.pubsub import PubSub
+from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.vtc import VTC
 
@@ -18,10 +17,10 @@ def run_vtc():
         EnvVar(key="CONDA_ENV_NAME", type=str),
     }
     config = Config(env_vars)
-    pubsub = PubSub(subscribe_to=[ChannelName.RUN_VTC])
+    queue = Queue(QueueName.RUN_VTC)
 
     vtc = VTC(
-        pubsub=pubsub,
+        queue=queue,
         config=config,
         skip_moving_files=True,
     )

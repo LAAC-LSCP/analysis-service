@@ -2,7 +2,7 @@
 
 [[package]]
 name = "analysis-service-core"
-version = "0.3.0"
+version = "0.4.0"
 description = "a core library that different parts of the analysis service can borrow from"
 optional = false
 python-versions = ">=3.13"
@@ -15,9 +15,9 @@ redis = ">=7.1.0,<8.0.0"
 
 [package.source]
 type = "git"
-url = "https://github.com/LAAC-LSCP/analysis-service-core/"
+url = "https://github.com/LAAC-LSCP/analysis-service-core.git"
 reference = "HEAD"
-resolved_reference = "6894881516c505a2de6dd1549e18669622468ee5"
+resolved_reference = "03b9badf1d303080aaa293eb23cac47da69b92b7"
 
 [[package]]
 name = "click"
@@ -145,4 +145,4 @@ ocsp = ["cryptography (>=36.0.1)", "pyopenssl (>=20.0.1)", "requests (>=2.31.0)"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "b65efccb2ee26fa983061f1bcbb48128894d76c361d1fbcc2db6ac83bcaf5c1b"
+content-hash = "e34183472db0ec0bbe2a97ead39a2a6f5d5d9fc768a36436e85cbc6068456b12"

@@ -1,11 +1,10 @@
 import asyncio
 from datetime import datetime, timedelta
-from typing import Type
+from time import sleep
 
 from analysis_service_core.src.model import RunTask
-from analysis_service_core.src.redis.channels import Channels
-from analysis_service_core.src.redis.commands import Command
-from analysis_service_core.src.redis.pubsub import PubSub
+from analysis_service_core.src.redis.commands import CompleteTask
+from analysis_service_core.src.redis.queue import Queue
 from tenacity import Retrying, stop_after_attempt, wait_fixed
 
 from src.core.types import TaskStatus
@@ -15,21 +14,19 @@ from src.service.http_client import HTTPClient
 
 class Service:
     S_PER_UPDATE: int = 10
+    S_PER_QUEUE_FETCH: int = 1
 
-    _channels: Channels
+    _completion_queue: Queue
     _command_handlers: CommandHandlers
     _http_client: HTTPClient
-    _pubsub: PubSub
 
     def __init__(
         self,
-        pubsub: PubSub,
-        channels: Channels,
+        completion_queue: Queue,
         command_handlers: CommandHandlers,
         http_client: HTTPClient,
     ):
-        self._pubsub = pubsub
-        self._channels = channels
+        self._completion_queue = completion_queue
         self._command_handlers = command_handlers
         self._http_client = http_client
 
@@ -76,10 +73,14 @@ class Service:
                 handler(message)
 
     def _listen_and_handle_redis(self) -> None:
-        for message in self._pubsub.listen():
-            self._handle_message(message)
+        while True:
+            # Why not pubsub? Because if the Daemon is down things get lost
+            message = self._completion_queue.dequeue()
+            if message:
+                self._handle_completion(message)
+            sleep(self.S_PER_QUEUE_FETCH)
 
-    def get_next_message_and_handle(
+    def get_completion_message_and_handle(
         self, max_attempts: int = 3, wait_seconds: float = 0.1
     ) -> None:
         """
@@ -91,10 +92,10 @@ class Service:
             reraise=True,
         ):
             with attempt:
-                message = self._pubsub.get_message(timeout=1)
+                command_dict = self._completion_queue.dequeue()
 
-                if message:
-                    self._handle_message(message)
+                if command_dict:
+                    self._handle_completion(command_dict)
 
                     return
                 else:
@@ -102,26 +103,9 @@ class Service:
 
         return
 
-    def _handle_message(self, message: dict) -> None:
-        print(f"Handling message: {message}")
-        channel_name = self._pubsub.get_channel_from_message(message)
-        data = self._pubsub.get_data_from_message(message)
+    def _handle_completion(self, command_dict: dict) -> None:
+        print(f"Handling message: {command_dict}")
+        command = CompleteTask.from_dict(command_dict)
 
-        command_cls: Type[Command] | None = next(
-            (
-                channel.command
-                for channel in self._channels.channels
-                if channel.name.value == channel_name
-            ),
-            None,
-        )
-        if command_cls is None:
-            raise ValueError("Command not associated with a channel")
-
-        self._handle_cmd(command_cls, data)
-
-    def _handle_cmd(self, command_cls: Type[Command], data: dict) -> None:
-        command = command_cls.from_dict(dict_repr=data)
-
-        for handler in self._command_handlers.get(command_cls, []):
+        for handler in self._command_handlers.get(CompleteTask, []):
             handler(command)
