@@ -3,7 +3,7 @@ from pathlib import Path
 import click
 from analysis_service_core.src.config import Config, EnvVar
 from analysis_service_core.src.redis.channels import ChannelName
-from analysis_service_core.src.redis.pubsub import PubSub
+from analysis_service_core.src.redis.queue import Queue
 
 from src.core.alice import ALICE
 
@@ -18,10 +18,10 @@ def run_alice():
         EnvVar(key="CONDA_ENV_NAME", type=str),
     }
     config = Config(env_vars)
-    pubsub = PubSub(subscribe_to=[ChannelName.RUN_ALICE])
+    queue = Queue(subscribe_to=[ChannelName.RUN_ALICE])
 
     alice = ALICE(
-        pubsub=pubsub,
+        queue=queue,
         config=config,
         skip_moving_files=True,
     )

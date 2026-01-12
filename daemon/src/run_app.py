@@ -1,14 +1,7 @@
 from pathlib import Path
 from typing import Tuple
 
-# TODO: fix this channels mess when we add queues
-from analysis_service_core.src.redis.channels import (
-    ChannelDict,
-    ChannelName,
-    Channels,
-)
-from analysis_service_core.src.redis.commands import CompleteTask
-from analysis_service_core.src.redis.pubsub import PubSub
+from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.config.config import load_config
 from src.service.command_handlers import CommandHandlers, get_command_handlers
@@ -17,15 +10,15 @@ from src.service.service import Service
 
 
 async def run(config: Path) -> None:
-    pubsub, channels, command_handlers, http_client = setup(config)
+    completion_queue, command_handlers, http_client = setup(config)
 
-    service = Service(pubsub, channels, command_handlers, http_client)
+    service = Service(completion_queue, command_handlers, http_client)
     await service.start()
 
     return
 
 
-def setup(config_file: Path) -> Tuple[PubSub, Channels, CommandHandlers, HTTPClient]:
+def setup(config_file: Path) -> Tuple[Queue, CommandHandlers, HTTPClient]:
     if not config_file.exists():
         raise FileNotFoundError(f"File at '{str(config_file)}' not found")
 
@@ -37,17 +30,7 @@ def setup(config_file: Path) -> Tuple[PubSub, Channels, CommandHandlers, HTTPCli
         client_secret=config.http.client_secret,
     )
 
-    channels = Channels(
-        {
-            ChannelDict(
-                name=ChannelName.COMPLETE_TASK,
-                command=CompleteTask,
-            ),
-        }
-    )
+    queues = {name: Queue(name) for name in list(QueueName)}
+    command_handlers = get_command_handlers(http_client, queues)
 
-    pubsub = PubSub(subscribe_to=list(channels.channel_names))
-
-    command_handlers = get_command_handlers(http_client, pubsub)
-
-    return pubsub, channels, command_handlers, http_client
+    return Queue(QueueName.COMPLETE_TASK), command_handlers, http_client

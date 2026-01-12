@@ -1,8 +1,7 @@
 from typing import Any, Dict, List, Protocol, Type, TypeVar
 
 import analysis_service_core.src.redis.commands as commands
-from analysis_service_core.src.redis.channels import ChannelName
-from analysis_service_core.src.redis.pubsub import PubSub
+from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.types import TaskStatus
 from src.service.http_client import HTTPClient
@@ -38,25 +37,35 @@ estimated duration '{0}'"
     return send_update
 
 
-def handle_run_task(pubsub: PubSub) -> CommandHandler:
+def handle_run_task(queues: Dict[QueueName, Queue]) -> CommandHandler:
     def send_request(command: commands.RunTask) -> None:
         print(f"Sending request to redis for task with model: {str(command.operation)}")
+        queue: Queue | None = None
         if command.operation == commands.Operation.RUN_VTC:
-            pubsub.publish(ChannelName.RUN_VTC, command)
+            queue = queues[QueueName.RUN_VTC]
         elif command.operation == commands.Operation.RUN_ALICE:
-            pubsub.publish(ChannelName.RUN_ALICE, command)
+            queue = queues[QueueName.RUN_ALICE]
         elif command.operation == commands.Operation.RUN_ACOUSTICS:
-            pubsub.publish(ChannelName.RUN_ACOUSTICS, command)
+            queue = queues[QueueName.RUN_ACOUSTICS]
         elif command.operation == commands.Operation.RUN_VTC_2:
-            pubsub.publish(ChannelName.RUN_VTC_2, command)
+            queue = queues[QueueName.RUN_VTC_2]
+        elif command.operation == commands.Operation.RUN_W2V2:
+            queue = queues[QueueName.RUN_W2V2]
+
+        if queue is None:
+            return
+
+        queue.enqueue(command)
 
     return send_request
 
 
-def get_command_handlers(http_client: HTTPClient, pubsub: PubSub) -> CommandHandlers:
+def get_command_handlers(
+    http_client: HTTPClient, queues: Dict[QueueName, Queue]
+) -> CommandHandlers:
     return {
         commands.RunTask: [
-            handle_run_task(pubsub),
+            handle_run_task(queues),
             update_echolalia(http_client, TaskStatus.RUNNING),
         ],
         commands.CompleteTask: [update_echolalia(http_client, TaskStatus.COMPLETED)],

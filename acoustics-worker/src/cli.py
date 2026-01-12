@@ -1,7 +1,6 @@
 import click
 from analysis_service_core.src.config import Config
-from analysis_service_core.src.redis.channels import ChannelName
-from analysis_service_core.src.redis.pubsub import PubSub
+from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.acoustics import Acoustics
 
@@ -13,10 +12,10 @@ def run_acoustics():
     """
     config = Config()
 
-    pubsub = PubSub(subscribe_to=[ChannelName.RUN_ACOUSTICS])
+    queue = Queue(QueueName.RUN_ACOUSTICS)
 
     acoustics = Acoustics(
-        pubsub=pubsub,
+        queue=queue,
         config=config,
         skip_moving_files=True,
     )

@@ -2,17 +2,18 @@ from pathlib import Path
 
 import pytest
 from analysis_service_core.src.config import Config
-from analysis_service_core.testing.mocks.pubsub import PubSubMock
+from analysis_service_core.src.redis.queue import QueueName
+from analysis_service_core.testing.mocks.queue import QueueMock
 
 from tests.unit.vtc_2_mock import VTC_2_Mock
 
 
 @pytest.fixture
 def vtc_2_mock() -> VTC_2_Mock:
-    pubsub = PubSubMock([])
+    queue = QueueMock(QueueName.RUN_VTC_2)
     config = Config(check_required=False)
 
-    return VTC_2_Mock(pubsub, config, skip_moving_files=True)
+    return VTC_2_Mock(queue, config, skip_moving_files=True)
 
 
 def test_vtc_2_inputs_outputs(
