@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.10.0...v0.11.0) (2026-01-12)
+
+
+### Features
+
+* use queues ([b73a179](https://github.com/LAAC-LSCP/analysis-service/commit/b73a1793972548f7571d7a93875a440beec6e77f))
+
 ## [0.10.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.9.0...v0.10.0) (2026-01-11)
 
 
