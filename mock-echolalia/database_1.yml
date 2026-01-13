@@ -1,6 +1,6 @@
 tasks:
   - task_uid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-    model_name: "run_vtc"
+    model_name: "vtc"
     status_label: "pending"
     user_uid: "d9c30005-ab97-4daa-bc34-c6ffc4caeeac"
     dataset_name: "simple-test-dataset"
@@ -9,7 +9,7 @@ tasks:
     modified: "2025-12-31T03:01:25.651183+01:00"
     estimated_duration: 15
   - task_uid: "cea95657-8e73-4a97-a982-44368d9a835c"
-    model_name: "run_alice"
+    model_name: "alice"
     status_label: "pending"
     user_uid: "0556907d-c6bc-4255-8b56-53cb042b6e90"
     dataset_name: "simple-test-dataset"
@@ -18,7 +18,7 @@ tasks:
     modified: "2025-12-31T03:01:25.651183+01:00"
     estimated_duration: 15
   - task_uid: "2111e290-128f-4c21-b7cc-2318f54b63ce"
-    model_name: "run_acoustics"
+    model_name: "acoustics"
     status_label: "pending"
     user_uid: "0556907d-c6bc-4255-8b56-53cb042b6e90"
     dataset_name: "simple-test-dataset"
@@ -27,7 +27,7 @@ tasks:
     modified: "2025-12-31T03:01:25.651183+01:00"
     estimated_duration: 15
   - task_uid: "954f493c-443f-498c-9490-7b7036e4b1be"
-    model_name: "run_vtc_2"
+    model_name: "vtc_2"
     status_label: "pending"
     user_uid: "4ec65ca3-59fd-4cf6-b338-84313d783ebe"
     dataset_name: "simple-test-dataset"
