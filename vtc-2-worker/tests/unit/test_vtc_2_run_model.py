@@ -19,49 +19,52 @@ def vtc_2_mock() -> VTC_2_Mock:
 def test_vtc_2_inputs_outputs(
     vtc_2_mock: VTC_2_Mock,
     flat_dataset_tmp: Path,
-    tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
     """
     Tests the input-output behaviour of run model on flat datasets
     """
-    tmp_path = tmp_path_factory.mktemp("test_vtc_2", True)
-    vtc_2_mock.run_model(dataset_dir=flat_dataset_tmp, output_dir=tmp_path)
+    output_dir = flat_dataset_tmp / "outputs"
+    vtc_2_mock.run_model(dataset_dir=flat_dataset_tmp, output_dir=output_dir)
 
-    output_files_and_folders = {f for f in tmp_path.rglob("*")}
+    output_files_and_folders = {f for f in output_dir.rglob("*")}
 
-    assert len(output_files_and_folders) == 3
-    assert output_files_and_folders == {
-        tmp_path / "recording_1.rttm",
-        tmp_path / "recording_2.rttm",
-        tmp_path / "recording_3.rttm",
+    assert len(output_files_and_folders) == 4
+
+    output_files = {f for f in output_files_and_folders if f.is_file()}
+
+    assert len(output_files) == 3
+
+    assert output_files == {
+        output_dir / "raw" / "recording_1.rttm",
+        output_dir / "raw" / "recording_2.rttm",
+        output_dir / "raw" / "recording_3.rttm",
     }
 
 
 def test_vtc_2_inputs_outputs_nested(
     vtc_2_mock: VTC_2_Mock,
     nested_dataset_tmp: Path,
-    tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
     """
     Tests the input-output behaviour of run model on nested datasets
     """
-    tmp_path = tmp_path_factory.mktemp("test_vtc_2", True)
+    output_dir = nested_dataset_tmp / "outputs"
 
-    vtc_2_mock.run_model(dataset_dir=nested_dataset_tmp, output_dir=tmp_path)
+    vtc_2_mock.run_model(dataset_dir=nested_dataset_tmp, output_dir=output_dir)
 
-    output_files_and_folders = {f for f in tmp_path.rglob("*")}
+    output_files_and_folders = {f for f in output_dir.rglob("*")}
 
-    assert len(output_files_and_folders) == 14
+    assert len(output_files_and_folders) == 15
 
     output_files = {f for f in output_files_and_folders if f.is_file()}
 
     assert len(output_files) == 6
 
     assert output_files == {
-        tmp_path / "child_1/day_1/hour_1/recording.rttm",
-        tmp_path / "child_1/day_1/recording.rttm",
-        tmp_path / "child_2/day_1/recording.rttm",
-        tmp_path / "child_2/day_1/hour_2/recording.rttm",
-        tmp_path / "child_1/day_2/recording.rttm",
-        tmp_path / "child_2/day_1/hour_1/recording.rttm",
+        output_dir / "raw" / "child_1/day_1/hour_1/recording.rttm",
+        output_dir / "raw" / "child_1/day_1/recording.rttm",
+        output_dir / "raw" / "child_2/day_1/recording.rttm",
+        output_dir / "raw" / "child_2/day_1/hour_2/recording.rttm",
+        output_dir / "raw" / "child_1/day_2/recording.rttm",
+        output_dir / "raw" / "child_2/day_1/hour_1/recording.rttm",
     }

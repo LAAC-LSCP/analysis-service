@@ -8,7 +8,7 @@ from analysis_service_core.src.model import ModelPlugin
 class VTC_2(ModelPlugin):
     def run_model(self, dataset_dir: Path, output_dir: Path) -> None:
         recordings_path = dataset_dir / "recordings" / "converted"
-        self._do_vtc(recordings_path, output_dir)
+        self._do_vtc(recordings_path, output_dir / "raw")
 
         return
 

@@ -10,10 +10,9 @@ WORKDIR /app
 COPY --from=repo-builder /app/ALICE /app/ALICE/
 RUN cd ./ALICE && \
     conda env create -f ALICE_Linux.yml && \
-    conda env activate ALICE && \
-    # This looks dumb but running ALICE will not work otherwise
-    # See e.g., https://github.com/conda-forge/pytorch-cpu-feedstock/issues/350
-    conda update -c conda-forge pytorch
+#   This looks dumb but running ALICE will not work otherwise
+#   See e.g., https://github.com/conda-forge/pytorch-cpu-feedstock/issues/350
+    conda run -n ALICE conda install -c conda-forge pytorch
 
 FROM python:3.13-slim AS poetry-builder
 WORKDIR /app

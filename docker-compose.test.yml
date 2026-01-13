@@ -63,7 +63,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./tests/dummy_datasets:/app/datasets
-      - ./tests/dummy_echolalia_folder:/app/echolalia_dir
+      - ./tests/dummy_echolalia_folder:/app/echolalia
   echoservice-test-vtc-2-worker:
     container_name: echoservice-test-vtc-2-worker
     build:
@@ -85,7 +85,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./tests/dummy_datasets:/app/datasets
-      - ./tests/dummy_echolalia_folder:/app/echolalia_dir
+      - ./tests/dummy_echolalia_folder:/app/echolalia
   echoservice-test-alice-worker:
     platform: linux/amd64
     container_name: echoservice-test-alice-worker
@@ -108,7 +108,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./tests/dummy_datasets:/app/datasets
-      - ./tests/dummy_echolalia_folder:/app/echolalia_dir
+      - ./tests/dummy_echolalia_folder:/app/echolalia
   echoservice-test-acoustics-worker:
     container_name: echoservice-test-acoustics-worker
     build:
@@ -127,7 +127,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./tests/dummy_datasets:/app/datasets
-      - ./tests/dummy_echolalia_folder:/app/echolalia_dir
+      - ./tests/dummy_echolalia_folder:/app/echolalia
   echoservice-test-e2e:
     container_name: echoservice-test-e2e
     build:
