@@ -1,6 +1,14 @@
+FROM python:3.13-slim AS repo-builder
+WORKDIR /app
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/* && \
+    git clone --recurse-submodules https://github.com/MarvinLvn/voice_type_classifier.git
+
 FROM continuumio/miniconda3:latest AS conda-builder
-COPY vtc/voice-type-classifier ./voice-type-classifier/
-RUN cd ./voice-type-classifier && \
+WORKDIR /app
+COPY --from=repo-builder /app/voice_type_classifier /app/voice_type_classifier
+RUN cd ./voice_type_classifier && \
     conda env create -f vtc.yml
 
 FROM python:3.13-slim AS poetry-builder
@@ -24,10 +32,10 @@ RUN apt-get update && \
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 
+COPY --from=repo-builder /app/voice_type_classifier /app/voice_type_classifier
 COPY --from=poetry-builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY --from=conda-builder /opt/conda /opt/conda
 COPY src ./src
-COPY vtc ./vtc
 
 ENTRYPOINT ["python"]
 CMD ["-m", "src.cli"]

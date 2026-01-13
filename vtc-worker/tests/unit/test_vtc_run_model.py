@@ -12,6 +12,7 @@ from tests.unit.vtc_mock import VTC_Mock
 def vtc_mock() -> VTC_Mock:
     queue = QueueMock(QueueName.RUN_VTC)
     config = Config(check_required=False)
+    config.set("VTC_FOLDER", Path("."))  # We don't need this
 
     return VTC_Mock(queue, config, skip_moving_files=True)
 

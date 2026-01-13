@@ -57,6 +57,7 @@ services:
       - REDIS_PORT=6379
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
+      - VTC_FOLDER=/app/voice_type_classifier
       - CONDA_ENV_NAME=pyannote
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
       - PYTHONUNBUFFERED=1

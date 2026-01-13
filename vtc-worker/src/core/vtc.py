@@ -10,10 +10,6 @@ from src.core.file_formats import RecordingFormats
 
 logger = LoggerFactory.get_logger(__name__)
 
-VTC_DIR: Path = (
-    Path(__file__) / ".." / ".." / ".." / "vtc" / "voice-type-classifier"
-).resolve()
-
 
 class VTC(ModelPlugin):
     def run_model(self, dataset_dir: Path, output_dir: Path) -> None:
@@ -39,7 +35,7 @@ class VTC(ModelPlugin):
     ) -> None:
         rel_path: Path = file.relative_to(recordings_dir)
 
-        executable: Path = VTC_DIR / "apply.sh"
+        executable: Path = self.config.get("VTC_FOLDER") / "apply.sh"
 
         bash_script = f"""
         source {self.config.get("CONDA_ACTIVATE_FILE")}
