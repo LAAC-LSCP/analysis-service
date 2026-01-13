@@ -4,9 +4,12 @@ import subprocess
 from pathlib import Path
 from typing import Set
 
+from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import ModelPlugin
 
 from src.core.file_formats import RecordingFormats
+
+logger = LoggerFactory.get_logger(__name__)
 
 
 class ALICE(ModelPlugin):
@@ -38,30 +41,31 @@ class ALICE(ModelPlugin):
         {str(executable)} {str(file)}
         """
 
-        self._run_subprocess(bash_script, file)
+        return_code = self._run_subprocess(bash_script, self.alice_dir, file)
 
-        self._move_file(rel_path, output_dir, file)
+        if return_code == 0:
+            self._move_files(rel_path, output_dir)
 
         return
 
-    def _run_subprocess(self, bash_script: str, file: Path) -> None:
+    def _run_subprocess(self, bash_script: str, alice_dir, file: Path) -> int:
         # NOTE: ALICE has a quirk that it cannot run if your PWD is not the
         # ALICE folder itself
         result = subprocess.run(
             ["bash", "-c", bash_script],
-            cwd=self.alice_dir,
+            cwd=alice_dir,
             capture_output=True,
             text=True,
         )
 
         if result.returncode == 0:
-            print(f"Successfully ran VTC on '{str(file)}'")
+            logger.info(f"Successfully ran ALICE on '{str(file)}'")
         else:
-            print(f"Error running VTC on '{str(file)}: {result.stderr}")
+            logger.error(f"Error running ALICE on '{str(file)}: {result.stderr}")
 
-        return
+        return result.returncode
 
-    def _move_file(self, rel_path: Path, output_dir: Path, input_file: Path) -> None:
+    def _move_files(self, rel_path: Path, output_dir: Path) -> None:
         rel_path_dir = rel_path.parent
         base_name = rel_path.stem
 
@@ -80,6 +84,7 @@ class ALICE(ModelPlugin):
             self.alice_dir / "ALICE_output_utterances.txt",
             raw_folder / f"{base_name}.txt",
         )
+        # VTC output (VTC is a submodule of the ALICE model)
         os.remove(self.alice_dir / "diarization_output.rttm")
 
         return
@@ -95,4 +100,4 @@ class ALICE(ModelPlugin):
 
     @property
     def alice_dir(self) -> Path:
-        return self.config.get("ALICE_DIR")
+        return self.config.get("ALICE_FOLDER")

@@ -95,7 +95,6 @@ services:
       - echoservice-test-redis
     networks:
       - echoservice-test
-      - echoservice-test-external
     environment:
       - REDIS_HOST=echoservice-test-redis
       - REDIS_PORT=6379
