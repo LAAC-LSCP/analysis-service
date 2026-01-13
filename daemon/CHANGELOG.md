@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.11.0...v0.12.0) (2026-01-13)
+
+
+### Features
+
+* update service outputs ([5c7e112](https://github.com/LAAC-LSCP/analysis-service/commit/5c7e112626dc0a441060c1e339f510d4a0a7b37a))
+
 ## [0.11.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.10.0...v0.11.0) (2026-01-12)
 
 
