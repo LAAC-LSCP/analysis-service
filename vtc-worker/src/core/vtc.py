@@ -3,13 +3,12 @@ import subprocess
 from pathlib import Path
 from typing import Set
 
+from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import ModelPlugin
 
 from src.core.file_formats import RecordingFormats
 
-VTC_DIR: Path = (
-    Path(__file__) / ".." / ".." / ".." / "vtc" / "voice-type-classifier"
-).resolve()
+logger = LoggerFactory.get_logger(__name__)
 
 
 class VTC(ModelPlugin):
@@ -36,7 +35,7 @@ class VTC(ModelPlugin):
     ) -> None:
         rel_path: Path = file.relative_to(recordings_dir)
 
-        executable: Path = VTC_DIR / "apply.sh"
+        executable: Path = self.config.get("VTC_FOLDER") / "apply.sh"
 
         bash_script = f"""
         source {self.config.get("CONDA_ACTIVATE_FILE")}
@@ -64,7 +63,7 @@ class VTC(ModelPlugin):
         all_rttm = vtc_output_dir / "all.rttm"
 
         if not all_rttm.exists():
-            print(f"WARNING: Expected output file {all_rttm} not found")
+            logger.warning(f"Expected output file {all_rttm} not found")
             return
 
         output_file = (output_dir / rel_path).resolve()
@@ -85,9 +84,9 @@ class VTC(ModelPlugin):
         )
 
         if result.returncode == 0:
-            print(f"Successfully ran VTC on '{str(file)}'")
+            logger.info(f"Successfully ran VTC on '{str(file)}'")
         else:
-            print(f"Error running VTC on '{str(file)}: {result.stderr}")
+            logger.error(f"Error running VTC on '{str(file)}: {result.stderr}")
 
         return
 

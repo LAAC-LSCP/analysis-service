@@ -11,3 +11,7 @@ dist/
 
 # -- redis -- #
 dump.rdb
+
+# -- outputs of models are thrown into the dataset -- #
+# -- on ATOL's request                             -- #
+dummy_datasets/*/outputs/**

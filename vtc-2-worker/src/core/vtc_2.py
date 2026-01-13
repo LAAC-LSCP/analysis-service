@@ -7,16 +7,17 @@ from analysis_service_core.src.model import ModelPlugin
 
 class VTC_2(ModelPlugin):
     def run_model(self, dataset_dir: Path, output_dir: Path) -> None:
-        self._do_vtc(dataset_dir, output_dir)
+        recordings_path = dataset_dir / "recordings" / "converted"
+        self._do_vtc(recordings_path, output_dir)
 
         return
 
     def _do_vtc(self, input: Path, output: Path) -> None:
         sub_dirs = [dir for dir in input.iterdir() if dir.is_dir()]
+        files = [f for f in input.iterdir() if f.is_file()]
 
-        if len(sub_dirs) == 0:
+        if len(files):
             self._call_vtc(input, output)
-
             self._move_and_clean(output)
 
         for dir in sub_dirs:
@@ -53,7 +54,7 @@ class VTC_2(ModelPlugin):
         return
 
     def _run_subprocess(self, bash_script: str, cwd: Path, input_dir: Path) -> None:
-        # Note that vtc has a quirk that it puts outputs in the current working dir
+        # Note that vtc 2 has a quirk that it puts outputs in the current working dir
         result = subprocess.run(
             ["bash", "-c", bash_script], cwd=cwd, capture_output=True, text=True
         )

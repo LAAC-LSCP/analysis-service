@@ -15,6 +15,7 @@ def run_vtc():
     env_vars = {
         EnvVar(key="CONDA_ACTIVATE_FILE", type=Path),
         EnvVar(key="CONDA_ENV_NAME", type=str),
+        EnvVar(key="VTC_FOLDER", type=Path),
     }
     config = Config(env_vars)
     queue = Queue(QueueName.RUN_VTC)

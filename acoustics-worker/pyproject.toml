@@ -10,7 +10,7 @@ requires-python = ">=3.13"
 dependencies = [
     "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git",
     "click (>=8.3.1,<9.0.0)",
-    "childproject @ git+https://github.com/LAAC-LSCP/ChildProject.git@49b916471553921433470ec769139205a42d702b"
+    "childproject @ git+https://github.com/LAAC-LSCP/ChildProject.git@5fb7f8e983567e349d72068224ca9e5ba1c1c59c"
 ]
 
 
