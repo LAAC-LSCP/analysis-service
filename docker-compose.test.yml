@@ -134,11 +134,13 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - echoservice-test-redis
+      - echoservice-test-daemon
     networks:
       - echoservice-test
     environment:
-      - REDIS_HOST=echoservice-test-redis
-      - REDIS_PORT=6379
+      - EXPECTED_CLIENT_ID=my-client-id
+      - EXPECTED_CLIENT_SECRET=my-client-secret
+      - BASE_URL=http://echoservice-test-mock-server:8080
       - PYTHONUNBUFFERED=1
 networks:
   echoservice-test:

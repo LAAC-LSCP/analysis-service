@@ -3,11 +3,10 @@ import subprocess
 from pathlib import Path
 from typing import Set
 
-from analysis_service_core.src.model import ModelPlugin
 from analysis_service_core.src.logger import LoggerFactory
+from analysis_service_core.src.model import ModelPlugin
 
 from src.core.file_formats import RecordingFormats
-
 
 logger = LoggerFactory.get_logger(__name__)
 

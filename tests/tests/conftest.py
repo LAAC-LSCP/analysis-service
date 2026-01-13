@@ -1,53 +1,27 @@
-import os
-from enum import StrEnum
-from typing import Generator
-
 import pytest
-from redis.client import PubSub
-from tenacity import Retrying, stop_after_attempt, wait_fixed
-
-from tests.app_types import RedisInfo
-
-REDIS_HOST: str | None = os.environ.get("REDIS_HOST", None)
-REDIS_PORT: int = int(os.environ.get("REDIS_PORT", 0))
+import requests
+from analysis_service_core.src.config import Config, EnvVar
 
 
-class Channels(StrEnum):
-    COMPLETE_TASK = "complete_task"
-    RUN_VTC = "run_vtc"
-
-
-def get_next_message(
-    pubsub: PubSub, max_attempts: int = 60, wait_seconds: float = 1
-) -> dict:
-    """
-    Looks for next message, for testing purposes
-    """
-    for attempt in Retrying(
-        stop=stop_after_attempt(max_attempts),
-        wait=wait_fixed(wait_seconds),
-        reraise=True,
-    ):
-        with attempt:
-            message = pubsub.get_message(timeout=1, ignore_subscribe_messages=True)
-
-            if message:
-                return message
-            else:
-                raise Exception("Retrying...")
-
-    raise TimeoutError("No messages found")
-
-
-@pytest.fixture(scope="session")
-def redis_host_and_port() -> Generator[RedisInfo]:
-    if REDIS_HOST is None:
-        raise ValueError("'REDIS_HOST' env variable is not set")
-
-    if REDIS_PORT == 0:
-        raise ValueError("'REDIS_PORT' env variable is not set")
-
-    yield {
-        "host": REDIS_HOST,
-        "port": REDIS_PORT,
+@pytest.fixture(scope="session", autouse=True)
+def config() -> Config:
+    env_vars = {
+        EnvVar("EXPECTED_CLIENT_ID", str),
+        EnvVar("EXPECTED_CLIENT_SECRET", str),
+        EnvVar("BASE_URL", str),
     }
+
+    return Config(env_vars, check_required=False)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def authentication_token(config: Config) -> str:
+    login_url = f"{config.get("BASE_URL")}/api/auth/login-service"
+    login_payload = {
+        "client_id": config.get("EXPECTED_CLIENT_ID"),
+        "client_secret": config.get("EXPECTED_CLIENT_SECRET"),
+    }
+    login_resp = requests.post(login_url, json=login_payload)
+    token = login_resp.json()["access_token"]
+
+    return token
