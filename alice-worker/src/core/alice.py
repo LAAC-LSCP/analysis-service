@@ -85,7 +85,10 @@ class ALICE(ModelPlugin):
             raw_folder / f"{base_name}.txt",
         )
         # VTC output (VTC is a submodule of the ALICE model)
-        os.remove(self.alice_dir / "diarization_output.rttm")
+        diarization_output = self.alice_dir / "diarization_output.rttm"
+
+        if diarization_output.exists(): # This doesn't always exist??
+            os.remove(self.alice_dir / "diarization_output.rttm")
 
         return
 

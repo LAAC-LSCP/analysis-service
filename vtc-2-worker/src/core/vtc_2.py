@@ -3,6 +3,10 @@ import subprocess
 from pathlib import Path
 
 from analysis_service_core.src.model import ModelPlugin
+from analysis_service_core.src.logger import LoggerFactory
+
+
+logger = LoggerFactory.get_logger(__name__)
 
 
 class VTC_2(ModelPlugin):
@@ -60,8 +64,8 @@ class VTC_2(ModelPlugin):
         )
 
         if result.returncode == 0:
-            print(f"Successfully ran VTC on folder '{str(input_dir)}'")
+            logger.info(f"Successfully ran VTC 2 on folder '{str(input_dir)}'")
         else:
-            print(f"Error running VTC on folder '{str(input_dir)}: {result.stderr}")
+            logger.error(f"Error running VTC 2 on folder '{str(input_dir)}: {result.stderr}")
 
         return

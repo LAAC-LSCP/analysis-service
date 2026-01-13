@@ -1,6 +1,6 @@
 [project]
 name = "vtc-2-worker"
-version = "0.1.0"
+version = "0.1.1"
 description = "package and associated code for running vtc 2.0 on a dataset"
 authors = [
     {name = "Lawrence Borst",email = "laurens.s.borst@gmail.com"}
