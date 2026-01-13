@@ -8,8 +8,6 @@ from analysis_service_core.src.model import ModelPlugin
 
 from src.core.file_formats import RecordingFormats
 
-ALICE_DIR: Path = (Path(__file__).parent / ".." / ".." / "ALICE").resolve()
-
 
 class ALICE(ModelPlugin):
     def run_model(self, dataset_dir: Path, output_dir: Path) -> None:
@@ -32,7 +30,7 @@ class ALICE(ModelPlugin):
     ) -> None:
         rel_path: Path = file.relative_to(recordings_dir)
 
-        executable: Path = ALICE_DIR / "run_ALICE.sh"
+        executable: Path = self.alice_dir / "run_ALICE.sh"
 
         bash_script = f"""
         source {self.config.get("CONDA_ACTIVATE_FILE")}
@@ -50,7 +48,10 @@ class ALICE(ModelPlugin):
         # NOTE: ALICE has a quirk that it cannot run if your PWD is not the
         # ALICE folder itself
         result = subprocess.run(
-            ["bash", "-c", bash_script], cwd=ALICE_DIR, capture_output=True, text=True
+            ["bash", "-c", bash_script],
+            cwd=self.alice_dir,
+            capture_output=True,
+            text=True,
         )
 
         if result.returncode == 0:
@@ -72,11 +73,14 @@ class ALICE(ModelPlugin):
         if not sum_folder.exists():
             sum_folder.mkdir(parents=True, exist_ok=True)
 
-        shutil.move(ALICE_DIR / "ALICE_output.txt", sum_folder / f"{base_name}_sum.txt")
         shutil.move(
-            ALICE_DIR / "ALICE_output_utterances.txt", raw_folder / f"{base_name}.txt"
+            self.alice_dir / "ALICE_output.txt", sum_folder / f"{base_name}_sum.txt"
         )
-        os.remove(ALICE_DIR / "diarization_output.rttm")
+        shutil.move(
+            self.alice_dir / "ALICE_output_utterances.txt",
+            raw_folder / f"{base_name}.txt",
+        )
+        os.remove(self.alice_dir / "diarization_output.rttm")
 
         return
 
@@ -88,3 +92,7 @@ class ALICE(ModelPlugin):
             audio_files.update(recordings_dir.rglob(f"*.{format}"))
 
         return audio_files
+
+    @property
+    def alice_dir(self) -> Path:
+        return self.config.get("ALICE_DIR")

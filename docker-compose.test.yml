@@ -62,7 +62,6 @@ services:
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./tests/dummy_echolalia_folder/test-config.toml:/app/echolalia/test-config.toml
       - ./tests/dummy_datasets:/app/datasets
   echoservice-test-vtc-2-worker:
     container_name: echoservice-test-vtc-2-worker
@@ -84,7 +83,6 @@ services:
       - VTC_2_DEVICE=gpu
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./tests/dummy_echolalia_folder/test-config.toml:/app/echolalia/test-config.toml
       - ./tests/dummy_datasets:/app/datasets
   echoservice-test-alice-worker:
     platform: linux/amd64
@@ -103,11 +101,11 @@ services:
       - REDIS_PORT=6379
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
+      - ALICE_FOLDER=/app/ALICE
       - CONDA_ENV_NAME=ALICE
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./tests/dummy_echolalia_folder/test-config.toml:/app/echolalia/test-config.toml
       - ./tests/dummy_datasets:/app/datasets
   echoservice-test-acoustics-worker:
     container_name: echoservice-test-acoustics-worker
@@ -126,7 +124,6 @@ services:
       - DATASETS_DIR=/app/datasets
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./tests/dummy_echolalia_folder/test-config.toml:/app/echolalia/test-config.toml
       - ./tests/dummy_datasets:/app/datasets
   echoservice-test-e2e:
     container_name: echoservice-test-e2e
