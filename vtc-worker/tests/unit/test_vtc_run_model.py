@@ -29,11 +29,14 @@ def test_vtc_inputs_outputs(
 
     output_files_and_folders = {f for f in output_dir.rglob("*")}
 
-    assert len(output_files_and_folders) == 3
-    assert output_files_and_folders == {
-        output_dir / "recording_1.rttm",
-        output_dir / "recording_2.rttm",
-        output_dir / "recording_3.rttm",
+    assert len(output_files_and_folders) == 4
+
+    output_files = {f for f in output_files_and_folders if f.is_file()}
+
+    assert output_files == {
+        output_dir / "raw" / "recording_1.rttm",
+        output_dir / "raw" / "recording_2.rttm",
+        output_dir / "raw" / "recording_3.rttm",
     }
 
 
@@ -49,17 +52,17 @@ def test_vtc_inputs_outputs_nested(
 
     output_files_and_folders = {f for f in output_dir.rglob("*")}
 
-    assert len(output_files_and_folders) == 14
+    assert len(output_files_and_folders) == 15
 
     output_files = {f for f in output_files_and_folders if f.is_file()}
 
     assert len(output_files) == 6
 
     assert output_files == {
-        output_dir / "child_2" / "day_1" / "recording.rttm",
-        output_dir / "child_1" / "day_1" / "hour_1" / "recording.rttm",
-        output_dir / "child_1" / "day_2" / "recording.rttm",
-        output_dir / "child_2" / "day_1" / "hour_1" / "recording.rttm",
-        output_dir / "child_1" / "day_1" / "recording.rttm",
-        output_dir / "child_2" / "day_1" / "hour_2" / "recording.rttm",
+        output_dir / "raw" / "child_2" / "day_1" / "recording.rttm",
+        output_dir / "raw" / "child_1" / "day_1" / "hour_1" / "recording.rttm",
+        output_dir / "raw" / "child_1" / "day_2" / "recording.rttm",
+        output_dir / "raw" / "child_2" / "day_1" / "hour_1" / "recording.rttm",
+        output_dir / "raw" / "child_1" / "day_1" / "recording.rttm",
+        output_dir / "raw" / "child_2" / "day_1" / "hour_2" / "recording.rttm",
     }
