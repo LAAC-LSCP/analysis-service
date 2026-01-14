@@ -35,3 +35,12 @@ tasks:
     created: "2025-12-18T12:50:45.705711+01:00"
     modified: "2025-12-31T03:01:25.651183+01:00"
     estimated_duration: 15
+  - task_uid: "aa1bde3d-f4ab-4ab3-816d-b1e067174626"
+    model_name: "w2v2"
+    status_label: "pending"
+    user_uid: "407d4c8f-97cf-49fd-9224-f8a7a7d2ff72"
+    dataset_name: "simple-test-dataset"
+    dataset_uid_label: "simple-test-dataset_d34200f0-07dc-48e7-8508-8436c5b20ed6"
+    created: "2025-12-18T12:50:45.705711+01:00"
+    modified: "2025-12-31T03:01:25.651183+01:00"
+    estimated_duration: 15

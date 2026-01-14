@@ -128,6 +128,31 @@ services:
     volumes:
       - ./tests/dummy_datasets:/app/datasets
       - ./tests/dummy_echolalia_folder:/app/echolalia
+  echoservice-test-w2v2-worker:
+    container_name: echoservice-test-w2v2-worker
+    build:
+      context: ./w2v2-worker
+      dockerfile: Dockerfile
+      network: host
+    depends_on:
+      - echoservice-test-redis
+    networks:
+      - echoservice-test
+      - echoservice-test-external # I'd rather not, but needs HuggingFace connection
+    environment:
+      - REDIS_HOST=echoservice-test-redis
+      - REDIS_PORT=6379
+      - ECHOLALIA_DIR=/app/echolalia
+      - DATASETS_DIR=/app/datasets
+      - MAKE_CHUNKS_THREADS=8
+      - W2V2_FOLDER=/app/speech-maturity
+      - W2V2_DEVICE=cpu
+      - NUM_WORKERS=2 # May need tuning if you get "RuntimeError: stack expects a non-empty TensorList"
+      - BATCH_SIZE=32 # May need tuning if you get "RuntimeError: stack expects a non-empty TensorList"
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./tests/dummy_datasets:/app/datasets
+      - ./tests/dummy_echolalia_folder:/app/echolalia
   echoservice-test-e2e:
     container_name: echoservice-test-e2e
     build:

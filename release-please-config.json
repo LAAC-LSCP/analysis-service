@@ -1,0 +1,41 @@
+{
+  "include-component-in-tag": true,
+  "include-v-in-tag": true,
+  "tag-separator": "@",
+  "separate-pull-requests": true,
+  "packages": {
+    "acoustics-worker": {
+      "path": "acoustics-worker",
+      "release-type": "python"
+    },
+    "alice-worker": {
+      "path": "alice-worker",
+      "release-type": "python"
+    },
+    "vtc-worker": {
+      "path": "vtc-worker",
+      "release-type": "python"
+    },
+    "vtc-2-worker": {
+      "path": "vtc-2-worker",
+      "release-type": "python"
+    },
+    "w2v2-worker": {
+      "path": "w2v2-worker",
+      "release-type": "python"
+    },
+    "daemon": {
+      "path": "daemon",
+      "release-type": "python"
+    },
+    "mock-echolalia": {
+      "path": "mock-echolalia",
+      "release-type": "python"
+    },
+    "tests": {
+      "path": "tests",
+      "release-type": "python"
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}

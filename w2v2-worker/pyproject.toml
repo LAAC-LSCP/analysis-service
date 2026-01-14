@@ -1,7 +1,7 @@
 [project]
-name = "acoustics-worker"
+name = "w2v2-worker"
 version = "0.1.0"
-description = "package and associated code for running acoustics on a dataset"
+description = "package and associated code for running w2v2 on a dataset"
 authors = [
     {name = "Lawrence Borst",email = "laurens.s.borst@gmail.com"}
 ]
@@ -9,8 +9,8 @@ license = {text = "MIT"}
 requires-python = ">=3.13"
 dependencies = [
     "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git",
-    "click (>=8.3.1,<9.0.0)",
-    "childproject @ git+https://github.com/LAAC-LSCP/ChildProject.git@5fb7f8e983567e349d72068224ca9e5ba1c1c59c"
+    "childproject (>=0.4.5,<0.5.0)",
+    "ruamel-yaml (>=0.19.1,<0.20.0)"
 ]
 
 
