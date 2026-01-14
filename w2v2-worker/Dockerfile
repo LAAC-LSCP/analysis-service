@@ -23,20 +23,19 @@ RUN apt-get update && \
     . $HOME/.local/bin/env && \
     rm -rf /var/lib/apt/lists/* && \
     git lfs install && \
-    git clone --recurse-submodules https://github.com/LAAC-LSCP/VTC.git && \
+    git clone --recurse-submodules https://github.com/arxaqapi/speech-maturity && \
     cd speech-maturity && \
     uv sync && \
     uv add torchvision && \
     uv add tensorboard && \
-    uv add tensorboardX &&
-
-
+    uv add tensorboardX
 
 ENV VIRTUAL_ENV=/app/.venv \
-    PATH="/app/.venv/bin:$PATH"
+    PATH="/app/.venv/bin:$PATH:/root/.local/bin"
 
 COPY --from=poetry-builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY src ./src
+COPY src/infer.py /app/speech-maturity/scripts/infer.py
 
 ENTRYPOINT ["python"]
 CMD ["-m", "src.cli"]

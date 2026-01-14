@@ -29,6 +29,7 @@ def get_task(config: Config, authentication_token: str):
         ("a1b2c3d4-e5f6-7890-abcd-ef1234567890", "vtc"),
         ("954f493c-443f-498c-9490-7b7036e4b1be", "vtc-2"),
         ("cea95657-8e73-4a97-a982-44368d9a835c", "alice"),
+        ("aa1bde3d-f4ab-4ab3-816d-b1e067174626", "w2v2"),
     ],
 )
 def test_model_completion(task_id: str, model_name: str, get_task):
