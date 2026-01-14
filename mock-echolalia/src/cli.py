@@ -3,6 +3,7 @@ from pathlib import Path
 
 import click
 import yaml
+from analysis_service_core.src.logger import LoggerFactory
 
 from src.app_types import Database
 from src.create_app import create_app
@@ -10,6 +11,9 @@ from src.create_app import create_app
 EXPECTED_CLIENT_ID = os.environ.get("EXPECTED_CLIENT_ID", None)
 EXPECTED_CLIENT_SECRET = os.environ.get("EXPECTED_CLIENT_SECRET", None)
 FLASK_PORT = os.environ.get("FLASK_PORT", None)
+
+
+logger = LoggerFactory.get_logger(__name__)
 
 
 @click.command()
@@ -50,7 +54,7 @@ def start_app(db):
         expected_client_id=EXPECTED_CLIENT_ID,
         expected_client_secret=EXPECTED_CLIENT_SECRET,
     )
-    print("Running mock server...")
+    logger.info("Running mock server...")
     app.run(debug=True, host="0.0.0.0", port=FLASK_PORT)
 
 

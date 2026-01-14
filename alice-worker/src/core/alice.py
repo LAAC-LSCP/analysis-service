@@ -87,7 +87,7 @@ class ALICE(ModelPlugin):
         # VTC output (VTC is a submodule of the ALICE model)
         diarization_output = self.alice_dir / "diarization_output.rttm"
 
-        if diarization_output.exists(): # This doesn't always exist??
+        if diarization_output.exists():  # This doesn't always exist??
             os.remove(self.alice_dir / "diarization_output.rttm")
 
         return

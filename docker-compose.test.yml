@@ -81,7 +81,7 @@ services:
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
       - VTC_2_FOLDER=/app/VTC
-      - VTC_2_DEVICE=gpu
+      - VTC_2_DEVICE=cpu
       - PYTHONUNBUFFERED=1
     volumes:
       - ./tests/dummy_datasets:/app/datasets
