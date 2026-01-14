@@ -1,10 +1,13 @@
 from typing import Any, Dict, List, Protocol, Type, TypeVar
 
 import analysis_service_core.src.redis.commands as commands
+from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.types import TaskStatus
 from src.service.http_client import HTTPClient
+
+logger = LoggerFactory.get_logger(__name__)
 
 CommandT = TypeVar("CommandT", bound=commands.Command, contravariant=True)
 
@@ -28,7 +31,7 @@ def update_echolalia(
             },
         )
 
-        print(
+        logger.info(
             f"Sent update to Echolalia for task \
 {str(command.task_id)} with status '{str(task_status)}' and \
 estimated duration '{0}'"
@@ -39,7 +42,9 @@ estimated duration '{0}'"
 
 def handle_run_task(queues: Dict[QueueName, Queue]) -> CommandHandler:
     def send_request(command: commands.RunTask) -> None:
-        print(f"Sending request to redis for task with model: {str(command.operation)}")
+        logger.info(
+            f"Sending request to redis for task with model: {str(command.operation)}"
+        )
         queue: Queue | None = None
         if command.operation == commands.Operation.RUN_VTC:
             queue = queues[QueueName.RUN_VTC]

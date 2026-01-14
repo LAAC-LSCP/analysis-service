@@ -66,7 +66,7 @@ class VTC(ModelPlugin):
             logger.warning(f"Expected output file {all_rttm} not found")
             return
 
-        output_file = (output_dir / rel_path).resolve()
+        output_file = (output_dir / "raw" / rel_path).resolve()
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
         final_output = output_file.with_suffix(".rttm")

@@ -1,7 +1,10 @@
 import tomllib
 from pathlib import Path
 
+from analysis_service_core.src.logger import LoggerFactory
 from pydantic import BaseModel, Field, HttpUrl, ValidationError
+
+logger = LoggerFactory.get_logger(__name__)
 
 
 class HTTPConfig(BaseModel):
@@ -27,6 +30,5 @@ def load_config(file_path: Path) -> ConfigModel:
     try:
         return ConfigModel.model_validate(raw)
     except ValidationError as e:
-        print("Invalid configuration:")
-        print(e)
+        logger.err(f"Invalid configuration: {e}")
         raise

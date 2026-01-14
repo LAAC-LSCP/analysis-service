@@ -25,3 +25,7 @@ def run_vtc_2() -> None:
     vtc_2.run()
 
     return
+
+
+if __name__ == "__main__":
+    run_vtc_2()

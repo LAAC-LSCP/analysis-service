@@ -1,9 +1,12 @@
 import secrets
 
+from analysis_service_core.src.logger import LoggerFactory
 from flask import Flask, jsonify, request
 from flask_httpauth import HTTPTokenAuth
 
 from src.app_types import Database, FlaskConfig
+
+logger = LoggerFactory.get_logger(__name__)
 
 
 def create_app(
@@ -44,7 +47,7 @@ def create_app(
     @app.route("/api/analytics/services/tasks", methods=["GET"])
     @auth.login_required
     def get_tasks():
-        print("Received request to get all tasks")
+        logger.info("Received request to get all tasks")
         db: Database = app.config[FlaskConfig.TASK_DB]
         tasks = db.tasks
 
@@ -55,12 +58,12 @@ def create_app(
     @app.route("/api/analytics/services/tasks/<task_id>", methods=["GET"])
     @auth.login_required
     def get_task(task_id):
-        print(f"Received request to get task with id '{task_id}'")
+        logger.info(f"Received request to get task with id '{task_id}'")
         db: Database = app.config[FlaskConfig.TASK_DB]
 
         task = next((t for t in db.tasks if str(t.task_uid) == task_id), None)
 
-        print(f"Found task: {task}")
+        logger.info(f"Found task: {task}")
 
         if task is None:
             return jsonify({"error": "Task not found"}), 404
@@ -70,7 +73,7 @@ def create_app(
     @app.route("/api/analytics/services/tasks/<task_id>", methods=["PUT"])
     @auth.login_required
     def update_task(task_id):
-        print(
+        logger.info(
             f"Received request to update task with id '{task_id}' and \
 data '{request.json}'"
         )

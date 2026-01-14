@@ -12,7 +12,7 @@ from src.core.vtc_2 import VTC_2
 
 
 class VTC_2_Mock(VTC_2):
-    def _call_vtc(self, input: Path, output: Path) -> None:
+    def _call_vtc(self, input: Path, output: Path) -> int:
         """
         Mimicks calling VTC roughly as follows:
         `uv run scripts/infer.py --wavs [input] --output [output]`
@@ -31,7 +31,7 @@ class VTC_2_Mock(VTC_2):
         files = [f for f in input.iterdir() if f.is_file()]
 
         if len(files) == 0:
-            return
+            return 0
 
         (output / "raw_rttm").mkdir(parents=True, exist_ok=True)
         (output / "rttm").mkdir(parents=True, exist_ok=True)
@@ -42,4 +42,4 @@ class VTC_2_Mock(VTC_2):
             (output / "raw_rttm.csv").touch(exist_ok=True)
             (output / "rttm.csv").touch(exist_ok=True)
 
-        return
+        return 0

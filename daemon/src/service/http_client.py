@@ -70,7 +70,6 @@ class HTTPClient:
 
     def get_all_tasks(self) -> external_api.Tasks:
         uri: str = self._base_url + "/api/analytics/services/tasks"
-        print(f"requesting at {uri}")
 
         try:
             response = requests.get(uri, headers=self.headers, timeout=self._timeout_s)

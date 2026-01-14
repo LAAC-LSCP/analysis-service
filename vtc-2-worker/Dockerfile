@@ -28,7 +28,7 @@ RUN apt-get update && \
     uv sync
 
 ENV VIRTUAL_ENV=/app/.venv \
-    PATH="/app/.venv/bin:$PATH"
+    PATH="/app/.venv/bin:$PATH:/root/.local/bin"
 
 COPY --from=poetry-builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY src ./src

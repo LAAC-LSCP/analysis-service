@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timedelta
 from time import sleep
 
+from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import RunTask
 from analysis_service_core.src.redis.commands import CompleteTask
 from analysis_service_core.src.redis.queue import Queue
@@ -10,6 +11,8 @@ from tenacity import Retrying, stop_after_attempt, wait_fixed
 from src.core.types import TaskStatus
 from src.service.command_handlers import CommandHandlers
 from src.service.http_client import HTTPClient
+
+logger = LoggerFactory.get_logger(__name__)
 
 
 class Service:
@@ -31,7 +34,7 @@ class Service:
         self._http_client = http_client
 
     async def start(self) -> None:
-        print("Daemon started")
+        logger.info("Daemon started")
         loop = asyncio.get_event_loop()
         redis_task = loop.run_in_executor(None, self._listen_and_handle_redis)
         api_task = self._external_api_loop()
@@ -42,7 +45,7 @@ class Service:
         while True:
             current_t = datetime.now()
 
-            print("Loading new tasks...")
+            logger.info("Loading new tasks...")
             self.tick()
 
             sleep_t: float = (
@@ -52,14 +55,20 @@ class Service:
             await asyncio.sleep(sleep_t if sleep_t > 0 else 0)
 
     def tick(self) -> None:
-        all_tasks = self._http_client.get_all_tasks()
+        try:
+            logger.info("Requesting all tasks through external API...")
+            all_tasks = self._http_client.get_all_tasks()
+        except Exception as e:
+            logger.err(f"Failed to fetch tasks: {e}")
+
+            return
 
         new_tasks = {
             task for task in all_tasks if task.status_label == TaskStatus.PENDING
         }
 
         if len(new_tasks) != 0:
-            print(f"Received new tasks: {new_tasks}")
+            logger.info(f"Received new tasks: {new_tasks}")
 
         for task in new_tasks:
             message: RunTask = RunTask(
@@ -68,7 +77,7 @@ class Service:
                 operation=task.model_name,
             )
 
-            print(f"Publishing task with id '{task.task_uid}' to redis")
+            logger.info(f"Publishing task with id '{task.task_uid}' to redis")
             for handler in self._command_handlers.get(RunTask, []):
                 handler(message)
 
@@ -104,7 +113,7 @@ class Service:
         return
 
     def _handle_completion(self, command_dict: dict) -> None:
-        print(f"Handling message: {command_dict}")
+        logger.info(f"Handling message: {command_dict}")
         command = CompleteTask.from_dict(command_dict)
 
         for handler in self._command_handlers.get(CompleteTask, []):
