@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.13.0...v0.14.0) (2026-01-15)
+
+
+### Features
+
+* remove need for config ([bb1061e](https://github.com/LAAC-LSCP/analysis-service/commit/bb1061ecf488a90b84faa3f179dac6044c47ec1e))
+
 ## [0.13.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.12.0...v0.13.0) (2026-01-14)
 
 
