@@ -1,6 +1,6 @@
 [project]
 name = "w2v2-worker"
-version = "0.1.0"
+version = "0.2.0"
 description = "package and associated code for running w2v2 on a dataset"
 authors = [
     {name = "Lawrence Borst",email = "laurens.s.borst@gmail.com"}
