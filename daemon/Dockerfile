@@ -19,4 +19,4 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY src ./src
 
 ENTRYPOINT ["python"]
-CMD ["-m", "src.cli", "--config", "/app/echolalia/config.toml"]
+CMD ["-m", "src.cli"]
