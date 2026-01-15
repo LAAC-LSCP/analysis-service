@@ -4,6 +4,14 @@ The analysis service is a micro-service for Echolalia. It launches long-running 
 1. The voice type classifier (VTC) [[1]](#1)[[2]](#2) - note that different major versions are available, but at present (Dec 29, 2025) we use version 1
 2. ChildProject's acoustics pipeline [[3]](#3)
 
+# Setting Up
+Fill in the `.env.prod` file and use
+```bash
+docker compose --env-file .env.prod --profile prod -f docker-compose.yml up
+```
+
+To start up the services
+
 ## References
 
 <a id="1">[1]</a>

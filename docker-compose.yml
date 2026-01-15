@@ -1,178 +1,185 @@
 services:
-  echoservice-test-redis:
+  echoservice-redis:
     image: redis:7-alpine
-    container_name: echoservice-test-redis
+    container_name: echoservice-redis
     ports:
       - "6379:6379"
     networks:
-      - echoservice-test
+      - echoservice
     environment:
-      - REDIS_HOST=echoservice-test-redis
-      - REDIS_PORT=6379
-  echoservice-test-mock-server:
-    container_name: echoservice-test-mock-server
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    profiles: ["test", "prod"]
+  echoservice-mock-server:
+    container_name: echoservice-mock-server
     build:
       context: ./mock-echolalia
       dockerfile: Dockerfile
     ports:
-      - 8080:8080
+      - "8080:8080"
     networks:
-      - echoservice-test
+      - echoservice
     environment:
-      - EXPECTED_CLIENT_ID=my-client-id
-      - EXPECTED_CLIENT_SECRET=my-client-secret
-      - FLASK_PORT=8080
-      - PYTHONUNBUFFERED=1
-  echoservice-test-daemon:
-    container_name: echoservice-test-daemon
+      - EXPECTED_CLIENT_ID=${CLIENT_ID}
+      - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
+      - FLASK_PORT=${FLASK_PORT}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+    profiles: ["test"]
+  echoservice-daemon:
+    container_name: echoservice-daemon
     build:
       context: ./daemon
       dockerfile: Dockerfile
     depends_on:
-      - echoservice-test-mock-server
-      - echoservice-test-redis
+      - echoservice-redis
     networks:
-      - echoservice-test
-      - echoservice-test-external
+      - echoservice
+      - echoservice-external
     environment:
-      - REDIS_HOST=echoservice-test-redis
-      - REDIS_PORT=6379
-      - CLIENT_ID=my-client-id
-      - BASE_URL=http://echoservice-test-mock-server:8080
-      - CLIENT_SECRET=my-client-secret
-      - PYTHONUNBUFFERED=1
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - BASE_URL=${BASE_URL}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
-      - ./tests/dummy_echolalia_folder:/app/echolalia
-      - /app/echolalia/outputs # will ignore it
-  echoservice-test-vtc-worker:
-    container_name: echoservice-test-vtc-worker
+      - ${ECHOLALIA_FOLDER}:/app/echolalia
+    profiles: ["test", "prod"]
+  echoservice-vtc-worker:
+    container_name: echoservice-vtc-worker
     build:
       context: ./vtc-worker
       dockerfile: Dockerfile
-      network: host
+      network: host # I need this for Conda installation
     depends_on:
-      - echoservice-test-redis
+      - echoservice-redis
     networks:
-      - echoservice-test
+      - echoservice
     environment:
-      - REDIS_HOST=echoservice-test-redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
       - VTC_FOLDER=/app/voice_type_classifier
       - CONDA_ENV_NAME=pyannote
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
-      - PYTHONUNBUFFERED=1
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
-      - ./tests/dummy_datasets:/app/datasets
-      - ./tests/dummy_echolalia_folder:/app/echolalia
-  echoservice-test-vtc-2-worker:
-    container_name: echoservice-test-vtc-2-worker
+      - ${DATASETS_FOLDER}:/app/datasets
+      - ${ECHOLALIA_FOLDER}:/app/echolalia
+    profiles: ["test", "prod"]
+  echoservice-vtc-2-worker:
+    container_name: echoservice-vtc-2-worker
     build:
       context: ./vtc-2-worker
       dockerfile: Dockerfile
       network: host
     depends_on:
-      - echoservice-test-redis
+      - echoservice-redis
     networks:
-      - echoservice-test
-      - echoservice-test-external
+      - echoservice
+      - echoservice-external
     environment:
-      - REDIS_HOST=echoservice-test-redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
       - VTC_2_FOLDER=/app/VTC
-      - VTC_2_DEVICE=cpu
-      - PYTHONUNBUFFERED=1
+      - VTC_2_DEVICE=${VTC_2_DEVICE}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
-      - ./tests/dummy_datasets:/app/datasets
-      - ./tests/dummy_echolalia_folder:/app/echolalia
-  echoservice-test-alice-worker:
+      - ${DATASETS_FOLDER}:/app/datasets
+      - ${ECHOLALIA_FOLDER}:/app/echolalia
+    profiles: ["test", "prod"]
+  echoservice-alice-worker:
     platform: linux/amd64
-    container_name: echoservice-test-alice-worker
+    container_name: echoservice-alice-worker
     build:
       context: ./alice-worker
       dockerfile: Dockerfile
-      network: host
+      network: host # Needed for conda installation
     depends_on:
-      - echoservice-test-redis
+      - echoservice-redis
     networks:
-      - echoservice-test
+      - echoservice
     environment:
-      - REDIS_HOST=echoservice-test-redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
       - ALICE_FOLDER=/app/ALICE
       - CONDA_ENV_NAME=ALICE
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
-      - PYTHONUNBUFFERED=1
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
-      - ./tests/dummy_datasets:/app/datasets
-      - ./tests/dummy_echolalia_folder:/app/echolalia
-  echoservice-test-acoustics-worker:
-    container_name: echoservice-test-acoustics-worker
+      - ${DATASETS_FOLDER}:/app/datasets
+      - ${ECHOLALIA_FOLDER}:/app/echolalia
+    profiles: ["test", "prod"]
+  echoservice-acoustics-worker:
+    container_name: echoservice-acoustics-worker
     build:
       context: ./acoustics-worker
       dockerfile: Dockerfile
       network: host
     depends_on:
-      - echoservice-test-redis
+      - echoservice-redis
     networks:
-      - echoservice-test
+      - echoservice
     environment:
-      - REDIS_HOST=echoservice-test-redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
-      - PYTHONUNBUFFERED=1
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
-      - ./tests/dummy_datasets:/app/datasets
-      - ./tests/dummy_echolalia_folder:/app/echolalia
-  echoservice-test-w2v2-worker:
-    container_name: echoservice-test-w2v2-worker
+      - ${DATASETS_FOLDER}:/app/datasets
+      - ${ECHOLALIA_FOLDER}:/app/echolalia
+    profiles: ["test", "prod"]
+  echoservice-w2v2-worker:
+    container_name: echoservice-w2v2-worker
     build:
       context: ./w2v2-worker
       dockerfile: Dockerfile
       network: host
     depends_on:
-      - echoservice-test-redis
+      - echoservice-redis
     networks:
-      - echoservice-test
-      - echoservice-test-external # I'd rather not, but needs HuggingFace connection
+      - echoservice
+      - echoservice-external # I'd rather not, but needs HuggingFace connection
     environment:
-      - REDIS_HOST=echoservice-test-redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
-      - MAKE_CHUNKS_THREADS=8
+      - CHUNKIFY_THREADS=${W2V2_CHUNKIFY_THREADS}
       - W2V2_FOLDER=/app/speech-maturity
-      - W2V2_DEVICE=cpu
-      - NUM_WORKERS=2 # May need tuning if you get "RuntimeError: stack expects a non-empty TensorList"
-      - BATCH_SIZE=32 # May need tuning if you get "RuntimeError: stack expects a non-empty TensorList"
-      - PYTHONUNBUFFERED=1
+      - W2V2_DEVICE=${W2V2_DEVICE}
+      - NUM_WORKERS=${W2V2_NUM_WORKERS}
+      - BATCH_SIZE=${W2V2_BATCH_SIZE}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
-      - ./tests/dummy_datasets:/app/datasets
-      - ./tests/dummy_echolalia_folder:/app/echolalia
-  echoservice-test-e2e:
-    container_name: echoservice-test-e2e
+      - ${DATASETS_FOLDER}:/app/datasets
+      - ${ECHOLALIA_FOLDER}:/app/echolalia
+    profiles: ["test", "prod"]
+  echoservice-e2e:
+    container_name: echoservice-e2e
     build:
       context: ./tests
       dockerfile: Dockerfile
     depends_on:
-      - echoservice-test-redis
-      - echoservice-test-daemon
+      - echoservice-redis
+      - echoservice-daemon
     networks:
-      - echoservice-test
+      - echoservice
     environment:
-      - EXPECTED_CLIENT_ID=my-client-id
-      - EXPECTED_CLIENT_SECRET=my-client-secret
-      - BASE_URL=http://echoservice-test-mock-server:8080
-      - PYTHONUNBUFFERED=1
+      - EXPECTED_CLIENT_ID=${CLIENT_ID}
+      - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
+      - BASE_URL=${BASE_URL}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+    profiles: ["test", "prod"]
 networks:
-  echoservice-test:
+  echoservice:
     driver: bridge
     internal: true
-  echoservice-test-external:
+  echoservice-external:
     external: true

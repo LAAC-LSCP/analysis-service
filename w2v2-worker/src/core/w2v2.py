@@ -25,7 +25,7 @@ class W2V2(ModelPlugin):
             if return_code != 0:
                 return
 
-            return_code, chunks_dir = self._make_chunks(
+            return_code, chunks_dir = self._chunkify(
                 dataset_dir, output_dir, samples_csv
             )
             stack.callback(self._cleanup_chunks, chunks_dir)
@@ -86,7 +86,7 @@ class W2V2(ModelPlugin):
 
         return result.returncode, output_csv
 
-    def _make_chunks(
+    def _chunkify(
         self, dataset_dir: Path, output_dir: Path, samples_csv: Path
     ) -> Tuple[int, Path]:
         create_chunks: Path = CURRENT_DIR / "create_chunks.py"
@@ -102,7 +102,7 @@ class W2V2(ModelPlugin):
             "--destination-path",
             str(chunks_dir),
             "--threads",
-            str(self.config.get("MAKE_CHUNKS_THREADS")),
+            str(self.config.get("CHUNKIFY_THREADS")),
         ]
 
         logger.info(f"Creating chunks in '{str(chunks_dir)}'...")
