@@ -37,10 +37,15 @@ class VTC(ModelPlugin):
 
         executable: Path = self.config.get("VTC_FOLDER") / "apply.sh"
 
+        device_str: str = ""
+        device = self.config.get("VTC_DEVICE")
+        if device == "gpu":
+            device_str = "--device=gpu"
+
         bash_script = f"""
         source {self.config.get("CONDA_ACTIVATE_FILE")}
         conda activate {self.config.get("CONDA_ENV_NAME")}
-        {str(executable)} {str(file)} --device=gpu
+        {str(executable)} {str(file)} {device_str}
         """
 
         self._run_subprocess(bash_script, output_dir, file)
