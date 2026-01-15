@@ -16,6 +16,7 @@ def run_alice():
         EnvVar(key="CONDA_ACTIVATE_FILE", type=Path),
         EnvVar(key="CONDA_ENV_NAME", type=str),
         EnvVar(key="ALICE_FOLDER", type=Path),
+        EnvVar(key="ALICE_DEVICE", type=str),
     }
     config = Config(env_vars)
     queue = Queue(QueueName.RUN_ALICE)
