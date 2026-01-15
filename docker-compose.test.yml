@@ -37,11 +37,13 @@ services:
     environment:
       - REDIS_HOST=echoservice-test-redis
       - REDIS_PORT=6379
+      - CLIENT_ID=my-client-id
+      - BASE_URL=http://echoservice-test-mock-server:8080
+      - CLIENT_SECRET=my-client-secret
       - PYTHONUNBUFFERED=1
     volumes:
       - ./tests/dummy_echolalia_folder:/app/echolalia
       - /app/echolalia/outputs # will ignore it
-    command: ["-m", "src.cli", "--config", "/app/echolalia/test-config.toml"]
   echoservice-test-vtc-worker:
     container_name: echoservice-test-vtc-worker
     build:
