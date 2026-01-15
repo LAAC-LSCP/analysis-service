@@ -1,16 +1,15 @@
-from pathlib import Path
 from typing import Tuple
 
+from analysis_service_core.src.config import Config, EnvVar
 from analysis_service_core.src.redis.queue import Queue, QueueName
 
-from src.config.config import load_config
 from src.service.command_handlers import CommandHandlers, get_command_handlers
 from src.service.http_client import HTTPClient
 from src.service.service import Service
 
 
-async def run(config: Path) -> None:
-    completion_queue, command_handlers, http_client = setup(config)
+async def run() -> None:
+    completion_queue, command_handlers, http_client = setup()
 
     service = Service(completion_queue, command_handlers, http_client)
     await service.start()
@@ -18,16 +17,18 @@ async def run(config: Path) -> None:
     return
 
 
-def setup(config_file: Path) -> Tuple[Queue, CommandHandlers, HTTPClient]:
-    if not config_file.exists():
-        raise FileNotFoundError(f"File at '{str(config_file)}' not found")
-
-    config = load_config(config_file)
+def setup() -> Tuple[Queue, CommandHandlers, HTTPClient]:
+    env_vars = {
+        EnvVar("BASE_URL", str),
+        EnvVar("CLIENT_ID", str),
+        EnvVar("CLIENT_SECRET", str),
+    }
+    config = Config(env_vars, check_required=False)
 
     http_client = HTTPClient(
-        base_url=str(config.http.base_url).rstrip("/"),
-        client_id=config.http.client_id,
-        client_secret=config.http.client_secret,
+        base_url=config.get("BASE_URL").rstrip("/"),
+        client_id=config.get("CLIENT_ID"),
+        client_secret=config.get("CLIENT_SECRET"),
     )
 
     queues = {name: Queue(name) for name in list(QueueName)}

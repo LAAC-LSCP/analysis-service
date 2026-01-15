@@ -4,16 +4,6 @@ The analysis service is a micro-service for Echolalia. It launches long-running 
 1. The voice type classifier (VTC) [[1]](#1)[[2]](#2) - note that different major versions are available, but at present (Dec 29, 2025) we use version 1
 2. ChildProject's acoustics pipeline [[3]](#3)
 
-# Configuration
-The service will create files in the `analysis-service` folder inside your home directory. The `config.toml` file is looked for under `~/analysis-service/config.toml` and must look similar to the below
-
-```toml
-[http]
-base_url = "https://echolalia.com"
-client_id = "service"
-client_secret = "5y2CAKrLLD1iGRCrpALm1dkR9"
-```
-
 ## References
 
 <a id="1">[1]</a>
