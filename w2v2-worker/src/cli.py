@@ -12,7 +12,7 @@ def run_w2v2() -> None:
     env_vars = {
         EnvVar("W2V2_FOLDER", Path),
         EnvVar("W2V2_DEVICE", str),
-        EnvVar("MAKE_CHUNKS_THREADS", int),
+        EnvVar("CHUNKIFY_THREADS", int),
         EnvVar("BATCH_SIZE", int),
         EnvVar("NUM_WORKERS", int),
     }

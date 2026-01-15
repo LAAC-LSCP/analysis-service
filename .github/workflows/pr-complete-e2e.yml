@@ -43,8 +43,8 @@ jobs:
       run: docker network create echoservice-external
     - name: Run full E2E tests with Docker Compose
       run: |
-        docker compose -f docker-compose.test.yml up \
+        docker compose --env-file .env.test --profile test -f docker-compose.yml up \
         --build \
         --abort-on-container-exit \
-        --exit-code-from echoservice-test-e2e
+        --exit-code-from echoservice-e2e
 
