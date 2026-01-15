@@ -1,40 +1,23 @@
+version: "3.9"
 services:
-  echoservice-redis:
+  echoswarm-redis:
     image: redis:7-alpine
-    container_name: echoservice-redis
     ports:
       - "6379:6379"
     networks:
-      - echoservice
+      - echoswarm
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-    profiles: ["test", "prod"]
-  echoservice-mock-server:
-    container_name: echoservice-mock-server
-    build:
-      context: ./mock-echolalia
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    networks:
-      - echoservice
-    environment:
-      - EXPECTED_CLIENT_ID=${CLIENT_ID}
-      - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
-      - FLASK_PORT=${FLASK_PORT}
-      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
-    profiles: ["test"]
-  echoservice-daemon:
-    container_name: echoservice-daemon
-    build:
-      context: ./daemon
-      dockerfile: Dockerfile
+    deploy:
+      replicas: 1
+  echoswarm-daemon:
+    image: me/echoswarm-daemon:latest
     depends_on:
-      - echoservice-redis
+      - echoswarm-redis
     networks:
-      - echoservice
-      - echoservice-external
+      - echoswarm
+      - echoswarm-external
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -44,41 +27,41 @@ services:
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
-  echoservice-vtc-worker:
-    container_name: echoservice-vtc-worker
-    build:
-      context: ./vtc-worker
-      dockerfile: Dockerfile
-      network: host # I need this for Conda installation
+    deploy:
+      replicas: 1
+  echoswarm-vtc-worker:
+    image: me/echoswarm-vtc:latest
     depends_on:
-      - echoservice-redis
+      - echoswarm-redis
     networks:
-      - echoservice
+      - echoswarm
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
       - VTC_FOLDER=/app/voice_type_classifier
+      - VTC_DEVICE=${VTC_DEVICE}
       - CONDA_ENV_NAME=pyannote
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+      - NVIDIA_VISIBLE_DEVICES=0
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
-  echoservice-vtc-2-worker:
-    container_name: echoservice-vtc-2-worker
-    build:
-      context: ./vtc-2-worker
-      dockerfile: Dockerfile
-      network: host
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+  echoswarm-vtc-2-worker:
+    image: me/echoswarm-vtc-2:latest
     depends_on:
-      - echoservice-redis
+      - echoswarm-redis
     networks:
-      - echoservice
-      - echoservice-external
+      - echoswarm
+      - echoswarm-external
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -87,44 +70,48 @@ services:
       - VTC_2_FOLDER=/app/VTC
       - VTC_2_DEVICE=${VTC_2_DEVICE}
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+      - NVIDIA_VISIBLE_DEVICES=0
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
-  echoservice-alice-worker:
-    platform: linux/amd64
-    container_name: echoservice-alice-worker
-    build:
-      context: ./alice-worker
-      dockerfile: Dockerfile
-      network: host # Needed for conda installation
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+  echoswarm-alice-worker:
+    image: me/echoswarm-alice:latest
     depends_on:
-      - echoservice-redis
+      - echoswarm-redis
     networks:
-      - echoservice
+      - echoswarm
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
       - ALICE_FOLDER=/app/ALICE
+      - ALICE_DEVICE=${ALICE_DEVICE}
       - CONDA_ENV_NAME=ALICE
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+      - NVIDIA_VISIBLE_DEVICES=1
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
-  echoservice-acoustics-worker:
-    container_name: echoservice-acoustics-worker
-    build:
-      context: ./acoustics-worker
-      dockerfile: Dockerfile
-      network: host
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+  echoswarm-acoustics-worker:
+    image: me/echoswarm-acoustics:latest
     depends_on:
-      - echoservice-redis
+      - echoswarm-redis
     networks:
-      - echoservice
+      - echoswarm
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -134,18 +121,15 @@ services:
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
-  echoservice-w2v2-worker:
-    container_name: echoservice-w2v2-worker
-    build:
-      context: ./w2v2-worker
-      dockerfile: Dockerfile
-      network: host
+    deploy:
+      replicas: 1
+  echoswarm-w2v2-worker:
+    image: me/echoswarm-w2v2:latest
     depends_on:
-      - echoservice-redis
+      - echoswarm-redis
     networks:
-      - echoservice
-      - echoservice-external # I'd rather not, but needs HuggingFace connection
+      - echoswarm
+      - echoswarm-external # I'd rather not, but needs HuggingFace connection
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -157,29 +141,18 @@ services:
       - NUM_WORKERS=${W2V2_NUM_WORKERS}
       - BATCH_SIZE=${W2V2_BATCH_SIZE}
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+      - NVIDIA_VISIBLE_DEVICES=2
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
-  echoservice-e2e:
-    container_name: echoservice-e2e
-    build:
-      context: ./tests
-      dockerfile: Dockerfile
-    depends_on:
-      - echoservice-redis
-      - echoservice-daemon
-    networks:
-      - echoservice
-    environment:
-      - EXPECTED_CLIENT_ID=${CLIENT_ID}
-      - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
-      - BASE_URL=${BASE_URL}
-      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
-    profiles: ["test", "prod"]
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
 networks:
-  echoservice:
-    driver: bridge
-    internal: true
-  echoservice-external:
+  echoswarm:
+    driver: overlay
+  echoswarm-external:
     external: true

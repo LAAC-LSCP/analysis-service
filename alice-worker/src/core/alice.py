@@ -35,10 +35,14 @@ class ALICE(ModelPlugin):
 
         executable: Path = self.alice_dir / "run_ALICE.sh"
 
+        device_str: str = ""
+        if self.config.get("ALICE_DEVICE") == "gpu":
+            device_str = "gpu"
+
         bash_script = f"""
         source {self.config.get("CONDA_ACTIVATE_FILE")}
         conda activate {self.config.get("CONDA_ENV_NAME")}
-        {str(executable)} {str(file)}
+        {str(executable)} {str(file)} {device_str}
         """
 
         return_code = self._run_subprocess(bash_script, self.alice_dir, file)
