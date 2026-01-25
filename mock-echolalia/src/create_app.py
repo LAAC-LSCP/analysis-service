@@ -73,10 +73,8 @@ def create_app(
     @app.route("/api/analytics/services/tasks/<task_id>", methods=["PUT"])
     @auth.login_required
     def update_task(task_id):
-        logger.info(
-            f"Received request to update task with id '{task_id}' and \
-data '{request.json}'"
-        )
+        logger.info(f"Received request to update task with id '{task_id}' and \
+data '{request.json}'")
         db: Database = app.config[FlaskConfig.TASK_DB]
         data = request.json
 

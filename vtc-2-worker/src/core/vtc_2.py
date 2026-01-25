@@ -85,9 +85,7 @@ class VTC_2(ModelPlugin):
         if result.returncode == 0:
             logger.info(f"Successfully ran VTC 2 on folder '{str(input_dir)}'")
         else:
-            logger.error(
-                f"Error running VTC 2 on folder '{str(input_dir)} with output \
-'{str(output_dir)}': {result.stderr}"
-            )
+            logger.error(f"Error running VTC 2 on folder '{str(input_dir)} with output \
+'{str(output_dir)}': {result.stderr}")
 
         return result.returncode

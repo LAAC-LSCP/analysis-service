@@ -19,10 +19,8 @@ def client_and_app() -> Generator[Tuple[FlaskClient, Flask, str]]:
                 status_label="running",
                 user_uid=UUID("b076a352-fee1-44a4-84ff-608f57b98215"),
                 dataset_name="test-dataset",
-                dataset_uid_label=(
-                    "test-dataset-\
-93f291bb-a6c1-42a4-8ed2-378df27eee0e"
-                ),
+                dataset_uid_label=("test-dataset-\
+93f291bb-a6c1-42a4-8ed2-378df27eee0e"),
                 created="2025-12-18T12:50:45.705711+01:00",
                 modified="2025-12-18T12:50:45.705711+01:00",
                 estimated_duration=3,
@@ -61,10 +59,8 @@ def test_get_tasks(client_and_app: Tuple[FlaskClient, Flask, str]):
 
     resp = client.get(
         "/api/analytics/services/tasks",
-        headers={
-            "Authorization": f"Bearer \
-{token}"
-        },
+        headers={"Authorization": f"Bearer \
+{token}"},
     )
     assert resp.status_code == 200
 

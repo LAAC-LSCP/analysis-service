@@ -95,10 +95,8 @@ class HTTPClient:
             if exc.response and exc.response.status_code == HTTPStatus.NOT_FOUND:
                 return None
 
-            raise RuntimeError(
-                f"Failed to fetch task with UUID {id} from \
-                {self._base_url}: {exc}"
-            ) from exc
+            raise RuntimeError(f"Failed to fetch task with UUID {id} from \
+                {self._base_url}: {exc}") from exc
 
     def put_task(self, task_id: UUID, payload: external_api.PutPayload) -> None:
         uri: str = self._base_url + f"/api/analytics/services/tasks/{str(task_id)}"
