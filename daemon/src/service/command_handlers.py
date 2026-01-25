@@ -31,11 +31,9 @@ def update_echolalia(
             },
         )
 
-        logger.info(
-            f"Sent update to Echolalia for task \
+        logger.info(f"Sent update to Echolalia for task \
 {str(command.task_id)} with status '{str(task_status)}' and \
-estimated duration '{0}'"
-        )
+estimated duration '{0}'")
 
     return send_update
 

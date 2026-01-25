@@ -68,7 +68,7 @@ For development Docker Compose is the right tool. The main difference with Docke
 
 To run all the test containers
 ```bash
-docker compose --env-file .env.test --profile test -f docker-compose.dev.yml up
+docker compose --env-file .env.test -f docker-compose.dev.yml up
 ```
 
 ## References

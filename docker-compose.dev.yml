@@ -9,7 +9,6 @@ services:
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-    profiles: ["test", "prod"]
   echoservice-mock-server:
     container_name: echoservice-mock-server
     build:
@@ -24,7 +23,6 @@ services:
       - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
       - FLASK_PORT=${FLASK_PORT}
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
-    profiles: ["test"]
   echoservice-daemon:
     container_name: echoservice-daemon
     build:
@@ -32,6 +30,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - echoservice-redis
+      - echoservice-mock-server
     networks:
       - echoservice
       - echoservice-external
@@ -44,7 +43,6 @@ services:
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
   echoservice-vtc-worker:
     container_name: echoservice-vtc-worker
     build:
@@ -61,13 +59,13 @@ services:
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
       - VTC_FOLDER=/app/voice_type_classifier
+      - VTC_DEVICE=${VTC_DEVICE}
       - CONDA_ENV_NAME=pyannote
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
   echoservice-vtc-2-worker:
     container_name: echoservice-vtc-2-worker
     build:
@@ -90,7 +88,6 @@ services:
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
   echoservice-alice-worker:
     platform: linux/amd64
     container_name: echoservice-alice-worker
@@ -108,13 +105,13 @@ services:
       - ECHOLALIA_DIR=/app/echolalia
       - DATASETS_DIR=/app/datasets
       - ALICE_FOLDER=/app/ALICE
+      - ALICE_DEVICE=${ALICE_DEVICE}
       - CONDA_ENV_NAME=ALICE
       - CONDA_ACTIVATE_FILE=/opt/conda/bin/activate
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
   echoservice-acoustics-worker:
     container_name: echoservice-acoustics-worker
     build:
@@ -134,7 +131,6 @@ services:
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
   echoservice-w2v2-worker:
     container_name: echoservice-w2v2-worker
     build:
@@ -160,7 +156,6 @@ services:
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
-    profiles: ["test", "prod"]
   echoservice-e2e:
     container_name: echoservice-e2e
     build:
@@ -176,7 +171,6 @@ services:
       - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
       - BASE_URL=${BASE_URL}
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
-    profiles: ["test", "prod"]
 networks:
   echoservice:
     driver: bridge

@@ -40,10 +40,8 @@ def check_config() -> None:
     if EXPECTED_CLIENT_ID is None:
         raise ValueError("EXPECTED_CLIENT_ID environment variable is not set.")
     if EXPECTED_CLIENT_SECRET is None:
-        raise ValueError(
-            "EXPECTED_CLIENT_SECRET environment variable is not \
-set."
-        )
+        raise ValueError("EXPECTED_CLIENT_SECRET environment variable is not \
+set.")
     if FLASK_PORT is None:
         raise ValueError("FLASK_PORT environment variable is not set.")
 
