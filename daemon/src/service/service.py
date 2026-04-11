@@ -59,7 +59,7 @@ class Service:
             logger.info("Requesting all tasks through external API...")
             all_tasks = self._http_client.get_all_tasks()
         except Exception as e:
-            logger.err(f"Failed to fetch tasks: {e}")
+            logger.error(f"Failed to fetch tasks: {e}")
 
             return
 
