@@ -2,6 +2,7 @@ import shutil
 import subprocess
 from pathlib import Path
 from typing import Set
+from uuid import UUID
 
 from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import ModelPlugin
@@ -12,7 +13,7 @@ logger = LoggerFactory.get_logger(__name__)
 
 
 class VTC(ModelPlugin):
-    def run_model(self, dataset_dir: Path, output_dir: Path) -> None:
+    def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
         recordings_dir = dataset_dir / "recordings" / "converted"
 
         if not recordings_dir.exists():
@@ -26,15 +27,15 @@ class VTC(ModelPlugin):
         audio_files = self._get_audio_files(recordings_dir)
 
         for file in audio_files:
-            self._run_vtc_on_audio_file(recordings_dir, output_dir, file)
+            rel_path = file.relative_to(recordings_dir)
+
+            self._run_vtc_on_audio_file(output_dir, file)
+            self._move_and_prune_outputs(rel_path, output_dir, file)
+            self.report_progress(dataset_dir, task_id)
 
         return
 
-    def _run_vtc_on_audio_file(
-        self, recordings_dir: Path, output_dir: Path, file: Path
-    ) -> None:
-        rel_path: Path = file.relative_to(recordings_dir)
-
+    def _run_vtc_on_audio_file(self, output_dir: Path, file: Path) -> None:
         executable: Path = self.config.get("VTC_FOLDER") / "apply.sh"
 
         device_str: str = ""
@@ -50,11 +51,11 @@ class VTC(ModelPlugin):
 
         self._run_subprocess(bash_script, output_dir, file)
 
-        self._move_file(rel_path, output_dir, file)
-
         return
 
-    def _move_file(self, rel_path: Path, output_dir: Path, input_file: Path) -> None:
+    def _move_and_prune_outputs(
+        self, rel_path_to_recs: Path, output_dir: Path, input_file: Path
+    ) -> None:
         """
         VTC quirks to bear in mind:
 
@@ -71,7 +72,7 @@ class VTC(ModelPlugin):
             logger.warning(f"Expected output file {all_rttm} not found")
             return
 
-        output_file = (output_dir / "raw" / rel_path).resolve()
+        output_file = (output_dir / "raw" / rel_path_to_recs).resolve()
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
         final_output = output_file.with_suffix(".rttm")

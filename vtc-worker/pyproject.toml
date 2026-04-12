@@ -32,10 +32,6 @@ include = [
 ]
 
 
-[tool.poetry.dependencies]
-analysis-service-core = {develop = true}
-
-
 [tool.black]
 line-length = 88
 target-version = ["py313"]
