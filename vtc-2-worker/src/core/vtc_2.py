@@ -30,15 +30,15 @@ class VTC_2(ModelPlugin):
         output_dirs = [output / dir.relative_to(converted_recs) for dir in input_dirs]
 
         for input_dir, output_dir in zip(input_dirs, output_dirs):
-            logger.info(f"Calling VTC 2 in folder {str(input_dir)}")
+            logger.info(f"Calling VTC 2 in folder {input_dir!s}")
             return_code = self._call_vtc(input_dir, output_dir)
 
             if return_code == 0:
-                logger.info(f"VTC 2 successfully run in folder {str(converted_recs)}")
+                logger.info(f"VTC 2 successfully run in folder {converted_recs!s}")
                 self._move_and_clean(output_dir)
                 self.report_progress(dataset_dir, task_id)
             else:
-                logger.error(f"Problem running VTC 2 in folder {str(converted_recs)}")
+                logger.error(f"Problem running VTC 2 in folder {converted_recs!s}")
 
         return
 
@@ -91,9 +91,9 @@ class VTC_2(ModelPlugin):
         )
 
         if result.returncode == 0:
-            logger.info(f"Successfully ran VTC 2 on folder '{str(input_dir)}'")
+            logger.info(f"Successfully ran VTC 2 on folder '{input_dir!s}'")
         else:
-            logger.error(f"Error running VTC 2 on folder '{str(input_dir)} with output \
-'{str(output_dir)}': {result.stderr}")
+            logger.error(f"Error running VTC 2 on folder '{input_dir!s} with output \
+'{output_dir!s}': {result.stderr}")
 
         return result.returncode

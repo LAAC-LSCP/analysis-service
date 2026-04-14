@@ -69,7 +69,7 @@ class VTC(ModelPlugin):
         all_rttm = vtc_output_dir / "all.rttm"
 
         if not all_rttm.exists():
-            logger.warning(f"Expected output file {all_rttm} not found")
+            logger.warning(f"Expected output file {all_rttm!s} not found")
             return
 
         output_file = (output_dir / "raw" / rel_path_to_recs).resolve()
@@ -90,9 +90,9 @@ class VTC(ModelPlugin):
         )
 
         if result.returncode == 0:
-            logger.info(f"Successfully ran VTC on '{str(file)}'")
+            logger.info(f"Successfully ran VTC on '{file!s}'")
         else:
-            logger.error(f"Error running VTC on '{str(file)}: {result.stderr}")
+            logger.error(f"Error running VTC on '{file!s}: {result.stderr}")
 
         return
 
