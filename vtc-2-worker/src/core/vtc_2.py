@@ -7,7 +7,7 @@ from typing import List
 from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import UUID, ModelPlugin
 
-from src.core.audio_format import RecordingFormats
+from src.core.recording_formats import RecordingFormats
 
 logger = LoggerFactory.get_logger(__name__)
 
@@ -44,9 +44,7 @@ class VTC_2(ModelPlugin):
 
     def _get_recording_files(self, dir: Path) -> List[Path]:
         return [
-            f
-            for f in dir.iterdir()
-            if f.is_file() and f.suffix in list(RecordingFormats)
+            f for f in dir.iterdir() if f.is_file() and f.suffix in RecordingFormats
         ]
 
     def _move_and_clean(self, dir: Path) -> None:

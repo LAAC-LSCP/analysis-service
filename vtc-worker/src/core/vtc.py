@@ -7,7 +7,7 @@ from uuid import UUID
 from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import ModelPlugin
 
-from src.core.file_formats import RecordingFormats
+from src.core.recording_formats import RecordingFormats
 
 logger = LoggerFactory.get_logger(__name__)
 
@@ -97,10 +97,9 @@ class VTC(ModelPlugin):
         return
 
     def _get_audio_files(self, recordings_dir: Path) -> Set[Path]:
-        recording_formats: Set[str] = {r.value for r in RecordingFormats}
         audio_files: Set[Path] = set()
 
-        for format in recording_formats:
-            audio_files.update(recordings_dir.rglob(f"*.{format}"))
+        for format in RecordingFormats:
+            audio_files.update(recordings_dir.rglob(f"**{format}"))
 
         return audio_files

@@ -3,7 +3,7 @@ from typing import List
 
 from analysis_service_core.src.effort_model import EffortModel, InputGroup, OutputGroup
 
-from src.core.file_formats import RecordingFormats
+from src.core.recording_formats import RecordingFormats
 
 SAMPLING_RATE = 16_000
 
@@ -14,7 +14,7 @@ class VTCEffortModel(EffortModel):
 
         return [
             [f]
-            for f in converted_recs.rglob(f"**.{RecordingFormats.WAV}")
+            for f in converted_recs.rglob(f"**{RecordingFormats.WAV}")
             if f.is_file()
         ]
 

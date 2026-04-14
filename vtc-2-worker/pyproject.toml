@@ -25,6 +25,11 @@ packages = [
 include = [
 ]
 
+
+[tool.isort]
+profile = "black"
+
+
 [dependency-groups]
 dev = [
     "pytest (>=9.0.2,<10.0.0)"

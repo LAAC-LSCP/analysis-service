@@ -3,12 +3,12 @@ from typing import List
 
 from analysis_service_core.src.effort_model import EffortModel, InputGroup, OutputGroup
 
-from src.core.recording_formats import RecordingFormats
+from src.core.audio_format import RecordingFormats
 
 SAMPLING_RATE = 16_000
 
 
-class VTC2EffortModel(EffortModel):
+class ALICEEffortModel(EffortModel):
     def find_input_groups(self, dataset_dir: Path) -> List[InputGroup]:
         converted_recs = self._get_converted_recs(dataset_dir)
 
