@@ -8,10 +8,28 @@ I mock the input/output behaviour of VTC below
 import shutil
 from pathlib import Path
 
+from analysis_service_core.testing.mocks.pubsub import PubSubMock
+
 from src.core.vtc_2 import VTC_2
 
 
 class VTC_2_Mock(VTC_2):
+    def __init__(
+        self,
+        queue,
+        config,
+        pubsub=PubSubMock(),
+        effort_model=None,
+        skip_moving_files=False,
+    ):
+        super().__init__(
+            queue,
+            config,
+            pubsub=pubsub,
+            effort_model=effort_model,
+            skip_moving_files=skip_moving_files,
+        )
+
     def _call_vtc(self, input: Path, output: Path) -> int:
         """
         Mimicks calling VTC 2 roughly as follows:

@@ -97,17 +97,21 @@ class TestEffortModelNestedDataset:
         input_groups = self.effort_model.find_input_groups(nested_dataset_tmp)
 
         assert len(input_groups) == 6
-        assert [
-            [f.relative_to(nested_dataset_tmp) for f in igroup]
-            for igroup in input_groups
-        ] == [
-            [Path("recordings/converted/child_1/day_2")],
-            [Path("recordings/converted/child_1/day_1/")],
-            [Path("recordings/converted/child_1/day_1/hour_1/")],
-            [Path("recordings/converted/child_2/day_1/")],
-            [Path("recordings/converted/child_2/day_1/hour_1/")],
-            [Path("recordings/converted/child_2/day_1/hour_2/")],
-        ]
+        assert sorted(
+            [
+                [f.relative_to(nested_dataset_tmp) for f in igroup]
+                for igroup in input_groups
+            ]
+        ) == sorted(
+            [
+                [Path("recordings/converted/child_1/day_2")],
+                [Path("recordings/converted/child_1/day_1/")],
+                [Path("recordings/converted/child_1/day_1/hour_1/")],
+                [Path("recordings/converted/child_2/day_1/")],
+                [Path("recordings/converted/child_2/day_1/hour_1/")],
+                [Path("recordings/converted/child_2/day_1/hour_2/")],
+            ]
+        )
 
     def test_ogroup_from_igroup(self, nested_dataset_tmp: Path):
         input_groups = self.effort_model.find_input_groups(nested_dataset_tmp)

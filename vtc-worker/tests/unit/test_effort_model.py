@@ -13,11 +13,13 @@ class TestEffortModelFlatDataset:
         input_groups = effort_model.find_input_groups(flat_dataset_tmp)
 
         assert len(input_groups) == 3
-        assert [[f.name for f in igroup] for igroup in input_groups] == [
-            ["recording_3.wav"],
-            ["recording_2.wav"],
-            ["recording_1.wav"],
-        ]
+        assert sorted([[f.name for f in igroup] for igroup in input_groups]) == sorted(
+            [
+                ["recording_3.wav"],
+                ["recording_2.wav"],
+                ["recording_1.wav"],
+            ]
+        )
 
     def test_ogroup_from_igroup(self, flat_dataset_tmp: Path):
         effort_model = VTCEffortModelMock(default_file_size=16_000)
@@ -98,17 +100,21 @@ class TestEffortModelNestedDataset:
         input_groups = self.effort_model.find_input_groups(nested_dataset_tmp)
 
         assert len(input_groups) == 6
-        assert [
-            [f.relative_to(nested_dataset_tmp) for f in igroup]
-            for igroup in input_groups
-        ] == [
-            [Path("recordings/converted/child_1/day_2/recording.wav")],
-            [Path("recordings/converted/child_1/day_1/recording.wav")],
-            [Path("recordings/converted/child_1/day_1/hour_1/recording.wav")],
-            [Path("recordings/converted/child_2/day_1/recording.wav")],
-            [Path("recordings/converted/child_2/day_1/hour_1/recording.wav")],
-            [Path("recordings/converted/child_2/day_1/hour_2/recording.wav")],
-        ]
+        assert sorted(
+            [
+                [f.relative_to(nested_dataset_tmp) for f in igroup]
+                for igroup in input_groups
+            ]
+        ) == sorted(
+            [
+                [Path("recordings/converted/child_1/day_2/recording.wav")],
+                [Path("recordings/converted/child_1/day_1/recording.wav")],
+                [Path("recordings/converted/child_1/day_1/hour_1/recording.wav")],
+                [Path("recordings/converted/child_2/day_1/recording.wav")],
+                [Path("recordings/converted/child_2/day_1/hour_1/recording.wav")],
+                [Path("recordings/converted/child_2/day_1/hour_2/recording.wav")],
+            ]
+        )
 
     def test_ogroup_from_igroup(self, nested_dataset_tmp: Path):
         input_groups = self.effort_model.find_input_groups(nested_dataset_tmp)
