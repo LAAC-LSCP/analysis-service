@@ -4,14 +4,14 @@ from uuid import UUID
 
 import requests
 
-import src.core.echolalia_api as external_api
+import src.core.elsi_api as external_api
 
 Headers = Mapping[str, str]
 
 
 class HTTPClient:
     """
-    The HTTPClient calls the Echolalia endpoint to get tasks. It also
+    The HTTPClient calls the ELSI endpoint to get tasks. It also
     allows updating the server's task statuses
     """
 

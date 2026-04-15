@@ -31,7 +31,7 @@ def update_elsi_status(
             },
         )
 
-        logger.info(f"Sent update to Echolalia for task \
+        logger.info(f"Sent update to ELSI for task \
 {command.task_id!s} with status '{task_status!s}' and \
 estimated duration '{0}'")
 
@@ -41,7 +41,7 @@ estimated duration '{0}'")
 def update_elsi_progress(http_client: HTTPClient) -> CommandHandler:
     def send_progress_update(command: commands.ReportProgress) -> None:
         #       TODO: NOT IMPLEMENTED
-        #       logger.info(f"Sent progress update to Echolalia for task \
+        #       logger.info(f"Sent progress update to ELSI for task \
         # {command.task_id!s} with progress {command.progress!s}")
         pass
 
@@ -51,7 +51,7 @@ def update_elsi_progress(http_client: HTTPClient) -> CommandHandler:
 def handle_run_task(queues: Dict[QueueName, Queue]) -> CommandHandler:
     def send_request(command: commands.RunTask) -> None:
         logger.info(
-            f"Sending request to redis for task with model: {str(command.operation)}"
+            f"Sending request to broker for task with model: {command.operation!s}"
         )
         queue: Queue | None = None
         if command.operation == commands.Operation.RUN_VTC:
