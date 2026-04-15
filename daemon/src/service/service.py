@@ -1,10 +1,16 @@
 import asyncio
 from datetime import datetime, timedelta
 from time import sleep
+from typing import Type
 
 from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import RunTask
-from analysis_service_core.src.redis.commands import CompleteTask
+from analysis_service_core.src.redis.commands import (
+    Command,
+    CompleteTask,
+    ReportProgress,
+)
+from analysis_service_core.src.redis.pubsub import PubSub
 from analysis_service_core.src.redis.queue import Queue
 from tenacity import Retrying, stop_after_attempt, wait_fixed
 
@@ -20,23 +26,26 @@ class Service:
     S_PER_QUEUE_FETCH: int = 1
 
     _completion_queue: Queue
+    _progress_bus: PubSub
     _command_handlers: CommandHandlers
     _http_client: HTTPClient
 
     def __init__(
         self,
         completion_queue: Queue,
+        progress_bus: PubSub,
         command_handlers: CommandHandlers,
         http_client: HTTPClient,
     ):
         self._completion_queue = completion_queue
+        self._progress_bus = progress_bus
         self._command_handlers = command_handlers
         self._http_client = http_client
 
     async def start(self) -> None:
         logger.info("Daemon started")
         loop = asyncio.get_event_loop()
-        redis_task = loop.run_in_executor(None, self._listen_and_handle_redis)
+        redis_task = loop.run_in_executor(None, self._listen_and_handle_completion)
         api_task = self._external_api_loop()
 
         await asyncio.gather(redis_task, api_task)
@@ -81,13 +90,21 @@ class Service:
             for handler in self._command_handlers.get(RunTask, []):
                 handler(message)
 
-    def _listen_and_handle_redis(self) -> None:
+    def _listen_and_handle_completion(self) -> None:
         while True:
-            # Why not pubsub? Because if the Daemon is down things get lost
             message = self._completion_queue.dequeue()
-            if message:
-                self._handle_completion(message)
+            if not message:
+                continue
+
+            self._handle_message(message, CompleteTask)
             sleep(self.S_PER_QUEUE_FETCH)
+
+    def _listen_and_handle_progress(self) -> None:
+        for message in self._progress_bus.listen():
+            if not message:
+                continue
+
+            self._handle_message(message["data"], ReportProgress)
 
     def get_completion_message_and_handle(
         self, max_attempts: int = 3, wait_seconds: float = 0.1
@@ -104,7 +121,7 @@ class Service:
                 command_dict = self._completion_queue.dequeue()
 
                 if command_dict:
-                    self._handle_completion(command_dict)
+                    self._handle_message(command_dict, CompleteTask)
 
                     return
                 else:
@@ -112,9 +129,9 @@ class Service:
 
         return
 
-    def _handle_completion(self, command_dict: dict) -> None:
+    def _handle_message(self, command_dict: dict, command_cls: Type[Command]) -> None:
         logger.info(f"Handling message: {command_dict}")
-        command = CompleteTask.from_dict(command_dict)
+        command = command_cls.from_dict(command_dict)
 
-        for handler in self._command_handlers.get(CompleteTask, []):
+        for handler in self._command_handlers.get(command_cls, []):
             handler(command)

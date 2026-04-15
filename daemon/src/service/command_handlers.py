@@ -19,10 +19,10 @@ class CommandHandler(Protocol[CommandT]):
 type CommandHandlers = Dict[Type[commands.Command], List[CommandHandler[Any]]]
 
 
-def update_echolalia(
+def update_elsi_status(
     http_client: HTTPClient, task_status: TaskStatus
 ) -> CommandHandler:
-    def send_update(command: commands.Command) -> None:
+    def send_status_update(command: commands.Command) -> None:
         http_client.put_task(
             command.task_id,
             payload={
@@ -32,10 +32,20 @@ def update_echolalia(
         )
 
         logger.info(f"Sent update to Echolalia for task \
-{str(command.task_id)} with status '{str(task_status)}' and \
+{command.task_id!s} with status '{task_status!s}' and \
 estimated duration '{0}'")
 
-    return send_update
+    return send_status_update
+
+
+def update_elsi_progress(http_client: HTTPClient) -> CommandHandler:
+    def send_progress_update(command: commands.ReportProgress) -> None:
+        #       TODO: NOT IMPLEMENTED
+        #       logger.info(f"Sent progress update to Echolalia for task \
+        # {command.task_id!s} with progress {command.progress!s}")
+        pass
+
+    return send_progress_update
 
 
 def handle_run_task(queues: Dict[QueueName, Queue]) -> CommandHandler:
@@ -69,7 +79,8 @@ def get_command_handlers(
     return {
         commands.RunTask: [
             handle_run_task(queues),
-            update_echolalia(http_client, TaskStatus.RUNNING),
+            update_elsi_status(http_client, TaskStatus.RUNNING),
         ],
-        commands.CompleteTask: [update_echolalia(http_client, TaskStatus.COMPLETED)],
+        commands.CompleteTask: [update_elsi_status(http_client, TaskStatus.COMPLETED)],
+        commands.ReportProgress: [update_elsi_progress(http_client)],
     }
