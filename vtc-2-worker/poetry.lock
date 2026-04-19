@@ -147,4 +147,4 @@ xxhash = ["xxhash (>=3.6.0,<3.7.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "e881432b1c73c6455279215d016adc167782327e8285b51e2cd6af862fc8fa0d"
+content-hash = "b18bee93ead3f17f9dd63626974bf2c6ad442f8195fcd2e520f2dc756d8d4bee"
