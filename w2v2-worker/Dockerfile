@@ -23,7 +23,7 @@ RUN apt-get update && \
     . $HOME/.local/bin/env && \
     rm -rf /var/lib/apt/lists/* && \
     git lfs install && \
-    git clone --recurse-submodules https://github.com/arxaqapi/speech-maturity && \
+    git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/arxaqapi/speech-maturity && \
     cd speech-maturity && \
     uv sync && \
     uv add torchvision && \

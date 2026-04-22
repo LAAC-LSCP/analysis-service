@@ -23,7 +23,7 @@ RUN apt-get update && \
     . $HOME/.local/bin/env && \
     rm -rf /var/lib/apt/lists/* && \
     git lfs install && \
-    git clone --recurse-submodules https://github.com/LAAC-LSCP/VTC.git && \
+    git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/LAAC-LSCP/VTC.git && \
     cd VTC && \
     uv sync
 
