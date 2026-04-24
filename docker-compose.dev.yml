@@ -193,7 +193,7 @@ services:
       - echoservice
   echoservice-grafana:
     container_name: echoservice-grafana
-    image: grafana/grafana:latest
+    image: grafana/grafana:13.0.1
     ports:
       - "3000:3000"
     volumes:
@@ -204,9 +204,26 @@ services:
     networks:
       - echoservice
       - echoservice-external
+  echoservice-netdata:
+    image: netdata/netdata:v2.10.2
+    container_name: echoservice-netdata
+    ports:
+      - "19999:19999"
+    volumes:
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - echoservice
+      - echoservice-external
 volumes:
   loki-data:
   grafana-data:
+  uptime-kuma-data:
 networks:
   echoservice:
     driver: bridge
