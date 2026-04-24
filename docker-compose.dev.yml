@@ -171,6 +171,59 @@ services:
       - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
       - BASE_URL=${BASE_URL}
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+  echoservice-loki:
+    container_name: echoservice-loki
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./monitoring/loki:/etc/loki
+      - loki-data:/loki
+    command: -config.file=/etc/loki/config.yml
+    networks:
+      - echoservice
+  echoservice-promtail:
+    container_name: echoservice-promtail
+    image: grafana/promtail:2.9.0
+    volumes:
+      - ./monitoring/promtail:/etc/promtail
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.dev.yml
+    networks:
+      - echoservice
+  echoservice-grafana:
+    container_name: echoservice-grafana
+    image: grafana/grafana:13.0.1
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    networks:
+      - echoservice
+      - echoservice-external
+  echoservice-netdata:
+    image: netdata/netdata:v2.10.2
+    container_name: echoservice-netdata
+    ports:
+      - "19999:19999"
+    volumes:
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - echoservice
+      - echoservice-external
+volumes:
+  loki-data:
+  grafana-data:
+  uptime-kuma-data:
 networks:
   echoservice:
     driver: bridge
