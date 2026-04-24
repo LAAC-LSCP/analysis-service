@@ -3,7 +3,7 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y git && \
     rm -rf /var/lib/apt/lists/* && \
-    git clone --recurse-submodules https://github.com/orasanen/ALICE/
+    git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/orasanen/ALICE/
 
 FROM continuumio/miniconda3:latest AS conda-builder
 WORKDIR /app

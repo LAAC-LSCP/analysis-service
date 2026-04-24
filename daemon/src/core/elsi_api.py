@@ -1,6 +1,6 @@
 """
 This file contains the different response formats/types expected
-from the Echolalia external endpoints
+from the ELSI external endpoints
 """
 
 from dataclasses import dataclass

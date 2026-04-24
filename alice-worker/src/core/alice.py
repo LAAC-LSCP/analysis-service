@@ -3,34 +3,37 @@ import shutil
 import subprocess
 from pathlib import Path
 from typing import Set
+from uuid import UUID
 
 from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import ModelPlugin
 
-from src.core.file_formats import RecordingFormats
+from src.core.recording_formats import RecordingFormats
 
 logger = LoggerFactory.get_logger(__name__)
 
 
 class ALICE(ModelPlugin):
-    def run_model(self, dataset_dir: Path, output_dir: Path) -> None:
+    def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
         output_dir = output_dir / "output"
 
-        recordings_dir = dataset_dir / "recordings" / "converted"
+        converted_recs = self._get_converted_recs(dataset_dir)
 
-        if not recordings_dir.exists():
+        if not converted_recs.exists():
             raise ValueError(
-                f"Recordings directory at '{recordings_dir}' does not exist"
+                f"Recordings directory at '{converted_recs}' does not exist"
             )
 
-        audio_files = self._get_audio_files(recordings_dir)
+        audio_files = self._get_audio_files(converted_recs)
 
         for file in audio_files:
-            self._run_alice_on_audio_file(recordings_dir, output_dir, file)
+            self._run_alice_on_audio_file(converted_recs, output_dir, file)
+            self.report_progress(dataset_dir, task_id)
 
     def _run_alice_on_audio_file(
         self, recordings_dir: Path, output_dir: Path, file: Path
     ) -> None:
+        logger.info(f"Running ALICE on {recordings_dir!s}")
         rel_path: Path = file.relative_to(recordings_dir)
 
         executable: Path = self.alice_dir / "run_ALICE.sh"
@@ -48,11 +51,11 @@ class ALICE(ModelPlugin):
         return_code = self._run_subprocess(bash_script, self.alice_dir, file)
 
         if return_code == 0:
-            self._move_files(rel_path, output_dir)
+            self._move_and_clean_outputs(rel_path, output_dir)
 
         return
 
-    def _run_subprocess(self, bash_script: str, alice_dir, file: Path) -> int:
+    def _run_subprocess(self, bash_script: str, alice_dir: Path, file: Path) -> int:
         # NOTE: ALICE has a quirk that it cannot run if your PWD is not the
         # ALICE folder itself
         result = subprocess.run(
@@ -63,13 +66,13 @@ class ALICE(ModelPlugin):
         )
 
         if result.returncode == 0:
-            logger.info(f"Successfully ran ALICE on '{str(file)}'")
+            logger.info(f"Successfully ran ALICE on '{file!s}'")
         else:
-            logger.error(f"Error running ALICE on '{str(file)}: {result.stderr}")
+            logger.error(f"Error running ALICE on '{file!s}: {result.stderr}")
 
         return result.returncode
 
-    def _move_files(self, rel_path: Path, output_dir: Path) -> None:
+    def _move_and_clean_outputs(self, rel_path: Path, output_dir: Path) -> None:
         rel_path_dir = rel_path.parent
         base_name = rel_path.stem
 
@@ -91,19 +94,22 @@ class ALICE(ModelPlugin):
         # VTC output (VTC is a submodule of the ALICE model)
         diarization_output = self.alice_dir / "diarization_output.rttm"
 
-        if diarization_output.exists():  # This doesn't always exist??
+        if diarization_output.exists():  # Don't change this line!
             os.remove(self.alice_dir / "diarization_output.rttm")
 
         return
 
     def _get_audio_files(self, recordings_dir: Path) -> Set[Path]:
-        recording_formats: Set[str] = {r.value for r in RecordingFormats}
         audio_files: Set[Path] = set()
 
-        for format in recording_formats:
-            audio_files.update(recordings_dir.rglob(f"*.{format}"))
+        for format in RecordingFormats:
+            audio_files.update(recordings_dir.rglob(f"**{format}"))
 
         return audio_files
+
+    @staticmethod
+    def _get_converted_recs(dataset_dir: Path) -> Path:
+        return dataset_dir / "recordings" / "converted"
 
     @property
     def alice_dir(self) -> Path:

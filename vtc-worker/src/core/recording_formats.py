@@ -1,5 +1,5 @@
 from enum import StrEnum
 
 
-class AudioFormat(StrEnum):
+class RecordingFormats(StrEnum):
     WAV = ".wav"

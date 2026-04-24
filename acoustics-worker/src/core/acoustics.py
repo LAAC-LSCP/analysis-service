@@ -1,6 +1,7 @@
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+from uuid import UUID
 
 from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import ModelPlugin
@@ -21,24 +22,32 @@ class Args:
 
 
 class Acoustics(ModelPlugin):
-    def run_model(self, dataset_dir: Path, output_dir: Path) -> None:
+    def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
         project = ChildProject(dataset_dir)
-        am = AnnotationManager(project)
 
-        logger.info(f"Running acoustics in ${str(dataset_dir)}...")
-        acoustic_derivator = AcousticDerivator()
-        am._derive_annotations(
-            "vtc",
-            str(output_dir),
-            acoustic_derivator,
-            overwrite_existing=True,
-            output_as_path=True,
-        )
-
+        self._derive_annotations(dataset_dir, project, output_dir)
         self._make_outputs_raw(output_dir)
-        logger.info(f"Finished running acoustics in ${str(dataset_dir)}!")
 
-        return
+        logger.info(f"Finished running acoustics in ${dataset_dir!s}!")
+        self.report_progress(dataset_dir, task_id)
+
+    def _derive_annotations(
+        self, dataset_dir: Path, project: ChildProject, output_dir: Path
+    ) -> None:
+        am = AnnotationManager(project)
+        acoustic_derivator = AcousticDerivator()
+
+        try:
+            logger.info(f"Running acoustics in ${dataset_dir!s}...")
+            am._derive_annotations(
+                "vtc",  # TODO: make this parametrisable
+                str(output_dir),
+                acoustic_derivator,
+                overwrite_existing=True,
+                output_as_path=True,
+            )
+        except Exception:
+            logger.exception("Problem deriving annotations for acoustics")
 
     def _make_outputs_raw(self, output_dir) -> None:
         """
@@ -48,14 +57,14 @@ class Acoustics(ModelPlugin):
         1) set "converted" folder to "raw"
         2) rename filenames to remove the duration metadata
 
-        Then Echolalia can run the importation :)
+        Then the ELSI backend can run the importation :)
         """
         raw = output_dir / "raw"
         converted = output_dir / "converted"
         if raw.exists():
             shutil.rmtree(raw)
 
-        for file in converted.rglob("*.csv"):
+        for file in converted.rglob("**.csv"):
             self._rename_file(file)
 
         shutil.move(converted, raw)

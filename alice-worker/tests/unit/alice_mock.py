@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from analysis_service_core.testing.mocks.pubsub import PubSubMock
+
 from src.core.alice import ALICE
 
 
@@ -7,6 +9,16 @@ class ALICE_Mock(ALICE):
     """
     Test double for ALICE
     """
+
+    def __init__(
+        self,
+        queue,
+        config,
+        pubsub=PubSubMock(),
+        effort_model=None,
+        skip_moving_files=False,
+    ):
+        super().__init__(queue, config, pubsub, effort_model, skip_moving_files)
 
     def _run_subprocess(self, _: str, alice_dir: Path, file: Path) -> int:
         # Here `output_dir` doubles as the present working directory

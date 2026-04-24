@@ -13,7 +13,7 @@ dependencies = [
     "pyyaml (>=6.0.3,<7.0.0)",
     "pydantic (>=2.12.5,<3.0.0)",
     "flask-httpauth (>=4.8.0,<5.0.0)",
-    "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git"
+    "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git@v1.1.0"
 ]
 
 [dependency-groups]

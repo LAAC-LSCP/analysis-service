@@ -2,7 +2,7 @@
 
 [[package]]
 name = "analysis-service-core"
-version = "0.7.0"
+version = "1.1.0"
 description = "a core library that different parts of the analysis service can borrow from"
 optional = false
 python-versions = ">=3.13"
@@ -16,8 +16,8 @@ redis = ">=7.1.0,<8.0.0"
 [package.source]
 type = "git"
 url = "https://github.com/LAAC-LSCP/analysis-service-core.git"
-reference = "HEAD"
-resolved_reference = "3fe2374580636251a0ca0f23429190c611519141"
+reference = "v1.1.0"
+resolved_reference = "33df0c8f40c944eae8c7c557bf07f6f19cb9f289"
 
 [[package]]
 name = "certifi"
@@ -356,4 +356,4 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "61120670502d3135a2ee5e59c26943ec5141f33766c0584ba8b91b818a32325e"
+content-hash = "466ee2a969173a16443deb2885f90831e1ec6722055fef8c5cdc1aa42d57263a"

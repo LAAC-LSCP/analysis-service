@@ -23,8 +23,13 @@ RUN apt-get update && \
     . $HOME/.local/bin/env && \
     rm -rf /var/lib/apt/lists/* && \
     git lfs install && \
+    # TODO: add --depth 1 --shallow-submodules once we have accommodated our work for the
+    # latest VTC 2 and VTC 2 repository has finally stabilised
     git clone --recurse-submodules https://github.com/LAAC-LSCP/VTC.git && \
     cd VTC && \
+    # Remove the below 2 lines when above change is made
+    git checkout efb6e4400bd345048740c05136dc79529daf82ad && \
+    git submodule update --init --recursive && \
     uv sync
 
 ENV VIRTUAL_ENV=/app/.venv \

@@ -1,7 +1,7 @@
 [project]
 name = "analysis-service-daemon"
 version = "0.2.0"
-description = "analysis service daemon for Echolalia"
+description = "analysis service daemon for ELSI"
 authors = [
     {name = "Lawrence Borst",email = "laurens.borst@ens.psl.eu"}
 ]
@@ -13,7 +13,7 @@ dependencies = [
     "requests (>=2.32.5,<3.0.0)",
     "asyncio (>=4.0.0,<5.0.0)",
     "click (>=8.3.1,<9.0.0)",
-    "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git"
+    "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git@v1.1.0"
 ]
 
 [dependency-groups]
@@ -35,8 +35,6 @@ include = [
 ]
 
 
-[tool.poetry.dependencies]
-analysis-service-core = {develop = true}
 [tool.black]
 line-length = 88
 target-version = ["py313"]
