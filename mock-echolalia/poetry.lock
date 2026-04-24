@@ -2,7 +2,7 @@
 
 [[package]]
 name = "analysis-service-core"
-version = "0.8.0"
+version = "1.1.0"
 description = "a core library that different parts of the analysis service can borrow from"
 optional = false
 python-versions = ">=3.13"
@@ -16,8 +16,8 @@ redis = ">=7.1.0,<8.0.0"
 [package.source]
 type = "git"
 url = "https://github.com/LAAC-LSCP/analysis-service-core.git"
-reference = "HEAD"
-resolved_reference = "fe1159ddf5c686f89e2757b7022e4ac62cd10d8c"
+reference = "v1.1.0"
+resolved_reference = "33df0c8f40c944eae8c7c557bf07f6f19cb9f289"
 
 [[package]]
 name = "annotated-types"
@@ -621,4 +621,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "34c61f6c5a1785f3e71c21af379f70b80e817c78606165e7df73ca8ac43b0adc"
+content-hash = "45e42c684b3914a51ee95787a522217870386b4f70eddf62835776bad477b360"

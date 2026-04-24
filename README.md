@@ -1,8 +1,18 @@
 # Analysis Service
-The analysis service is a micro-service for Echolalia. It launches long-running tasks, including:
+The analysis service is a multi-repo for the ELSI project. It launches long-running tasks, including:
 
 1. The voice type classifier (VTC) [[1]](#1)[[2]](#2) - note that different major versions are available, but at present (Dec 29, 2025) we use version 1
 2. ChildProject's acoustics pipeline [[3]](#3)
+
+It's main components are
+- A daemon that orchestrates communication back and forth between the ELSI domain and the analysis domain
+- Redis as a message broker, currently used for queues and pubsubs
+- Various ML workers each implementing a common interface
+- A [core package](https://github.com/LAAC-LSCP/analysis-service-core) shared by the different components
+
+For development we also have:
+- An E2E test container
+- A mocked ELSI web server used for E2E testing
 
 # Setting Up
 Note that we use Swarm as our orchestrator, but that Swarm is quite opinionated in how you use Docker and Docker Compose. The deployment workflow is therefore a little different from the Docker Compose (development) workflow.

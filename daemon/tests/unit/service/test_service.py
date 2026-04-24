@@ -1,7 +1,9 @@
 from uuid import UUID
 
 import analysis_service_core.src.redis.commands as commands
+from analysis_service_core.src.redis.pubsub import ChannelName
 from analysis_service_core.src.redis.queue import QueueName
+from analysis_service_core.testing.mocks.pubsub import PubSubMock
 from analysis_service_core.testing.mocks.queue import QueueMock
 
 from src.service.service import Service
@@ -13,6 +15,7 @@ def test_service():
     command_handlers = {
         commands.RunTask: [lambda event: None],
         commands.CompleteTask: [lambda event: None],
+        commands.ReportProgress: [lambda event: None],
     }
     command_tester = CommandTester(command_handlers)
     http_client = FakeHTTPClient(
@@ -33,7 +36,10 @@ def test_service():
     )
 
     completion_queue = QueueMock(QueueName.COMPLETE_TASK)
-    service = Service(completion_queue, command_tester.command_handlers, http_client)
+    progress_bus = PubSubMock(subscribe_to=[ChannelName.UPDATE_STATUS])
+    service = Service(
+        completion_queue, progress_bus, command_tester.command_handlers, http_client
+    )
 
     service.tick()
 
@@ -48,11 +54,24 @@ def test_service():
     completion_queue.enqueue(
         commands.CompleteTask(task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57")),
     )
+    progress_bus.publish(
+        ChannelName.UPDATE_STATUS,
+        commands.ReportProgress(
+            task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57"),
+            progress=1.0,
+        ),
+    )
 
     service.get_completion_message_and_handle()
+    service._listen_and_handle_progress()
 
-    assert len(command_tester.calls) == 2
+    assert len(command_tester.calls) == 3
     assert command_tester.calls[1]["type"] == commands.CompleteTask
     assert command_tester.calls[1]["message"] == commands.CompleteTask(
         task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57")
+    )
+    assert command_tester.calls[2]["type"] == commands.ReportProgress
+    assert command_tester.calls[2]["message"] == commands.ReportProgress(
+        task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57"),
+        progress=1.0,
     )

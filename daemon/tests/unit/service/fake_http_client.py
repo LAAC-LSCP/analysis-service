@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 
-from src.core.echolalia_api import PutPayload, Task, Tasks
+from src.core.elsi_api import PutPayload, Task, Tasks
 from src.core.types import TaskStatus
 
 

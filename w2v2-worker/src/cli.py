@@ -4,6 +4,7 @@ import click
 from analysis_service_core.src.config import Config, EnvVar
 from analysis_service_core.src.redis.queue import Queue, QueueName
 
+from src.core.effort_model import W2V2EffortModel
 from src.core.w2v2 import W2V2
 
 
@@ -19,10 +20,12 @@ def run_w2v2() -> None:
 
     config = Config(env_vars)
     queue = Queue(QueueName.RUN_W2V2)
+    effort_model = W2V2EffortModel()
 
     w2v2 = W2V2(
         queue=queue,
         config=config,
+        effort_model=effort_model,
         skip_moving_files=True,
     )
 

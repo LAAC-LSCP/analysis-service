@@ -1,6 +1,7 @@
 from typing import Tuple
 
 from analysis_service_core.src.config import Config, EnvVar
+from analysis_service_core.src.redis.pubsub import ChannelName, PubSub
 from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.service.command_handlers import CommandHandlers, get_command_handlers
@@ -9,15 +10,15 @@ from src.service.service import Service
 
 
 async def run() -> None:
-    completion_queue, command_handlers, http_client = setup()
+    completion_queue, progress_bus, command_handlers, http_client = setup()
 
-    service = Service(completion_queue, command_handlers, http_client)
+    service = Service(completion_queue, progress_bus, command_handlers, http_client)
     await service.start()
 
     return
 
 
-def setup() -> Tuple[Queue, CommandHandlers, HTTPClient]:
+def setup() -> Tuple[Queue, PubSub, CommandHandlers, HTTPClient]:
     env_vars = {
         EnvVar("BASE_URL", str),
         EnvVar("CLIENT_ID", str),
@@ -33,5 +34,6 @@ def setup() -> Tuple[Queue, CommandHandlers, HTTPClient]:
 
     queues = {name: Queue(name) for name in list(QueueName)}
     command_handlers = get_command_handlers(http_client, queues)
+    progress_bus = PubSub(subscribe_to=[ChannelName.UPDATE_STATUS])
 
-    return Queue(QueueName.COMPLETE_TASK), command_handlers, http_client
+    return Queue(QueueName.COMPLETE_TASK), progress_bus, command_handlers, http_client

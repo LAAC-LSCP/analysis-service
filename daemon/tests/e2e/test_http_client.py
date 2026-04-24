@@ -1,5 +1,5 @@
 """
-"Contract tests" against the real Echolalia API
+"Contract tests" against the real ELSI API
 
 Also "verifying fakes", that is, our FakeHTTPClient class
 """

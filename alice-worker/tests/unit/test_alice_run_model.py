@@ -1,4 +1,5 @@
 from pathlib import Path
+from uuid import UUID
 
 import pytest
 from analysis_service_core.src.config import Config
@@ -27,7 +28,11 @@ def test_alice_inputs_outputs(
     Tests the input-output behaviour of run model on flat datasets
     """
     output_dir = flat_dataset_tmp / "outputs"
-    alice_mock.run_model(dataset_dir=flat_dataset_tmp, output_dir=output_dir)
+    alice_mock.run_model(
+        dataset_dir=flat_dataset_tmp,
+        output_dir=output_dir,
+        task_id=UUID("00000000-000-0000-0000-0000000000000"),
+    )
 
     output_files_and_folders = {f for f in output_dir.rglob("*")}
 
@@ -55,7 +60,11 @@ def test_alice_inputs_outputs_nested(
     Tests the input-output behaviour of run model on nested datasets
     """
     output_dir = nested_dataset_tmp / "outputs"
-    alice_mock.run_model(dataset_dir=nested_dataset_tmp, output_dir=output_dir)
+    alice_mock.run_model(
+        dataset_dir=nested_dataset_tmp,
+        output_dir=output_dir,
+        task_id=UUID("00000000-000-0000-0000-0000000000000"),
+    )
 
     output_files_and_folders = {f for f in output_dir.rglob("*")}
 

@@ -2,7 +2,7 @@
 
 [[package]]
 name = "analysis-service-core"
-version = "0.8.0"
+version = "1.1.0"
 description = "a core library that different parts of the analysis service can borrow from"
 optional = false
 python-versions = ">=3.13"
@@ -17,7 +17,7 @@ redis = ">=7.1.0,<8.0.0"
 type = "git"
 url = "https://github.com/LAAC-LSCP/analysis-service-core.git"
 reference = "HEAD"
-resolved_reference = "fe1159ddf5c686f89e2757b7022e4ac62cd10d8c"
+resolved_reference = "33df0c8f40c944eae8c7c557bf07f6f19cb9f289"
 
 [[package]]
 name = "click"
@@ -126,14 +126,14 @@ dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests
 
 [[package]]
 name = "redis"
-version = "7.1.0"
+version = "7.4.0"
 description = "Python client for Redis database and key-value store"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "redis-7.1.0-py3-none-any.whl", hash = "sha256:23c52b208f92b56103e17c5d06bdc1a6c2c0b3106583985a76a18f83b265de2b"},
-    {file = "redis-7.1.0.tar.gz", hash = "sha256:b1cc3cfa5a2cb9c2ab3ba700864fb0ad75617b41f01352ce5779dabf6d5f9c3c"},
+    {file = "redis-7.4.0-py3-none-any.whl", hash = "sha256:a9c74a5c893a5ef8455a5adb793a31bb70feb821c86eccb62eebef5a19c429ec"},
+    {file = "redis-7.4.0.tar.gz", hash = "sha256:64a6ea7bf567ad43c964d2c30d82853f8df927c5c9017766c55a1d1ed95d18ad"},
 ]
 
 [package.extras]
@@ -141,8 +141,10 @@ circuit-breaker = ["pybreaker (>=1.4.0)"]
 hiredis = ["hiredis (>=3.2.0)"]
 jwt = ["pyjwt (>=2.9.0)"]
 ocsp = ["cryptography (>=36.0.1)", "pyopenssl (>=20.0.1)", "requests (>=2.31.0)"]
+otel = ["opentelemetry-api (>=1.39.1)", "opentelemetry-exporter-otlp-proto-http (>=1.39.1)", "opentelemetry-sdk (>=1.39.1)"]
+xxhash = ["xxhash (>=3.6.0,<3.7.0)"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "fb531f68f3fe9081184de115010f358484f1c5227babf64679119ba67b9fa507"
+content-hash = "b18bee93ead3f17f9dd63626974bf2c6ad442f8195fcd2e520f2dc756d8d4bee"

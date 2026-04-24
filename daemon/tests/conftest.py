@@ -5,7 +5,7 @@ from typing import Generator, Optional, Protocol
 import pytest
 from analysis_service_core.src.redis.commands import Operation
 
-from src.core.echolalia_api import Task
+from src.core.elsi_api import Task
 from src.core.types import TaskStatus
 
 
