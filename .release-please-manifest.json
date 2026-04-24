@@ -5,6 +5,6 @@
     "vtc-2-worker": "0.2.0",
     "w2v2-worker": "0.2.0",
     "daemon": "0.2.0",
-    "mock-echolalia": "0.2.0",
+    "mock-echolalia": "0.3.0",
     "tests": "0.3.0"
 }
