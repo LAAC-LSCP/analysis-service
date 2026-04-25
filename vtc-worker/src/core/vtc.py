@@ -14,20 +14,20 @@ logger = LoggerFactory.get_logger(__name__)
 
 class VTC(ModelPlugin):
     def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
-        recordings_dir = dataset_dir / "recordings" / "converted"
+        recs_conv_std = dataset_dir / "recordings" / "converted" / "standard"
 
-        if not recordings_dir.exists():
+        if not recs_conv_std.exists():
             raise ValueError(
-                f"Recordings directory at '{recordings_dir}' does not exist"
+                f"Recordings directory at '{recs_conv_std}' does not exist"
             )
 
         if not output_dir.exists():
             output_dir.mkdir(parents=True)
 
-        audio_files = self._get_audio_files(recordings_dir)
+        audio_files = self._get_audio_files(recs_conv_std)
 
         for file in audio_files:
-            rel_path = file.relative_to(recordings_dir)
+            rel_path = file.relative_to(recs_conv_std)
 
             self._run_vtc_on_audio_file(output_dir, file)
             self._move_and_prune_outputs(rel_path, output_dir, file)
