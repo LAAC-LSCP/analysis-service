@@ -25,13 +25,13 @@ class AcousticsMock(Acoustics):
     def _derive_annotations(
         self, dataset_dir: Path, _: ChildProject, output_dir: Path
     ) -> None:
-        recs_converted = dataset_dir / "recordings" / "converted"
+        recs_conv_std = dataset_dir / "recordings" / "converted" / "standard"
         vtc_converted = dataset_dir / "annotations" / "vtc" / "converted"
         recs: List[Path] = [
-            f for f in recs_converted.rglob("**") if f.is_file() and f.suffix == ".wav"
+            f for f in recs_conv_std.rglob("**") if f.is_file() and f.suffix == ".wav"
         ]
         annots: List[Path | None] = [
-            AcousticsMock._get_annotation(rec, recs_converted, vtc_converted)
+            AcousticsMock._get_annotation(rec, recs_conv_std, vtc_converted)
             for rec in recs
         ]
 
@@ -47,9 +47,9 @@ class AcousticsMock(Acoustics):
 
     @staticmethod
     def _get_annotation(
-        recording: Path, recs_converted: Path, annots_converted: Path
+        recording: Path, recs_conv_std: Path, annots_converted: Path
     ) -> Path | None:
-        rel_rec = recording.relative_to(recs_converted)
+        rel_rec = recording.relative_to(recs_conv_std)
 
         annot_dir = (annots_converted / rel_rec).parent
 

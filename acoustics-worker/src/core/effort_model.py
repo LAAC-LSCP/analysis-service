@@ -2,6 +2,7 @@ from itertools import chain
 from pathlib import Path
 from typing import List
 
+import pandas as pd
 from analysis_service_core.src.effort_model import EffortModel, InputGroup, OutputGroup
 
 SAMPLING_RATE = 16_000
@@ -9,13 +10,13 @@ SAMPLING_RATE = 16_000
 
 class AcousticsEffortModel(EffortModel):
     def find_input_groups(self, dataset_dir: Path) -> List[InputGroup]:
-        recs_converted = AcousticsEffortModel._get_converted_recs(dataset_dir)
+        recs_conv_std = AcousticsEffortModel._get_conv_std_recs(dataset_dir)
         vtc_converted = dataset_dir / "annotations" / "vtc" / "converted"
         recs: List[Path] = [
-            f for f in recs_converted.rglob("**") if f.is_file() and f.suffix == ".wav"
+            f for f in recs_conv_std.rglob("**") if f.is_file() and f.suffix == ".wav"
         ]
         annots: List[Path | None] = [
-            AcousticsEffortModel._get_annotation(rec, recs_converted, vtc_converted)
+            AcousticsEffortModel._get_annotation(rec, recs_conv_std, vtc_converted)
             for rec in recs
         ]
 
@@ -32,7 +33,7 @@ class AcousticsEffortModel(EffortModel):
     def ogroup_from_igroup(
         self, dataset_dir: Path, input_group: InputGroup, output_dir: Path
     ) -> List[OutputGroup]:
-        recs_converted = AcousticsEffortModel._get_converted_recs(dataset_dir)
+        recs_converted = AcousticsEffortModel._get_conv_std_recs(dataset_dir)
         recs = [f for f in input_group if f.suffix == ".wav"]
 
         return [
@@ -47,15 +48,15 @@ class AcousticsEffortModel(EffortModel):
 
     @staticmethod
     def _get_annot_length_s(file: Path) -> float:
-        *_, start, end = file.stem.split("_")
+        df = pd.read_csv(file)
 
-        return (int(end) - int(start)) / 1000
+        return (df["segment_offset"] - df["segment_onset"]).sum() / 1000
 
     @staticmethod
     def _get_annotation(
-        recording: Path, recs_converted: Path, annots_converted: Path
+        recording: Path, recs_conv_std: Path, annots_converted: Path
     ) -> Path | None:
-        rel_rec = recording.relative_to(recs_converted)
+        rel_rec = recording.relative_to(recs_conv_std)
 
         annot_dir = (annots_converted / rel_rec).parent
 
@@ -76,5 +77,5 @@ class AcousticsEffortModel(EffortModel):
         return "_".join(rest) + ".wav"
 
     @staticmethod
-    def _get_converted_recs(dataset_dir: Path) -> Path:
-        return dataset_dir / "recordings" / "converted"
+    def _get_conv_std_recs(dataset_dir: Path) -> Path:
+        return dataset_dir / "recordings" / "converted" / "standard"

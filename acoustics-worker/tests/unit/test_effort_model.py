@@ -15,19 +15,31 @@ class TestEffortModelFlatDataset:
         assert len(input_groups) == 1
         igroup = input_groups[0]
         assert set(igroup) == {
-            flat_dataset_tmp / "recordings" / "converted" / "recording_1.wav",
+            flat_dataset_tmp
+            / "recordings"
+            / "converted"
+            / "standard"
+            / "recording_1.wav",
             flat_dataset_tmp
             / "annotations"
             / "vtc"
             / "converted"
             / "recording_1_0_1000.csv",
-            flat_dataset_tmp / "recordings" / "converted" / "recording_2.wav",
+            flat_dataset_tmp
+            / "recordings"
+            / "converted"
+            / "standard"
+            / "recording_2.wav",
             flat_dataset_tmp
             / "annotations"
             / "vtc"
             / "converted"
             / "recording_2_0_2000.csv",
-            flat_dataset_tmp / "recordings" / "converted" / "recording_3.wav",
+            flat_dataset_tmp
+            / "recordings"
+            / "converted"
+            / "standard"
+            / "recording_3.wav",
             flat_dataset_tmp
             / "annotations"
             / "vtc"
@@ -99,6 +111,7 @@ class TestEffortModelNestedDataset:
             nested_dataset_tmp
             / "recordings"
             / "converted"
+            / "standard"
             / "child_1"
             / "day_1"
             / "hour_1"
@@ -114,6 +127,7 @@ class TestEffortModelNestedDataset:
             nested_dataset_tmp
             / "recordings"
             / "converted"
+            / "standard"
             / "child_1"
             / "day_1"
             / "recording.wav",
@@ -127,6 +141,7 @@ class TestEffortModelNestedDataset:
             nested_dataset_tmp
             / "recordings"
             / "converted"
+            / "standard"
             / "child_1"
             / "day_2"
             / "recording.wav",
@@ -140,6 +155,7 @@ class TestEffortModelNestedDataset:
             nested_dataset_tmp
             / "recordings"
             / "converted"
+            / "standard"
             / "child_2"
             / "day_1"
             / "hour_1"
@@ -155,6 +171,7 @@ class TestEffortModelNestedDataset:
             nested_dataset_tmp
             / "recordings"
             / "converted"
+            / "standard"
             / "child_2"
             / "day_1"
             / "hour_2"
@@ -170,6 +187,7 @@ class TestEffortModelNestedDataset:
             nested_dataset_tmp
             / "recordings"
             / "converted"
+            / "standard"
             / "child_2"
             / "day_1"
             / "recording.wav",
