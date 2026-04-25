@@ -2,6 +2,7 @@ from itertools import chain
 from pathlib import Path
 from typing import List
 
+import pandas as pd
 from analysis_service_core.src.effort_model import EffortModel, InputGroup, OutputGroup
 
 SAMPLING_RATE = 16_000
@@ -47,9 +48,9 @@ class AcousticsEffortModel(EffortModel):
 
     @staticmethod
     def _get_annot_length_s(file: Path) -> float:
-        *_, start, end = file.stem.split("_")
+        df = pd.read_csv(file)
 
-        return (int(end) - int(start)) / 1000
+        return (df["segment_offset"] - df["segment_onset"]).sum() / 1000
 
     @staticmethod
     def _get_annotation(
