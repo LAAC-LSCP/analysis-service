@@ -32,7 +32,7 @@ class W2V2Mock(W2V2):
     ) -> Tuple[int, Path]:
         # this one is harder to mimick, as it depends on the audio. Will just create 2
         # chunks per audio file for now
-        converted_recs = dataset_dir / "recordings" / "converted"
+        conv_std_recs = dataset_dir / "recordings" / "converted" / "standard"
 
         chunks = output_dir / "chunks"
         chunks_chunks = chunks / "chunks"
@@ -40,7 +40,7 @@ class W2V2Mock(W2V2):
 
         (chunks / "segments.csv").touch()
 
-        for f in self._get_chunks(chunks_chunks, converted_recs):
+        for f in self._get_chunks(chunks_chunks, conv_std_recs):
             f.touch()
 
         return 0, chunks

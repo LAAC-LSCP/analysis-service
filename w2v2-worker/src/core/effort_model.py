@@ -10,17 +10,17 @@ class W2V2EffortModel(EffortModel):
     def find_input_groups(self, dataset_dir: Path) -> List[InputGroup]:
         # NOTE: W2V2 can in fact be adapted to run on small sets of files
         # This coarse-grained approach can be improved upon
-        converted_recs = self._get_converted_recs(dataset_dir)
+        conv_std_recs = self._get_conv_std_recs(dataset_dir)
 
-        return [[converted_recs]]
+        return [[conv_std_recs]]
 
     def ogroup_from_igroup(
         self, dataset_dir: Path, input_group: InputGroup, output_dir: Path
     ) -> List[OutputGroup]:
-        converted_recs = input_group[0]
-        wav_files = [f for f in converted_recs.rglob("**.wav") if f.is_file()]
+        conv_std_recs = input_group[0]
+        wav_files = [f for f in conv_std_recs.rglob("**.wav") if f.is_file()]
 
-        rel_wav_files = [wav_f.relative_to(converted_recs) for wav_f in wav_files]
+        rel_wav_files = [wav_f.relative_to(conv_std_recs) for wav_f in wav_files]
 
         return [
             output_dir / "output" / "raw" / "_".join(f.with_suffix(".csv").parts)
@@ -34,5 +34,5 @@ class W2V2EffortModel(EffortModel):
         return file.stat().st_size / SAMPLING_RATE
 
     @staticmethod
-    def _get_converted_recs(dataset_dir: Path) -> Path:
-        return dataset_dir / "recordings" / "converted"
+    def _get_conv_std_recs(dataset_dir: Path) -> Path:
+        return dataset_dir / "recordings" / "converted" / "standard"

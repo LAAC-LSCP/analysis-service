@@ -14,8 +14,8 @@ logger = LoggerFactory.get_logger(__name__)
 
 class VTC_2(ModelPlugin):
     def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
-        recordings_path = dataset_dir / "recordings" / "converted"
-        self._do_vtc(dataset_dir, task_id, recordings_path, output_dir / "raw")
+        conv_std_recs = dataset_dir / "recordings" / "converted" / "standard"
+        self._do_vtc(dataset_dir, task_id, conv_std_recs, output_dir / "raw")
 
         return
 

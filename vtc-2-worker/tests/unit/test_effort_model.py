@@ -17,7 +17,7 @@ class TestEffortModelFlatDataset:
         assert len(input_group) == 1
         directory = input_group[0]
         assert directory.is_dir()
-        assert directory == flat_dataset_tmp / "recordings" / "converted"
+        assert directory == flat_dataset_tmp / "recordings" / "converted" / "standard"
 
     def test_ogroup_from_igroup(self, flat_dataset_tmp: Path):
         effort_model = VTC2EffortModelMock()
@@ -39,13 +39,31 @@ class TestEffortModelFlatDataset:
     def test_calculate_progress(self, flat_dataset_tmp: Path):
         output_dir = get_final_output_dir(flat_dataset_tmp, self.task_id)
 
-        infile_1 = flat_dataset_tmp / "recordings" / "converted" / "recording_1.wav"
+        infile_1 = (
+            flat_dataset_tmp
+            / "recordings"
+            / "converted"
+            / "standard"
+            / "recording_1.wav"
+        )
         outfile_1 = output_dir / "raw" / "recording_1.rttm"
 
-        infile_2 = flat_dataset_tmp / "recordings" / "converted" / "recording_2.wav"
+        infile_2 = (
+            flat_dataset_tmp
+            / "recordings"
+            / "converted"
+            / "standard"
+            / "recording_2.wav"
+        )
         outfile_2 = output_dir / "raw" / "recording_2.rttm"
 
-        infile_3 = flat_dataset_tmp / "recordings" / "converted" / "recording_3.wav"
+        infile_3 = (
+            flat_dataset_tmp
+            / "recordings"
+            / "converted"
+            / "standard"
+            / "recording_3.wav"
+        )
         outfile_3 = output_dir / "raw" / "recording_3.rttm"
 
         effort_model = VTC2EffortModelMock(
@@ -104,12 +122,12 @@ class TestEffortModelNestedDataset:
             ]
         ) == sorted(
             [
-                [Path("recordings/converted/child_1/day_2")],
-                [Path("recordings/converted/child_1/day_1/")],
-                [Path("recordings/converted/child_1/day_1/hour_1/")],
-                [Path("recordings/converted/child_2/day_1/")],
-                [Path("recordings/converted/child_2/day_1/hour_1/")],
-                [Path("recordings/converted/child_2/day_1/hour_2/")],
+                [Path("recordings/converted/standard/child_1/day_2")],
+                [Path("recordings/converted/standard/child_1/day_1/")],
+                [Path("recordings/converted/standard/child_1/day_1/hour_1/")],
+                [Path("recordings/converted/standard/child_2/day_1/")],
+                [Path("recordings/converted/standard/child_2/day_1/hour_1/")],
+                [Path("recordings/converted/standard/child_2/day_1/hour_2/")],
             ]
         )
 
@@ -122,7 +140,7 @@ class TestEffortModelNestedDataset:
                 for igroup in input_groups
                 if len(igroup)
                 and igroup[0].relative_to(nested_dataset_tmp)
-                == Path("recordings/converted/child_1/day_2")
+                == Path("recordings/converted/standard/child_1/day_2")
             ),
             None,
         )
@@ -147,6 +165,7 @@ class TestEffortModelNestedDataset:
             nested_dataset_tmp
             / "recordings"
             / "converted"
+            / "standard"
             / "child_1"
             / "day_1"
             / "recording.wav"
@@ -157,6 +176,7 @@ class TestEffortModelNestedDataset:
             nested_dataset_tmp
             / "recordings"
             / "converted"
+            / "standard"
             / "child_1"
             / "day_2"
             / "recording.wav"
@@ -167,6 +187,7 @@ class TestEffortModelNestedDataset:
             nested_dataset_tmp
             / "recordings"
             / "converted"
+            / "standard"
             / "child_2"
             / "day_1"
             / "hour_1"

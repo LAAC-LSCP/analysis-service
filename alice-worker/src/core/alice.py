@@ -17,17 +17,17 @@ class ALICE(ModelPlugin):
     def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
         output_dir = output_dir / "output"
 
-        converted_recs = self._get_converted_recs(dataset_dir)
+        conv_std_recs = self._get_conv_std_recs(dataset_dir)
 
-        if not converted_recs.exists():
+        if not conv_std_recs.exists():
             raise ValueError(
-                f"Recordings directory at '{converted_recs}' does not exist"
+                f"Recordings directory at '{conv_std_recs}' does not exist"
             )
 
-        audio_files = self._get_audio_files(converted_recs)
+        audio_files = self._get_audio_files(conv_std_recs)
 
         for file in audio_files:
-            self._run_alice_on_audio_file(converted_recs, output_dir, file)
+            self._run_alice_on_audio_file(conv_std_recs, output_dir, file)
             self.report_progress(dataset_dir, task_id)
 
     def _run_alice_on_audio_file(
@@ -108,8 +108,8 @@ class ALICE(ModelPlugin):
         return audio_files
 
     @staticmethod
-    def _get_converted_recs(dataset_dir: Path) -> Path:
-        return dataset_dir / "recordings" / "converted"
+    def _get_conv_std_recs(dataset_dir: Path) -> Path:
+        return dataset_dir / "recordings" / "converted" / "standard"
 
     @property
     def alice_dir(self) -> Path:
