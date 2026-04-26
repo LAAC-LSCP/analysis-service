@@ -13,9 +13,7 @@ class VTCEffortModel(EffortModel):
         conv_std_recs = self._get_conv_std_recs(dataset_dir)
 
         return [
-            [f]
-            for f in conv_std_recs.rglob(f"**{RecordingFormats.WAV}")
-            if f.is_file()
+            [f] for f in conv_std_recs.rglob(f"**{RecordingFormats.WAV}") if f.is_file()
         ]
 
     def ogroup_from_igroup(

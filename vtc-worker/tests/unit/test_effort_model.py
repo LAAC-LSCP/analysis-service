@@ -47,13 +47,31 @@ class TestEffortModelFlatDataset:
     def test_calculate_progress(self, flat_dataset_tmp: Path):
         output_folder = get_final_output_dir(flat_dataset_tmp, self.task_id)
 
-        infile_1 = flat_dataset_tmp / "recordings" / "converted" / "standard" / "recording_1.wav"
+        infile_1 = (
+            flat_dataset_tmp
+            / "recordings"
+            / "converted"
+            / "standard"
+            / "recording_1.wav"
+        )
         outfile_1 = output_folder / "raw" / "recording_1.rttm"
 
-        infile_2 = flat_dataset_tmp / "recordings" / "converted" / "standard" / "recording_2.wav"
+        infile_2 = (
+            flat_dataset_tmp
+            / "recordings"
+            / "converted"
+            / "standard"
+            / "recording_2.wav"
+        )
         outfile_2 = output_folder / "raw" / "recording_2.rttm"
 
-        infile_3 = flat_dataset_tmp / "recordings" / "converted" / "standard" / "recording_3.wav"
+        infile_3 = (
+            flat_dataset_tmp
+            / "recordings"
+            / "converted"
+            / "standard"
+            / "recording_3.wav"
+        )
         outfile_3 = output_folder / "raw" / "recording_3.rttm"
 
         effort_model = VTCEffortModelMock(
@@ -109,10 +127,25 @@ class TestEffortModelNestedDataset:
             [
                 [Path("recordings/converted/standard/child_1/day_2/recording.wav")],
                 [Path("recordings/converted/standard/child_1/day_1/recording.wav")],
-                [Path("recordings/converted/standard/child_1/day_1/hour_1/recording.wav")],
+                [
+                    Path(
+                        "recordings/converted/standard/child_1/day_1/"
+                        "hour_1/recording.wav"
+                    )
+                ],
                 [Path("recordings/converted/standard/child_2/day_1/recording.wav")],
-                [Path("recordings/converted/standard/child_2/day_1/hour_1/recording.wav")],
-                [Path("recordings/converted/standard/child_2/day_1/hour_2/recording.wav")],
+                [
+                    Path(
+                        "recordings/converted/standard/child_2/day_1/"
+                        "hour_1/recording.wav"
+                    )
+                ],
+                [
+                    Path(
+                        "recordings/converted/standard/child_2/day_1/"
+                        "hour_2/recording.wav"
+                    )
+                ],
             ]
         )
 
