@@ -10,7 +10,7 @@ SAMPLING_RATE = 16_000
 
 class VTC2EffortModel(EffortModel):
     def find_input_groups(self, dataset_dir: Path) -> List[InputGroup]:
-        converted_recs = self._get_converted_recs(dataset_dir)
+        converted_recs = self._get_conv_std_recs(dataset_dir)
 
         subdirs: List[Path] = [
             dir for dir in converted_recs.rglob("**") if dir.is_dir()
@@ -22,7 +22,7 @@ class VTC2EffortModel(EffortModel):
     def ogroup_from_igroup(
         self, dataset_dir: Path, input_group: InputGroup, output_dir: Path
     ) -> List[OutputGroup]:
-        converted_recs = self._get_converted_recs(dataset_dir)
+        converted_recs = self._get_conv_std_recs(dataset_dir)
         directory = input_group[0]
 
         audio_files = VTC2EffortModel._get_audio_files(directory)
@@ -46,8 +46,8 @@ class VTC2EffortModel(EffortModel):
         ]
 
     @staticmethod
-    def _get_converted_recs(dataset_dir: Path) -> Path:
-        return dataset_dir / "recordings" / "converted"
+    def _get_conv_std_recs(dataset_dir: Path) -> Path:
+        return dataset_dir / "recordings" / "converted" / "standard"
 
     def _bytes_per_second(self, file: Path) -> float:
         return file.stat().st_size / SAMPLING_RATE

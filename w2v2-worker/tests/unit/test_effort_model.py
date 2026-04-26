@@ -13,7 +13,9 @@ class TestEffortModelFlatDataset:
         input_groups = self.effort_model.find_input_groups(flat_dataset_tmp)
 
         assert len(input_groups) == 1
-        assert input_groups == [[flat_dataset_tmp / "recordings" / "converted"]]
+        assert input_groups == [
+            [flat_dataset_tmp / "recordings" / "converted" / "standard"]
+        ]
 
     def test_ogroup_from_igroup(self, flat_dataset_tmp: Path):
         input_groups = self.effort_model.find_input_groups(flat_dataset_tmp)
@@ -89,7 +91,9 @@ class TestEffortModelNestedDataset:
         input_groups = self.effort_model.find_input_groups(nested_dataset_tmp)
 
         assert len(input_groups) == 1
-        assert input_groups[0] == [nested_dataset_tmp / "recordings" / "converted"]
+        assert input_groups[0] == [
+            nested_dataset_tmp / "recordings" / "converted" / "standard"
+        ]
 
     def test_ogroup_from_igroup(self, nested_dataset_tmp: Path):
         input_groups = self.effort_model.find_input_groups(nested_dataset_tmp)
