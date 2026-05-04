@@ -1,7 +1,5 @@
 from pathlib import Path
 
-from analysis_service_core.testing.mocks.pubsub import PubSubMock
-
 from src.core.vtc import VTC
 
 
@@ -10,17 +8,7 @@ class VTC_Mock(VTC):
     Test double for VTC
     """
 
-    def __init__(
-        self,
-        queue,
-        config,
-        pubsub=PubSubMock(),
-        effort_model=None,
-        skip_moving_files=False,
-    ):
-        super().__init__(queue, config, pubsub, effort_model, skip_moving_files)
-
-    def _run_subprocess(self, _: str, output_dir: Path, file: Path):
+    def _run_subprocess(self, bash_script: str, output_dir: Path, file: Path) -> None:
         # Here `output_dir` doubles as the present working directory
         # in the subprocess call, which for VTC, is where the outputs are
         vtc_base_dir = output_dir / "output_voice_type_classifier"
@@ -29,6 +17,9 @@ class VTC_Mock(VTC):
         vtc_output_dir.mkdir(parents=True, exist_ok=True)
 
         self._create_rttm_files(vtc_output_dir, file)
+
+    def _get_apply_sh(self) -> Path:
+        return Path(".")
 
     def _create_rttm_files(self, vtc_output_dir: Path, file: Path) -> None:
         for f_name in [
