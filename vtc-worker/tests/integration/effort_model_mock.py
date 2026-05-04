@@ -19,4 +19,4 @@ class VTCEffortModelMock(VTCEffortModel):
         self._default_file_size = default_file_size
 
     def _bytes_per_second(self, file: Path) -> float:
-        return self._file_efforts.get(file, self._default_file_size)
+        return self._file_efforts.get(file, self._default_file_size) / 16_000

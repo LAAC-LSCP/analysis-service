@@ -1,0 +1,86 @@
+[
+    {
+        "igroup": ["recordings/converted/standard/child_1/day_1/hour_1/recording.wav"],
+        "pogroup": [
+            "output_voice_type_classifier/recording/all.rttm",
+            "output_voice_type_classifier/recording/CHI.rttm",
+            "output_voice_type_classifier/recording/FEM.rttm",
+            "output_voice_type_classifier/recording/KCHI.rttm",
+            "output_voice_type_classifier/recording/MAL.rttm",
+            "output_voice_type_classifier/recording/SPEECH.rttm"
+        ],
+        "ogroup": ["raw/child_1/day_1/hour_1/recording.rttm"],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_1/day_1/recording.wav"],
+        "pogroup": [
+            "output_voice_type_classifier/recording/all.rttm",
+            "output_voice_type_classifier/recording/CHI.rttm",
+            "output_voice_type_classifier/recording/FEM.rttm",
+            "output_voice_type_classifier/recording/KCHI.rttm",
+            "output_voice_type_classifier/recording/MAL.rttm",
+            "output_voice_type_classifier/recording/SPEECH.rttm"
+        ],
+        "ogroup": ["raw/child_1/day_1/recording.rttm"],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_1/day_2/recording.wav"],
+        "pogroup": [
+            "output_voice_type_classifier/recording/all.rttm",
+            "output_voice_type_classifier/recording/CHI.rttm",
+            "output_voice_type_classifier/recording/FEM.rttm",
+            "output_voice_type_classifier/recording/KCHI.rttm",
+            "output_voice_type_classifier/recording/MAL.rttm",
+            "output_voice_type_classifier/recording/SPEECH.rttm"
+        ],
+        "ogroup": ["raw/child_1/day_2/recording.rttm"],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_2/day_1/hour_1/recording.wav"],
+        "pogroup": [
+            "output_voice_type_classifier/recording/all.rttm",
+            "output_voice_type_classifier/recording/CHI.rttm",
+            "output_voice_type_classifier/recording/FEM.rttm",
+            "output_voice_type_classifier/recording/KCHI.rttm",
+            "output_voice_type_classifier/recording/MAL.rttm",
+            "output_voice_type_classifier/recording/SPEECH.rttm"
+        ],
+        "ogroup": ["raw/child_2/day_1/hour_1/recording.rttm"],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_2/day_1/hour_2/recording.wav"],
+        "pogroup": [
+            "output_voice_type_classifier/recording/all.rttm",
+            "output_voice_type_classifier/recording/CHI.rttm",
+            "output_voice_type_classifier/recording/FEM.rttm",
+            "output_voice_type_classifier/recording/KCHI.rttm",
+            "output_voice_type_classifier/recording/MAL.rttm",
+            "output_voice_type_classifier/recording/SPEECH.rttm"
+        ],
+        "ogroup": ["raw/child_2/day_1/hour_2/recording.rttm"],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_2/day_1/recording.wav"],
+        "pogroup": [
+            "output_voice_type_classifier/recording/all.rttm",
+            "output_voice_type_classifier/recording/CHI.rttm",
+            "output_voice_type_classifier/recording/FEM.rttm",
+            "output_voice_type_classifier/recording/KCHI.rttm",
+            "output_voice_type_classifier/recording/MAL.rttm",
+            "output_voice_type_classifier/recording/SPEECH.rttm"
+        ],
+        "ogroup": ["raw/child_2/day_1/recording.rttm"],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    }
+]
