@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from analysis_service_core.testing.mocks import ConfigMock
+
 _FORWARD_PASSES_FLAT_JSON = Path(__file__).parent.parent / "forward_passes_flat.json"
 assert _FORWARD_PASSES_FLAT_JSON.exists()
 
@@ -13,3 +15,12 @@ assert _FLAT_DATASETS.exists()
 
 _NESTED_DATASETS = Path(__file__).parent.parent / "nested_datasets"
 assert _NESTED_DATASETS.exists()
+
+mock_config = ConfigMock(
+    overrides={
+        "VTC_FOLDER": Path("/temp"),
+        "VTC_DEVICE": "cpu",
+        "CONDA_ACTIVATE_FILE": "",
+        "CONDA_ENV_NAME": "",
+    }
+)

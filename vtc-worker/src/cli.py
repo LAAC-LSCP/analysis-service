@@ -21,13 +21,12 @@ def run_vtc():
     }
     config = Config(env_vars)
     queue = Queue(QueueName.RUN_VTC)
-    effort_model = VTCEffortModel()
+    effort_model = VTCEffortModel(config)
 
     vtc = VTC(
         queue=queue,
         config=config,
         effort_model=effort_model,
-        skip_moving_files=True,
     )
 
     vtc.run()

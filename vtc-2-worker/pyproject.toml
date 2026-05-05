@@ -9,7 +9,7 @@ license = {text = "MIT"}
 requires-python = ">=3.13"
 dependencies = [
     "click (>=8.3.1,<9.0.0)",
-    "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git@v1.1.0"
+    "analysis-service-core @ file:///Users/lawrenceborst/Desktop/analysis-service-core"
 ]
 
 
@@ -26,8 +26,17 @@ include = [
 ]
 
 
+[tool.poetry.dependencies]
+analysis-service-core = {develop = true}
 [tool.isort]
-profile = "black"
+profile="black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+src_paths = ["src", "tests"]
 
 
 [dependency-groups]

@@ -2,50 +2,42 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import List
 
-from analysis_service_core.src.logger import LoggerFactory
-from analysis_service_core.src.model import UUID, ModelPlugin
+from analysis_service_core.src.effort_model import InputGroup, PassOutputGroup
+from analysis_service_core.src.model import (
+    ModelPlugin,
+)
 
-from src.core.recording_formats import RecordingFormats
-
-logger = LoggerFactory.get_logger(__name__)
+from src.core.effort_model import VTC2EffortModel
 
 
-class VTC_2(ModelPlugin):
-    def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
-        conv_std_recs = dataset_dir / "recordings" / "converted" / "standard"
-        self._do_vtc(dataset_dir, task_id, conv_std_recs, output_dir / "raw")
-
-        return
-
-    def _do_vtc(
-        self, dataset_dir: Path, task_id: UUID, converted_recs: Path, output: Path
+class VTC2(ModelPlugin):
+    def run_model(
+        self, dataset_dir: Path, output_dir: Path, igroup: InputGroup
     ) -> None:
-        input_dirs = [
-            dir
-            for dir in converted_recs.rglob("**")
-            if dir.is_dir() and len(self._get_recording_files(dir))
-        ]
-        output_dirs = [output / dir.relative_to(converted_recs) for dir in input_dirs]
+        directory = igroup[0]
 
-        for input_dir, output_dir in zip(input_dirs, output_dirs):
-            logger.info(f"Calling VTC 2 in folder {input_dir!s}")
-            return_code = self._call_vtc(input_dir, output_dir)
+        conv_std_recs = VTC2EffortModel._get_conv_std_recs(dataset_dir)
+        final_output_dir = output_dir / "raw" / directory.relative_to(conv_std_recs)
 
-            if return_code == 0:
-                logger.info(f"VTC 2 successfully run in folder {converted_recs!s}")
-                self._move_and_clean(output_dir)
-                self.report_progress(dataset_dir, task_id)
-            else:
-                logger.error(f"Problem running VTC 2 in folder {converted_recs!s}")
+        return_code = self._call_vtc(directory, final_output_dir)
+        if return_code == 0:
+            self._logger.info(f"VTC 2 successfully run in folder {conv_std_recs!s}")
 
-        return
+    def postprocess(
+        self,
+        dataset_dir: Path,
+        output_dir: Path,
+        pogroup: PassOutputGroup,
+        igroup: InputGroup,
+    ) -> None:
+        directory = igroup[0]
 
-    def _get_recording_files(self, dir: Path) -> List[Path]:
-        return [
-            f for f in dir.iterdir() if f.is_file() and f.suffix in RecordingFormats
-        ]
+        conv_std_recs = VTC2EffortModel._get_conv_std_recs(dataset_dir)
+        final_output_dir = output_dir / "raw" / directory.relative_to(conv_std_recs)
+
+        self._logger.info("Moving outputs")
+        self._move_and_clean(final_output_dir)
 
     def _move_and_clean(self, dir: Path) -> None:
         raw_rttm_dir = dir / "raw_rttm"
@@ -60,8 +52,6 @@ class VTC_2(ModelPlugin):
             shutil.move(str(item), str(dir / item.name))
 
         rttm_dir.rmdir()
-
-        return
 
     def _call_vtc(self, input: Path, output: Path) -> int:
         vtc_folder = self.config.get("VTC_2_FOLDER")
@@ -78,7 +68,7 @@ class VTC_2(ModelPlugin):
     ) -> int:
         vtc_venv = self.config.get("VTC_2_FOLDER") / ".venv"
 
-        # Note that vtc 2 has a quirk that it puts outputs in the current working dir
+        # NOTE that VTC 2 has a quirk that it puts outputs in the cwd
         result = subprocess.run(
             ["bash", "-c", bash_script],
             cwd=cwd,
@@ -91,9 +81,11 @@ class VTC_2(ModelPlugin):
         )
 
         if result.returncode == 0:
-            logger.info(f"Successfully ran VTC 2 on folder '{input_dir!s}'")
+            self._logger.info(f"Successfully ran VTC 2 on folder '{input_dir!s}'")
         else:
-            logger.error(f"Error running VTC 2 on folder '{input_dir!s} with output \
-'{output_dir!s}': {result.stderr}")
+            self._logger.error(
+                f"Error running VTC 2 on folder '{input_dir!s} with output \
+'{output_dir!s}': {result.stderr}"
+            )
 
         return result.returncode

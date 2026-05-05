@@ -1,15 +1,18 @@
 from pathlib import Path
 from typing import List
 
-from analysis_service_core.src.effort_model import EffortModel, InputGroup, OutputGroup
+from analysis_service_core.src.effort_model import (
+    EffortModel,
+    InputGroup,
+    OutputGroup,
+    PassOutputGroup,
+)
 
-from src.core.recording_formats import RecordingFormats
-
-SAMPLING_RATE = 16_000
+from src.core.recording_formats import SAMPLING_RATE, RecordingFormats
 
 
 class VTC2EffortModel(EffortModel):
-    def find_input_groups(self, dataset_dir: Path) -> List[InputGroup]:
+    def find_igroups(self, dataset_dir: Path) -> List[InputGroup]:
         converted_recs = self._get_conv_std_recs(dataset_dir)
 
         subdirs: List[Path] = [
@@ -19,20 +22,42 @@ class VTC2EffortModel(EffortModel):
 
         return [[subdir] for subdir in subdirs_with_recs]
 
-    def ogroup_from_igroup(
-        self, dataset_dir: Path, input_group: InputGroup, output_dir: Path
-    ) -> List[OutputGroup]:
+    def pogroup_from_igroup(
+        self, dataset_dir: Path, output_dir: Path, igroup: InputGroup
+    ) -> PassOutputGroup:
         converted_recs = self._get_conv_std_recs(dataset_dir)
-        directory = input_group[0]
-
+        directory = igroup[0]
         audio_files = VTC2EffortModel._get_audio_files(directory)
 
-        return [
-            output_dir / "raw" / f.relative_to(converted_recs).with_suffix(".rttm")
+        vtc_output_dir = output_dir / "raw" / directory.relative_to(converted_recs)
+
+        rttm_files = [
+            vtc_output_dir / "rttm" / f.with_suffix(".rttm").name for f in audio_files
+        ]
+        raw_rttm_files = [
+            vtc_output_dir / "raw_rttm" / f.with_suffix(".rttm").name
             for f in audio_files
         ]
 
-    def effort_from_igroup(self, igroup: InputGroup) -> float:
+        return [
+            *rttm_files,
+            *raw_rttm_files,
+            vtc_output_dir / "rttm.csv",
+            vtc_output_dir / "raw_rttm.csv",
+        ]
+
+    def ogroup_from_pogroup(
+        self,
+        dataset_dir: Path,
+        output_dir: Path,
+        pogroup: List[Path],
+        igroup: List[Path],
+    ) -> OutputGroup:
+        return [f.parent.parent / f.name for f in pogroup if f.parent.name == "rttm"]
+
+    def effort_pogroup_from_igroup(
+        self, igroup: List[Path], pogroup: List[Path]
+    ) -> float:
         directory = igroup[0]
 
         return sum(
