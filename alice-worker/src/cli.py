@@ -5,6 +5,7 @@ from analysis_service_core.src.config import Config, EnvVar
 from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.alice import ALICE
+from src.core.effort_model import ALICEEffortModel
 
 
 @click.command()
@@ -20,11 +21,12 @@ def run_alice():
     }
     config = Config(env_vars)
     queue = Queue(QueueName.RUN_ALICE)
+    effort_model = ALICEEffortModel(config)
 
     alice = ALICE(
         queue=queue,
         config=config,
-        skip_moving_files=True,
+        effort_model=effort_model,
     )
 
     alice.run()

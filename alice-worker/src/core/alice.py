@@ -7,10 +7,11 @@ from uuid import UUID
 import pandas as pd
 from collections import defaultdict
 
+from analysis_service_core.src.effort_model import InputGroup, PassOutputGroup
 from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import ModelPlugin
 
-from src.core.recording_formats import RecordingFormats
+from src.core.effort_model import ALICEEffortModel
 
 logger = LoggerFactory.get_logger(__name__)
 
@@ -38,11 +39,9 @@ class ALICE(ModelPlugin):
             self.report_progress(dataset_dir, task_id)
 
     def _run_alice_on_audio_file(
-        self, recordings_dir: Path, output_dir: Path, file: Path
+        self, recordings_dir: Path, final_output_dir: Path, file: Path
     ) -> None:
         logger.info(f"Running ALICE on {recordings_dir!s}")
-        rel_path: Path = file.relative_to(recordings_dir)
-
         executable: Path = self.alice_dir / "run_ALICE.sh"
 
         device_str: str = ""
@@ -55,12 +54,7 @@ class ALICE(ModelPlugin):
         {str(executable)} {str(file)} {device_str}
         """
 
-        return_code = self._run_subprocess(bash_script, self.alice_dir, file)
-
-        if return_code == 0:
-            self._move_and_clean_outputs(rel_path, output_dir)
-
-        return
+        self._run_subprocess(bash_script, self.alice_dir, file)
 
     def _run_subprocess(self, bash_script: str, alice_dir: Path, file: Path) -> int:
         # NOTE: ALICE has a quirk that it cannot run if your PWD is not the
@@ -79,7 +73,18 @@ class ALICE(ModelPlugin):
 
         return result.returncode
 
-    def _move_and_clean_outputs(self, rel_path: Path, output_dir: Path) -> None:
+    def postprocess(
+        self,
+        dataset_dir: Path,
+        output_dir: Path,
+        pogroup: PassOutputGroup,
+        igroup: InputGroup,
+    ) -> None:
+        conv_std_recs = ALICEEffortModel.get_conv_std_recs(dataset_dir)
+        audio_file = igroup[0]
+        rel_path: Path = audio_file.relative_to(conv_std_recs)
+        final_output_dir = output_dir / "output"
+
         rel_path_dir = rel_path.parent
         base_name = rel_path.stem
 
@@ -104,20 +109,6 @@ class ALICE(ModelPlugin):
 
         if general_output.exists():
             os.remove(general_output)
-
-        return
-
-    def _get_audio_files(self, recordings_dir: Path) -> Set[Path]:
-        audio_files: Set[Path] = set()
-
-        for format in RecordingFormats:
-            audio_files.update(recordings_dir.rglob(f"**{format}"))
-
-        return audio_files
-
-    @staticmethod
-    def _get_conv_std_recs(dataset_dir: Path) -> Path:
-        return dataset_dir / "recordings" / "converted" / "standard"
 
     @property
     def alice_dir(self) -> Path:

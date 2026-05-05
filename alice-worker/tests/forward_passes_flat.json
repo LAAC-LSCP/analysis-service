@@ -1,0 +1,50 @@
+[
+    {
+        "igroup": [
+            "recordings/converted/standard/recording_1.wav"
+        ],
+        "pogroup": [
+            "alice_folder/ALICE_output.txt",
+            "alice_folder/ALICE_output_utterances.txt",
+            "alice_folder/diarization_output.rttm"
+        ],
+        "ogroup": [
+            "output/raw/recording_1.txt",
+            "output/extra/recording_1_sum.txt"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": [
+            "recordings/converted/standard/recording_2.wav"
+        ],
+        "pogroup": [
+            "alice_folder/ALICE_output.txt",
+            "alice_folder/ALICE_output_utterances.txt",
+            "alice_folder/diarization_output.rttm"
+        ],
+        "ogroup": [
+            "output/raw/recording_2.txt",
+            "output/extra/recording_2_sum.txt"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": [
+            "recordings/converted/standard/recording_3.wav"
+        ],
+        "pogroup": [
+            "alice_folder/ALICE_output.txt",
+            "alice_folder/ALICE_output_utterances.txt",
+            "alice_folder/diarization_output.rttm"
+        ],
+        "ogroup": [
+            "output/raw/recording_3.txt",
+            "output/extra/recording_3_sum.txt"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    }
+]
