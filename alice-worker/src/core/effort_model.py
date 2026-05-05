@@ -1,26 +1,32 @@
 from pathlib import Path
 from typing import List
 
-from analysis_service_core.src.effort_model import EffortModel, InputGroup, OutputGroup
+from analysis_service_core.src.effort_model import EffortModel, InputGroup, OutputGroup, PassOutputGroup
 
 from src.core.recording_formats import RecordingFormats
 
-SAMPLING_RATE = 16_000
+_SAMPLING_RATE = 16_000
 
 
 class ALICEEffortModel(EffortModel):
-    def find_input_groups(self, dataset_dir: Path) -> List[InputGroup]:
-        conv_std_recs = self._get_conv_std_recs(dataset_dir)
+    def find_igroups(self, dataset_dir: Path) -> List[InputGroup]:
+        conv_std_recs = self.get_conv_std_recs(dataset_dir)
 
         return [
             [f] for f in conv_std_recs.rglob(f"**{RecordingFormats.WAV}") if f.is_file()
         ]
 
-    def ogroup_from_igroup(
-        self, dataset_dir: Path, input_group: InputGroup, output_dir: Path
-    ) -> List[OutputGroup]:
-        converted_recs = self._get_conv_std_recs(dataset_dir)
-        audio_file = input_group[0]
+    def pogroup_from_igroup(self, dataset_dir: Path, output_dir: Path, igroup: InputGroup) -> PassOutputGroup:
+        alice_dir: Path = self.config.get("ALICE_FOLDER")
+        return [
+            alice_dir / "ALICE_output.txt",
+            alice_dir / "ALICE_output_utterances.txt",
+            alice_dir / "diarization_output.rttm",
+        ]
+
+    def ogroup_from_pogroup(self, dataset_dir: Path, output_dir: Path, pogroup: PassOutputGroup, igroup: InputGroup) -> OutputGroup:
+        converted_recs = self.get_conv_std_recs(dataset_dir)
+        audio_file = igroup[0]
 
         return [
             output_dir
@@ -34,15 +40,15 @@ class ALICEEffortModel(EffortModel):
             / "extra"
             / audio_file.with_suffix(".txt").with_stem(audio_file.stem + "_sum").name,
         ]
-
-    def effort_from_igroup(self, igroup: InputGroup) -> float:
+    
+    def effort_pogroup_from_igroup(self, igroup: List[Path], pogroup: List[Path]) -> float:
         audio_file = igroup[0]
 
         return self._bytes_per_second(audio_file)
 
     @staticmethod
-    def _get_conv_std_recs(dataset_dir: Path) -> Path:
+    def get_conv_std_recs(dataset_dir: Path) -> Path:
         return dataset_dir / "recordings" / "converted" / "standard"
 
     def _bytes_per_second(self, file: Path) -> float:
-        return file.stat().st_size / SAMPLING_RATE
+        return file.stat().st_size / _SAMPLING_RATE

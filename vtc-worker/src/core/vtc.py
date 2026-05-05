@@ -1,42 +1,66 @@
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Set
-from uuid import UUID
 
+from analysis_service_core.src.effort_model import InputGroup, PassOutputGroup
 from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import ModelPlugin
 
-from src.core.recording_formats import RecordingFormats
+from src.core.effort_model import VTCEffortModel
 
 logger = LoggerFactory.get_logger(__name__)
 
 
 class VTC(ModelPlugin):
-    def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
-        recs_conv_std = dataset_dir / "recordings" / "converted" / "standard"
-
-        if not recs_conv_std.exists():
-            raise ValueError(
-                f"Recordings directory at '{recs_conv_std}' does not exist"
-            )
-
+    def run_model(
+        self, dataset_dir: Path, output_dir: Path, igroup: InputGroup
+    ) -> None:
         if not output_dir.exists():
             output_dir.mkdir(parents=True)
 
-        audio_files = self._get_audio_files(recs_conv_std)
+        file = igroup[0]
+        self._run_vtc_on_audio_file(output_dir, file)
 
-        for file in audio_files:
-            rel_path = file.relative_to(recs_conv_std)
+    def postprocess(
+        self,
+        dataset_dir: Path,
+        output_dir: Path,
+        pogroup: PassOutputGroup,
+        igroup: InputGroup,
+    ) -> None:
+        """
+        VTC quirks to bear in mind:
 
-            self._run_vtc_on_audio_file(output_dir, file)
-            self._move_and_prune_outputs(rel_path, output_dir, file)
-            self.report_progress(dataset_dir, task_id)
+        - VTC puts the output files into the same folder as the present working
+        directory
+        - Puts it under the folder "output_voice_type_classifier/[name of input file]"
+        - In there you'll find various outputs. We want "all.rttm"
+        """
+        input_file = igroup[0]
+        all_rttm = next((f for f in pogroup if f.name == "all.rttm"), None)
+
+        if not all_rttm:
+            logger.warning(f"Expected output file {all_rttm!s} not found")
+            return
+
+        output_file = (
+            output_dir
+            / "raw"
+            / input_file.relative_to(VTCEffortModel._get_conv_std_recs(dataset_dir))
+        ).resolve()
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+
+        final_output = output_file.with_suffix(".rttm")
+        all_rttm.rename(final_output)
+
+        vtc_base_dir = output_dir / "output_voice_type_classifier"
+        if vtc_base_dir.exists():
+            shutil.rmtree(vtc_base_dir)
 
         return
 
     def _run_vtc_on_audio_file(self, output_dir: Path, file: Path) -> None:
-        executable: Path = self.config.get("VTC_FOLDER") / "apply.sh"
+        executable: Path = self._get_apply_sh()
 
         device_str: str = ""
         device = self.config.get("VTC_DEVICE")
@@ -51,37 +75,8 @@ class VTC(ModelPlugin):
 
         self._run_subprocess(bash_script, output_dir, file)
 
-        return
-
-    def _move_and_prune_outputs(
-        self, rel_path_to_recs: Path, output_dir: Path, input_file: Path
-    ) -> None:
-        """
-        VTC quirks to bear in mind:
-
-        - VTC puts the output files into the same folder as the present working
-        directory
-        - Puts it under the folder "output_voice_type_classifier/[name of input file]"
-        - In there you'll find various outputs. We want "all.rttm"
-        """
-        vtc_base_dir = output_dir / "output_voice_type_classifier"
-        vtc_output_dir = vtc_base_dir / input_file.stem
-        all_rttm = vtc_output_dir / "all.rttm"
-
-        if not all_rttm.exists():
-            logger.warning(f"Expected output file {all_rttm!s} not found")
-            return
-
-        output_file = (output_dir / "raw" / rel_path_to_recs).resolve()
-        output_file.parent.mkdir(parents=True, exist_ok=True)
-
-        final_output = output_file.with_suffix(".rttm")
-        all_rttm.rename(final_output)
-
-        if vtc_base_dir.exists():
-            shutil.rmtree(vtc_base_dir)
-
-        return
+    def _get_apply_sh(self) -> Path:
+        return self.config.get("VTC_FOLDER") / "apply.sh"
 
     def _run_subprocess(self, bash_script: str, output_dir: Path, file: Path) -> None:
         # Note that vtc has a quirk that it puts outputs in the current working dir
@@ -95,11 +90,3 @@ class VTC(ModelPlugin):
             logger.error(f"Error running VTC on '{file!s}: {result.stderr}")
 
         return
-
-    def _get_audio_files(self, recordings_dir: Path) -> Set[Path]:
-        audio_files: Set[Path] = set()
-
-        for format in RecordingFormats:
-            audio_files.update(recordings_dir.rglob(f"**{format}"))
-
-        return audio_files

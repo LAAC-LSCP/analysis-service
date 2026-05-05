@@ -1,0 +1,98 @@
+[
+    {
+        "igroup": [
+            "recordings/converted/standard/child_1/day_1"
+        ],
+        "pogroup": [
+            "raw/child_1/day_1/rttm/recording.rttm",
+            "raw/child_1/day_1/raw_rttm/recording.rttm",
+            "raw/child_1/day_1/rttm.csv",
+            "raw/child_1/day_1/raw_rttm.csv"
+        ],
+        "ogroup": [
+            "raw/child_1/day_1/recording.rttm"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": [
+            "recordings/converted/standard/child_1/day_1/hour_1"
+        ],
+        "pogroup": [
+            "raw/child_1/day_1/hour_1/rttm/recording.rttm",
+            "raw/child_1/day_1/hour_1/raw_rttm/recording.rttm",
+            "raw/child_1/day_1/hour_1/rttm.csv",
+            "raw/child_1/day_1/hour_1/raw_rttm.csv"
+        ],
+        "ogroup": [
+            "raw/child_1/day_1/hour_1/recording.rttm"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": [
+            "recordings/converted/standard/child_1/day_2"
+        ],
+        "pogroup": [
+            "raw/child_1/day_2/rttm/recording.rttm",
+            "raw/child_1/day_2/raw_rttm/recording.rttm",
+            "raw/child_1/day_2/rttm.csv",
+            "raw/child_1/day_2/raw_rttm.csv"
+        ],
+        "ogroup": [
+            "raw/child_1/day_2/recording.rttm"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": [
+            "recordings/converted/standard/child_2/day_1"
+        ],
+        "pogroup": [
+            "raw/child_2/day_1/rttm/recording.rttm",
+            "raw/child_2/day_1/raw_rttm/recording.rttm",
+            "raw/child_2/day_1/rttm.csv",
+            "raw/child_2/day_1/raw_rttm.csv"
+        ],
+        "ogroup": [
+            "raw/child_2/day_1/recording.rttm"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": [
+            "recordings/converted/standard/child_2/day_1/hour_1"
+        ],
+        "pogroup": [
+            "raw/child_2/day_1/hour_1/rttm/recording.rttm",
+            "raw/child_2/day_1/hour_1/raw_rttm/recording.rttm",
+            "raw/child_2/day_1/hour_1/rttm.csv",
+            "raw/child_2/day_1/hour_1/raw_rttm.csv"
+        ],
+        "ogroup": [
+            "raw/child_2/day_1/hour_1/recording.rttm"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": [
+            "recordings/converted/standard/child_2/day_1/hour_2"
+        ],
+        "pogroup": [
+            "raw/child_2/day_1/hour_2/rttm/recording.rttm",
+            "raw/child_2/day_1/hour_2/raw_rttm/recording.rttm",
+            "raw/child_2/day_1/hour_2/rttm.csv",
+            "raw/child_2/day_1/hour_2/raw_rttm.csv"
+        ],
+        "ogroup": [
+            "raw/child_2/day_1/hour_2/recording.rttm"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    }
+]
