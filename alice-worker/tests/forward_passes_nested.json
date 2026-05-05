@@ -1,0 +1,86 @@
+[
+    {
+        "igroup": ["recordings/converted/standard/child_1/day_1/hour_1/recording.wav"],
+        "pogroup": [
+            "alice_folder/ALICE_output.txt",
+            "alice_folder/ALICE_output_utterances.txt",
+            "alice_folder/diarization_output.rttm"
+        ],
+        "ogroup": [
+            "output/child_1/day_1/hour_1/raw/recording.txt",
+            "output/child_1/day_1/hour_1/extra/recording_sum.txt"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_1/day_1/recording.wav"],
+        "pogroup": [
+            "alice_folder/ALICE_output.txt",
+            "alice_folder/ALICE_output_utterances.txt",
+            "alice_folder/diarization_output.rttm"
+        ],
+        "ogroup": [
+            "output/child_1/day_1/raw/recording.txt",
+            "output/child_1/day_1/extra/recording_sum.txt"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_1/day_2/recording.wav"],
+        "pogroup": [
+            "alice_folder/ALICE_output.txt",
+            "alice_folder/ALICE_output_utterances.txt",
+            "alice_folder/diarization_output.rttm"
+        ],
+        "ogroup": [
+            "output/child_1/day_2/raw/recording.txt",
+            "output/child_1/day_2/extra/recording_sum.txt"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_2/day_1/hour_1/recording.wav"],
+        "pogroup": [
+            "alice_folder/ALICE_output.txt",
+            "alice_folder/ALICE_output_utterances.txt",
+            "alice_folder/diarization_output.rttm"
+        ],
+        "ogroup": [
+            "output/child_2/day_1/hour_1/raw/recording.txt",
+            "output/child_2/day_1/hour_1/extra/recording_sum.txt"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_2/day_1/hour_2/recording.wav"],
+        "pogroup": [
+            "alice_folder/ALICE_output.txt",
+            "alice_folder/ALICE_output_utterances.txt",
+            "alice_folder/diarization_output.rttm"
+        ],
+        "ogroup": [
+            "output/child_2/day_1/hour_2/raw/recording.txt",
+            "output/child_2/day_1/hour_2/extra/recording_sum.txt"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    },
+    {
+        "igroup": ["recordings/converted/standard/child_2/day_1/recording.wav"],
+        "pogroup": [
+            "alice_folder/ALICE_output.txt",
+            "alice_folder/ALICE_output_utterances.txt",
+            "alice_folder/diarization_output.rttm"
+        ],
+        "ogroup": [
+            "output/child_2/day_1/raw/recording.txt",
+            "output/child_2/day_1/extra/recording_sum.txt"
+        ],
+        "pass_effort": 1.0,
+        "output_effort": 0.0
+    }
+]
