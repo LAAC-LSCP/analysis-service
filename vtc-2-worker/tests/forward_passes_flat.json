@@ -1,0 +1,24 @@
+[
+    {
+        "igroup": [
+            "recordings/converted/standard"
+        ],
+        "pogroup": [
+            "raw/rttm.csv",
+            "raw/raw_rttm.csv",
+            "raw/raw_rttm/recording_1.rttm",
+            "raw/raw_rttm/recording_2.rttm",
+            "raw/raw_rttm/recording_3.rttm",
+            "raw/rttm/recording_1.rttm",
+            "raw/rttm/recording_2.rttm",
+            "raw/rttm/recording_3.rttm"
+        ],
+        "ogroup": [
+            "raw/recording_1.rttm",
+            "raw/recording_2.rttm",
+            "raw/recording_3.rttm"
+        ],
+        "pass_effort": 3.0,
+        "output_effort": 0.0
+    }
+]
