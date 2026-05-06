@@ -3,15 +3,19 @@ from pathlib import Path
 from typing import List
 
 import pandas as pd
-from analysis_service_core.src.effort_model import EffortModel, InputGroup, OutputGroup
+from analysis_service_core.src.effort_model import (
+    EffortModel,
+    InputGroup,
+    PassOutputGroup,
+)
 
-SAMPLING_RATE = 16_000
+_VTC = "vtc"
 
 
 class AcousticsEffortModel(EffortModel):
-    def find_input_groups(self, dataset_dir: Path) -> List[InputGroup]:
+    def find_igroups(self, dataset_dir: Path) -> List[InputGroup]:
         recs_conv_std = AcousticsEffortModel._get_conv_std_recs(dataset_dir)
-        vtc_converted = dataset_dir / "annotations" / "vtc" / "converted"
+        vtc_converted = dataset_dir / "annotations" / _VTC / "converted"
         recs: List[Path] = [
             f for f in recs_conv_std.rglob("**") if f.is_file() and f.suffix == ".wav"
         ]
@@ -30,18 +34,37 @@ class AcousticsEffortModel(EffortModel):
 
         return [rec_annots]
 
-    def ogroup_from_igroup(
-        self, dataset_dir: Path, input_group: InputGroup, output_dir: Path
-    ) -> List[OutputGroup]:
-        recs_converted = AcousticsEffortModel._get_conv_std_recs(dataset_dir)
-        recs = [f for f in input_group if f.suffix == ".wav"]
+    def pogroup_from_igroup(
+        self, dataset_dir: Path, output_dir: Path, igroup: InputGroup
+    ) -> PassOutputGroup:
+        vtc_converted = dataset_dir / "annotations" / _VTC / "converted"
+        annots = [f for f in igroup if f.suffix == ".csv"]
 
         return [
-            output_dir / "raw" / rec.relative_to(recs_converted).with_suffix(".csv")
-            for rec in recs
+            output_dir / "converted" / annot.relative_to(vtc_converted)
+            for annot in annots
         ]
 
-    def effort_from_igroup(self, igroup: InputGroup) -> float:
+    def ogroup_from_pogroup(
+        self,
+        dataset_dir: Path,
+        output_dir: Path,
+        pogroup: List[Path],
+        igroup: List[Path],
+    ) -> List[Path]:
+        recs_converted = AcousticsEffortModel._get_conv_std_recs(dataset_dir)
+        recordings = [f for f in igroup if f.suffix == ".wav"]
+
+        return [
+            output_dir
+            / "raw"
+            / recording.relative_to(recs_converted).with_suffix(".csv")
+            for recording in recordings
+        ]
+
+    def effort_pogroup_from_igroup(
+        self, igroup: InputGroup, pogroup: PassOutputGroup
+    ) -> float:
         annots = [f for f in igroup if f.suffix == ".csv"]
 
         return sum(map(AcousticsEffortModel._get_annot_length_s, annots))

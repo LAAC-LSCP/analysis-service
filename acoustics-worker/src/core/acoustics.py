@@ -1,35 +1,32 @@
 import shutil
-from dataclasses import dataclass
 from pathlib import Path
-from uuid import UUID
 
-from analysis_service_core.src.logger import LoggerFactory
+from analysis_service_core.src.effort_model import InputGroup, PassOutputGroup
 from analysis_service_core.src.model import ModelPlugin
 from ChildProject.annotations import AnnotationManager
 from ChildProject.pipelines.derivations import AcousticDerivator
 from ChildProject.projects import ChildProject
 
-logger = LoggerFactory.get_logger(__name__)
-
-
-@dataclass
-class Args:
-    source: str
-    set: str
-    threads: int
-    overwrite_existing: bool
-    format: str
+_VTC = "vtc"
 
 
 class Acoustics(ModelPlugin):
-    def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
+    def run_model(
+        self, dataset_dir: Path, output_dir: Path, igroup: InputGroup
+    ) -> None:
         project = ChildProject(dataset_dir)
 
         self._derive_annotations(dataset_dir, project, output_dir)
-        self._make_outputs_raw(output_dir)
+        self._logger.info(f"Finished running acoustics in ${dataset_dir!s}!")
 
-        logger.info(f"Finished running acoustics in ${dataset_dir!s}!")
-        self.report_progress(dataset_dir, task_id)
+    def postprocess(
+        self,
+        dataset_dir: Path,
+        output_dir: Path,
+        pogroup: PassOutputGroup,
+        igroup: InputGroup,
+    ) -> None:
+        self._make_outputs_raw(output_dir)
 
     def _derive_annotations(
         self, dataset_dir: Path, project: ChildProject, output_dir: Path
@@ -38,16 +35,16 @@ class Acoustics(ModelPlugin):
         acoustic_derivator = AcousticDerivator()
 
         try:
-            logger.info(f"Running acoustics in ${dataset_dir!s}...")
+            self._logger.info(f"Running acoustics in ${dataset_dir!s}...")
             am._derive_annotations(
-                "vtc",  # TODO: make this parametrisable
-                str(output_dir),
-                acoustic_derivator,
+                input_set=_VTC,  # TODO: make this parametrisable
+                output_set=str(output_dir),
+                derivation=acoustic_derivator,  # type: ignore
                 overwrite_existing=True,
                 output_as_path=True,
             )
         except Exception:
-            logger.exception("Problem deriving annotations for acoustics")
+            self._logger.exception("Problem deriving annotations for acoustics")
 
     def _make_outputs_raw(self, output_dir) -> None:
         """

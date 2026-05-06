@@ -1,0 +1,36 @@
+[
+    {
+        "igroup": [
+            "annotations/vtc/converted/child_1/day_1/hour_1/recording_0_3000.csv",
+            "annotations/vtc/converted/child_1/day_1/recording_0_1000.csv",
+            "annotations/vtc/converted/child_1/day_2/recording_0_1000.csv",
+            "annotations/vtc/converted/child_2/day_1/hour_1/recording_0_1000.csv",
+            "annotations/vtc/converted/child_2/day_1/hour_2/recording_0_2000.csv",
+            "annotations/vtc/converted/child_2/day_1/recording_0_1000.csv",
+            "recordings/converted/standard/child_1/day_1/hour_1/recording.wav",
+            "recordings/converted/standard/child_1/day_1/recording.wav",
+            "recordings/converted/standard/child_1/day_2/recording.wav",
+            "recordings/converted/standard/child_2/day_1/hour_1/recording.wav",
+            "recordings/converted/standard/child_2/day_1/hour_2/recording.wav",
+            "recordings/converted/standard/child_2/day_1/recording.wav"
+        ],
+        "pogroup": [
+            "converted/child_1/day_1/hour_1/recording_0_3000.csv",
+            "converted/child_1/day_1/recording_0_1000.csv",
+            "converted/child_1/day_2/recording_0_1000.csv",
+            "converted/child_2/day_1/hour_1/recording_0_1000.csv",
+            "converted/child_2/day_1/hour_2/recording_0_2000.csv",
+            "converted/child_2/day_1/recording_0_1000.csv"
+        ],
+        "ogroup": [
+            "raw/child_1/day_1/hour_1/recording.csv",
+            "raw/child_1/day_1/recording.csv",
+            "raw/child_1/day_2/recording.csv",
+            "raw/child_2/day_1/hour_1/recording.csv",
+            "raw/child_2/day_1/hour_2/recording.csv",
+            "raw/child_2/day_1/recording.csv"
+        ],
+        "pass_effort": 9.0,
+        "output_effort": 0.0
+    }
+]

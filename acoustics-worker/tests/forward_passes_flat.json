@@ -1,0 +1,24 @@
+[
+    {
+        "igroup": [
+            "annotations/vtc/converted/recording_1_0_1000.csv",
+            "annotations/vtc/converted/recording_2_0_2000.csv",
+            "annotations/vtc/converted/recording_3_0_4000.csv",
+            "recordings/converted/standard/recording_1.wav",
+            "recordings/converted/standard/recording_2.wav",
+            "recordings/converted/standard/recording_3.wav"
+        ],
+        "pogroup": [
+            "converted/recording_1_0_1000.csv",
+            "converted/recording_2_0_2000.csv",
+            "converted/recording_3_0_4000.csv"
+        ],
+        "ogroup": [
+            "raw/recording_1.csv",
+            "raw/recording_2.csv",
+            "raw/recording_3.csv"
+        ],
+        "pass_effort": 7.0,
+        "output_effort": 0.0
+    }
+]
