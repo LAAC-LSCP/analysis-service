@@ -1,63 +1,62 @@
 import os
 import shutil
 import subprocess
-from contextlib import ExitStack
 from pathlib import Path
 from typing import Tuple
-from uuid import UUID
 
-from analysis_service_core.src.logger import LoggerFactory
+from analysis_service_core.src.effort_model import InputGroup, PassOutputGroup
 from analysis_service_core.src.model import ModelPlugin
 from ruamel.yaml import YAML
-
-logger = LoggerFactory.get_logger(__name__)
 
 CURRENT_DIR: Path = Path(__file__).parent
 
 
 class W2V2(ModelPlugin):
-    def run_model(self, dataset_dir: Path, output_dir: Path, task_id: UUID) -> None:
+    def run_model(
+        self, dataset_dir: Path, output_dir: Path, igroup: InputGroup
+    ) -> None:
         output_dir.mkdir(exist_ok=True, parents=True)
 
-        with ExitStack() as stack:
-            return_code, samples_csv = self._create_samples_csv(dataset_dir, output_dir)
-            stack.callback(self._cleanup_samples, samples_csv)
-            if return_code != 0:
-                return
-
-            return_code, chunks_dir = self._chunkify(
-                dataset_dir, output_dir, samples_csv
-            )
-            stack.callback(self._cleanup_chunks, chunks_dir)
-            if return_code != 0:
-                return
-
-            w2v2_dir = self.config.get("W2V2_FOLDER")
-            return_code, audio_chunks_json = self._run_gen_json(
-                w2v2_dir, chunks_dir, output_dir
-            )
-            stack.callback(self._cleanup_chunks_json, audio_chunks_json)
-            if return_code != 0:
-                return
-
-            try:
-                self._set_hparams(w2v2_dir)
-            except Exception:
-                logger.exception("Failed to set hparams")
-                return
-
-            return_code, w2v2_output_dir = self._run_w2v2(
-                w2v2_dir, audio_chunks_json, output_dir
-            )
-            stack.callback(self._cleanup_w2v2_output, w2v2_output_dir)
-            if return_code != 0:
-                return
-
-            return_code = self._split_output(dataset_dir, w2v2_output_dir, output_dir)
-
+        return_code, samples_csv = self._create_samples_csv(dataset_dir, output_dir)
+        if return_code != 0:
             return
 
-        return
+        return_code, chunks_dir = self._chunkify(dataset_dir, output_dir, samples_csv)
+        if return_code != 0:
+            return
+
+        w2v2_dir = self.config.get("W2V2_FOLDER")
+        return_code, audio_chunks_json = self._run_gen_json(
+            w2v2_dir, chunks_dir, output_dir
+        )
+        if return_code != 0:
+            return
+
+        try:
+            self._set_hparams(w2v2_dir)
+        except Exception:
+            self._logger.exception("Failed to set hparams")
+            return
+
+        return_code, w2v2_output_dir = self._run_w2v2(
+            w2v2_dir, audio_chunks_json, output_dir
+        )
+        if return_code != 0:
+            return
+
+        self._split_output(dataset_dir, w2v2_output_dir, output_dir)
+
+    def postprocess(
+        self,
+        dataset_dir: Path,
+        output_dir: Path,
+        pogroup: PassOutputGroup,
+        igroup: InputGroup,
+    ) -> None:
+        self._cleanup_samples(output_dir / "chi_vocs.csv")
+        self._cleanup_chunks(output_dir / "chunks")
+        self._cleanup_chunks_json(output_dir / "audio_chunks.json")
+        self._cleanup_w2v2_output(output_dir / "w2v2_outputs")
 
     def _create_samples_csv(
         self, dataset_dir: Path, output_dir: Path
@@ -74,13 +73,13 @@ class W2V2(ModelPlugin):
             str(output_csv),
         ]
 
-        logger.info(f"Creating samples in '{dataset_dir!s}'")
+        self._logger.info(f"Creating samples in '{dataset_dir!s}'")
         result = subprocess.run(cmd, cwd=dataset_dir, capture_output=True, text=True)
 
         if result.returncode == 0:
-            logger.info(f"Successfully created samples csv in '{dataset_dir!s}'")
+            self._logger.info(f"Successfully created samples csv in '{dataset_dir!s}'")
         else:
-            logger.error(
+            self._logger.error(
                 f"Error creating samples csv in '{dataset_dir!s}: {result.stderr}"
             )
 
@@ -105,13 +104,13 @@ class W2V2(ModelPlugin):
             str(self.config.get("CHUNKIFY_THREADS")),
         ]
 
-        logger.info(f"Creating chunks in '{chunks_dir!s}'...")
+        self._logger.info(f"Creating chunks in '{chunks_dir!s}'...")
         result = subprocess.run(cmd, cwd=dataset_dir, capture_output=True, text=True)
 
         if result.returncode == 0:
-            logger.info(f"Successfully created chunks in '{chunks_dir!s}'")
+            self._logger.info(f"Successfully created chunks in '{chunks_dir!s}'")
         else:
-            logger.error(
+            self._logger.error(
                 f"Error creating chunks in dataset '{dataset_dir!s}: {result.stderr}"
             )
 
@@ -124,8 +123,6 @@ class W2V2(ModelPlugin):
         for f in files:
             f.unlink()
 
-        return
-
     def _run_gen_json(
         self, w2v2_dir: Path, chunks_dir: Path, output_dir: Path
     ) -> Tuple[int, Path]:
@@ -136,7 +133,7 @@ uv run scripts/gen_json.py --audio {(chunks_dir / "chunks")!s} \
         """
         w2v2_venv = w2v2_dir / ".venv"
 
-        logger.info("Running gen_json.py...")
+        self._logger.info("Running gen_json.py...")
         result = subprocess.run(
             ["bash", "-c", bash_script],
             cwd=w2v2_dir,
@@ -149,15 +146,17 @@ uv run scripts/gen_json.py --audio {(chunks_dir / "chunks")!s} \
         )
 
         if result.returncode == 0:
-            logger.info("Successfully ran gen_json.py")
+            self._logger.info("Successfully ran gen_json.py")
         else:
-            logger.error(f"Error running gen_json.py in folder '{w2v2_dir!s}' with \
-audio '{chunks_dir!s}' and output '{output_dir!s}': {result.stderr}")
+            self._logger.error(
+                f"Error running gen_json.py in folder '{w2v2_dir!s}' with \
+audio '{chunks_dir!s}' and output '{output_dir!s}': {result.stderr}"
+            )
 
         return result.returncode, audio_chunks_json
 
     def _set_hparams(self, w2v2_dir: Path) -> None:
-        logger.info("Setting hparams...")
+        self._logger.info("Setting hparams...")
         hparams = w2v2_dir / "hparams" / "hparams.yaml"
 
         yaml = YAML()
@@ -180,8 +179,7 @@ audio '{chunks_dir!s}' and output '{output_dir!s}': {result.stderr}")
         with open(hparams, "w") as f:
             yaml.dump(data, f)
 
-        logger.info("Done setting hparams")
-        return
+        self._logger.info("Done setting hparams")
 
     def _run_w2v2(
         self, w2v2_dir: Path, audio_chunks_json: Path, output_dir: Path
@@ -199,7 +197,7 @@ uv run scripts/infer.py hparams/hparams.yaml \
         """
         w2v2_venv = w2v2_dir / ".venv"
 
-        logger.info("Running w2v2 inference...")
+        self._logger.info("Running w2v2 inference...")
         result = subprocess.run(
             ["bash", "-c", bash_script],
             cwd=w2v2_dir,
@@ -212,14 +210,16 @@ uv run scripts/infer.py hparams/hparams.yaml \
         )
 
         if result.returncode == 0:
-            logger.info("Successfully ran w2v2 inference")
+            self._logger.info("Successfully ran w2v2 inference")
         else:
-            logger.error(f"Error running w2v2 inference in folder '{w2v2_dir!s}' with \
+            self._logger.error(
+                f"Error running w2v2 inference in folder '{w2v2_dir!s}' with \
 audio chunks '{audio_chunks_json!s}' and output '{w2v2_output_dir!s}'.\n\
 STDOUT:\n\
 {result.stdout}\n\
 STDERR:\n\
-{result.stderr}")
+{result.stderr}"
+            )
 
         return result.returncode, w2v2_output_dir
 
@@ -239,13 +239,15 @@ STDERR:\n\
             str(output_dir / "output" / "raw"),
         ]
 
-        logger.info(f"Splitting outputs for '{dataset_dir!s}'")
+        self._logger.info(f"Splitting outputs for '{dataset_dir!s}'")
         result = subprocess.run(cmd, cwd=dataset_dir, capture_output=True, text=True)
 
         if result.returncode == 0:
-            logger.info(f"Successfully split outputs in '{dataset_dir!s}'")
+            self._logger.info(f"Successfully split outputs in '{dataset_dir!s}'")
         else:
-            logger.error(f"Error splitting outputs '{dataset_dir!s}: {result.stderr}")
+            self._logger.error(
+                f"Error splitting outputs '{dataset_dir!s}: {result.stderr}"
+            )
 
         return result.returncode
 

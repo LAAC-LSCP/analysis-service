@@ -3,22 +3,10 @@ import json
 from pathlib import Path
 from typing import List, Tuple
 
-from analysis_service_core.testing.mocks.pubsub import PubSubMock
-
 from src.core.w2v2 import W2V2
 
 
 class W2V2Mock(W2V2):
-    def __init__(
-        self,
-        queue,
-        config,
-        pubsub=PubSubMock(),
-        effort_model=None,
-        skip_moving_files=False,
-    ):
-        super().__init__(queue, config, pubsub, effort_model, skip_moving_files)
-
     def _create_samples_csv(
         self, dataset_dir: Path, output_dir: Path
     ) -> Tuple[int, Path]:
