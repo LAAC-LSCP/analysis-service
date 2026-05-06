@@ -1,0 +1,2 @@
+/app/ALICE/tmp_data/short/rec_0000005080_0000015540.wav 15.12 7.41 4.77
+/app/ALICE/tmp_data/short/rec_0000032000_0000037000.wav 6.0 3.0 1.5

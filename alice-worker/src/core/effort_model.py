@@ -46,7 +46,7 @@ class ALICEEffortModel(EffortModel):
             / "output"
             / audio_file.parent.relative_to(converted_recs)
             / "raw"
-            / audio_file.with_suffix(".txt").name,
+            / audio_file.with_suffix(".csv").name,
             output_dir
             / "output"
             / audio_file.parent.relative_to(converted_recs)

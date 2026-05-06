@@ -21,5 +21,6 @@ class TestALICEFlatDataset(ModelIntegrationTestBase):
         return ConfigMock(
             overrides={
                 "ALICE_FOLDER": temp_dataset / "alice_folder",
+                "ALICE_DEVICE": "cpu",
             }
         )

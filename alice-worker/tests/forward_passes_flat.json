@@ -9,7 +9,7 @@
             "alice_folder/diarization_output.rttm"
         ],
         "ogroup": [
-            "output/raw/recording_1.txt",
+            "output/raw/recording_1.csv",
             "output/extra/recording_1_sum.txt"
         ],
         "pass_effort": 1.0,
@@ -25,7 +25,7 @@
             "alice_folder/diarization_output.rttm"
         ],
         "ogroup": [
-            "output/raw/recording_2.txt",
+            "output/raw/recording_2.csv",
             "output/extra/recording_2_sum.txt"
         ],
         "pass_effort": 1.0,
@@ -41,7 +41,7 @@
             "alice_folder/diarization_output.rttm"
         ],
         "ogroup": [
-            "output/raw/recording_3.txt",
+            "output/raw/recording_3.csv",
             "output/extra/recording_3_sum.txt"
         ],
         "pass_effort": 1.0,

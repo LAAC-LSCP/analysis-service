@@ -1,24 +1,24 @@
-import shutil
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
-CURRENT_FOLDER: Path = Path(__file__).parent
-FLAT_RECORDINGS_DIR = (CURRENT_FOLDER / ".." / "flat_dataset").resolve()
-NESTED_RECORDINGS_DIR = (CURRENT_FOLDER / ".." / "nested_dataset").resolve()
+_DATA = Path(__file__).parent / "data"
 
 
 @pytest.fixture
-def flat_dataset_tmp(tmp_path_factory: pytest.TempPathFactory):
-    dest = tmp_path_factory.mktemp("flat_dataset")
-    shutil.copytree(FLAT_RECORDINGS_DIR, dest, dirs_exist_ok=True)
-
-    return dest
+def utterances_file() -> Path:
+    return _DATA / "utterances.txt"
 
 
 @pytest.fixture
-def nested_dataset_tmp(tmp_path_factory: pytest.TempPathFactory):
-    dest = tmp_path_factory.mktemp("nested_dataset")
-    shutil.copytree(NESTED_RECORDINGS_DIR, dest, dirs_exist_ok=True)
+def diarization_file() -> Path:
+    return _DATA / "diarization.rttm"
 
-    return dest
+
+@pytest.fixture
+def expected_merged() -> pd.DataFrame:
+    return pd.read_csv(
+        _DATA / "expected_merged.csv",
+        dtype={"speaker_type": "string"},
+    )
