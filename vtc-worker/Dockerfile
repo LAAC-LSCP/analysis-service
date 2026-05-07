@@ -14,7 +14,7 @@ RUN cd ./voice_type_classifier && \
 FROM python:3.13-slim AS poetry-builder
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
+COPY --chown=1002:1002 pyproject.toml poetry.lock ./
 
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 
@@ -32,10 +32,10 @@ RUN apt-get update && \
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 
-COPY --from=repo-builder /app/voice_type_classifier /app/voice_type_classifier
-COPY --from=poetry-builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-COPY --from=conda-builder /opt/conda /opt/conda
-COPY src ./src
+COPY --chown=1002:1002 --from=repo-builder /app/voice_type_classifier /app/voice_type_classifier
+COPY --chown=1002:1002 --from=poetry-builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY --chown=1002:1002 --from=conda-builder /opt/conda /opt/conda
+COPY --chown=1002:1002 src ./src
 
 ENTRYPOINT ["python"]
 CMD ["-m", "src.cli"]

@@ -49,11 +49,11 @@ class VTC_2(ModelPlugin):
 
     def _move_and_clean(self, dir: Path) -> None:
         raw_rttm_dir = dir / "raw_rttm"
-        shutil.rmtree(raw_rttm_dir)
+        shutil.rmtree(raw_rttm_dir, ignore_errors=True)
 
         for csv_name in ["raw_rttm.csv", "rttm.csv"]:
             csv_path = dir / csv_name
-            csv_path.unlink()
+            csv_path.unlink(missing_ok=True)
 
         rttm_dir = dir / "rttm"
         for item in rttm_dir.iterdir():
@@ -67,7 +67,7 @@ class VTC_2(ModelPlugin):
         vtc_folder = self.config.get("VTC_2_FOLDER")
         device = self.config.get("VTC_2_DEVICE")
         bash_script = f"""
-        uv run scripts/infer.py --wavs {str(input)} --output {str(output)} \
+        /home/appuser/.local/bin/uv run scripts/infer.py --wavs {str(input)} --output {str(output)} \
 --device={device}
         """
 

@@ -3,18 +3,18 @@
 # path /app/../../.git
 # Would have loved to multi-stage for uv but it's proven tricky in this case
 # Final image could probably be smaller is my guess... But nothing is ever perfect :)
-FROM --platform=linux/amd64 python:3.13-slim AS poetry-builder
+FROM python:3.13-slim AS poetry-builder
 WORKDIR /app
 
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 
-COPY pyproject.toml poetry.lock ./
+COPY --chown=1002:1002 pyproject.toml poetry.lock ./
 
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir poetry && \
     poetry install --no-root
 
-FROM --platform=linux/amd64 python:3.13-slim AS runtime
+FROM python:3.13-slim AS runtime
 WORKDIR /app
 
 RUN apt-get update && \
@@ -33,9 +33,9 @@ RUN apt-get update && \
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH:/root/.local/bin"
 
-COPY --from=poetry-builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-COPY src ./src
-COPY src/infer.py /app/speech-maturity/scripts/infer.py
+COPY --chown=1002:1002 --from=poetry-builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY --chown=1002:1002 src ./src
+COPY --chown=1002:1002 src/infer.py /app/speech-maturity/scripts/infer.py
 
 ENTRYPOINT ["python"]
 CMD ["-m", "src.cli"]

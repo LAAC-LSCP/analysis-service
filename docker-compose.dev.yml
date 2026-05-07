@@ -89,7 +89,6 @@ services:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
   echoservice-alice-worker:
-    platform: linux/amd64
     container_name: echoservice-alice-worker
     build:
       context: ./alice-worker

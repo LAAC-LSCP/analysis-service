@@ -45,7 +45,7 @@ class HTTPClient:
     def _get_access_token(
         self, client_id: str, client_secret: str
     ) -> Tuple[str, int, str]:
-        uri: str = self._base_url + "/api/auth/login-service"
+        uri: str = self._base_url + "/auth/login-service"
         payload = {
             "client_id": client_id,
             "client_secret": client_secret,
@@ -69,7 +69,7 @@ class HTTPClient:
         )
 
     def get_all_tasks(self) -> external_api.Tasks:
-        uri: str = self._base_url + "/api/analytics/services/tasks"
+        uri: str = self._base_url + "/analytics/services/tasks"
 
         try:
             response = requests.get(uri, headers=self.headers, timeout=self._timeout_s)
@@ -83,7 +83,7 @@ class HTTPClient:
             ) from exc
 
     def get_task_by_id(self, id: UUID) -> Optional[external_api.Task]:
-        uri: str = self._base_url + f"/api/analytics/services/tasks/{str(id)}"
+        uri: str = self._base_url + f"/analytics/services/tasks/{str(id)}"
 
         try:
             response = requests.get(uri, headers=self.headers, timeout=self._timeout_s)
@@ -99,7 +99,7 @@ class HTTPClient:
                 {self._base_url}: {exc}") from exc
 
     def put_task(self, task_id: UUID, payload: external_api.PutPayload) -> None:
-        uri: str = self._base_url + f"/api/analytics/services/tasks/{str(task_id)}"
+        uri: str = self._base_url + f"/analytics/services/tasks/{str(task_id)}"
 
         try:
             response = requests.put(

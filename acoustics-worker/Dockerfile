@@ -1,8 +1,8 @@
 # praat-parselmouth building step frozen for arm64
-FROM --platform=linux/amd64 python:3.13-slim AS poetry-builder
+FROM python:3.13-slim AS poetry-builder
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
+COPY --chown=1002:1002 pyproject.toml poetry.lock ./
 
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 
@@ -15,7 +15,7 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir poetry && \
     poetry install --no-root
 
-FROM --platform=linux/amd64 python:3.13-slim AS runtime
+FROM python:3.13-slim AS runtime
 WORKDIR /app
 
 RUN apt-get update && \
@@ -26,8 +26,8 @@ RUN apt-get update && \
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 
-COPY --from=poetry-builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-COPY src ./src
+COPY --chown=1002:1002 --from=poetry-builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY --chown=1002:1002 src ./src
 
 ENTRYPOINT ["python"]
 CMD ["-m", "src.cli"]
