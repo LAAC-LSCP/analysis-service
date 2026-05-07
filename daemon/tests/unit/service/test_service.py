@@ -49,6 +49,7 @@ def test_service():
         task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57"),
         dataset_uid_label="",
         operation=commands.Operation.RUN_VTC,
+        resume=False,
     )
 
     completion_queue.enqueue(

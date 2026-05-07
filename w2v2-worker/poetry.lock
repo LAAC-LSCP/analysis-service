@@ -2,7 +2,7 @@
 
 [[package]]
 name = "analysis-service-core"
-version = "1.10.0"
+version = "1.10.2"
 description = "a core library that different parts of the analysis service can borrow from"
 optional = false
 python-versions = ">=3.13"
@@ -17,8 +17,8 @@ redis = ">=7.1.0,<8.0.0"
 [package.source]
 type = "git"
 url = "https://github.com/LAAC-LSCP/analysis-service-core.git"
-reference = "v1.10.0"
-resolved_reference = "e5730ca13bb9ed1a6f8b3b130025fd0b11b64c3d"
+reference = "v1.10.2"
+resolved_reference = "238189bb918f01b20e6220465660b91b4e1abeac"
 
 [[package]]
 name = "audioop-lts"
@@ -2594,4 +2594,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "7ab25e259b019cea5f2ec4d0fd369d4d443f98d7222fe4c1aa24892e22bbf046"
+content-hash = "87086f928901a51ee5a4686d20d439be458d5604be6c4b6879c2083932085e1d"

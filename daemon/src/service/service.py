@@ -84,6 +84,7 @@ class Service:
                 task_id=task.task_uid,
                 dataset_uid_label=task.dataset_uid_label,
                 operation=task.model_name,
+                resume=False,
             )
 
             logger.info(f"Publishing task with id '{task.task_uid}' to redis")

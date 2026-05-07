@@ -16,8 +16,6 @@ ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-COPY src ./src
-COPY database_1.yml .
 
 ENTRYPOINT ["python"]
-CMD ["-m", "src.cli", "--db-path", "/app/database_1.yml"]
+CMD ["-m", "src.cli"]

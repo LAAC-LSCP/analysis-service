@@ -14,15 +14,13 @@ def run_acoustics():
     config = Config()
 
     queue = Queue(QueueName.RUN_ACOUSTICS)
-    effort_model = AcousticsEffortModel()
+    effort_model = AcousticsEffortModel(config=config)
 
     acoustics = Acoustics(
         queue=queue,
         config=config,
         effort_model=effort_model,
-        skip_moving_files=True,
     )
-
     acoustics.run()
 
     return

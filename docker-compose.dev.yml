@@ -9,11 +9,12 @@ services:
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
+    command: redis-server --save ""
   echoservice-mock-server:
     container_name: echoservice-mock-server
     build:
       context: ./mock-echolalia
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "8080:8080"
     networks:
@@ -23,11 +24,14 @@ services:
       - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
       - FLASK_PORT=${FLASK_PORT}
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+    volumes:
+      - ./mock-echolalia/src:/app/src
+      - ./mock-echolalia/database_1.yml:/app/database_1.yml
   echoservice-daemon:
     container_name: echoservice-daemon
     build:
       context: ./daemon
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     depends_on:
       - echoservice-redis
       - echoservice-mock-server
@@ -43,11 +47,12 @@ services:
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
     volumes:
       - ${ECHOLALIA_FOLDER}:/app/echolalia
+      - ./daemon/src:/app/src
   echoservice-vtc-worker:
     container_name: echoservice-vtc-worker
     build:
       context: ./vtc-worker
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       network: host # I need this for Conda installation
     depends_on:
       - echoservice-redis
@@ -66,11 +71,12 @@ services:
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
+      - ./vtc-worker/src:/app/src
   echoservice-vtc-2-worker:
     container_name: echoservice-vtc-2-worker
     build:
       context: ./vtc-2-worker
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       network: host
     depends_on:
       - echoservice-redis
@@ -88,11 +94,12 @@ services:
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
+      - ./vtc-2-worker/src:/app/src
   echoservice-alice-worker:
     container_name: echoservice-alice-worker
     build:
       context: ./alice-worker
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       network: host # Needed for conda installation
     depends_on:
       - echoservice-redis
@@ -111,11 +118,12 @@ services:
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
+      - ./alice-worker/src:/app/src
   echoservice-acoustics-worker:
     container_name: echoservice-acoustics-worker
     build:
       context: ./acoustics-worker
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       network: host
     depends_on:
       - echoservice-redis
@@ -130,11 +138,12 @@ services:
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
+      - ./acoustics-worker/src:/app/src
   echoservice-w2v2-worker:
     container_name: echoservice-w2v2-worker
     build:
       context: ./w2v2-worker
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       network: host
     depends_on:
       - echoservice-redis
@@ -155,11 +164,13 @@ services:
     volumes:
       - ${DATASETS_FOLDER}:/app/datasets
       - ${ECHOLALIA_FOLDER}:/app/echolalia
+      - ./w2v2-worker/src:/app/src
+      - ./w2v2-worker/src/infer.py:/app/speech-maturity/scripts/infer.py
   echoservice-e2e:
     container_name: echoservice-e2e
     build:
       context: ./tests
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     depends_on:
       - echoservice-redis
       - echoservice-daemon
@@ -170,6 +181,8 @@ services:
       - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
       - BASE_URL=${BASE_URL}
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+    volumes:
+      - ./tests/tests:/app/tests
   echoservice-loki:
     container_name: echoservice-loki
     image: grafana/loki:2.9.0

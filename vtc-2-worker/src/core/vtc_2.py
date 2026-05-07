@@ -57,7 +57,8 @@ class VTC2(ModelPlugin):
         vtc_folder = self.config.get("VTC_2_FOLDER")
         device = self.config.get("VTC_2_DEVICE")
         bash_script = f"""
-        /home/appuser/.local/bin/uv run scripts/infer.py --wavs {str(input)} --output {str(output)} \
+        /home/appuser/.local/bin/uv run scripts/infer.py --wavs \
+{str(input)} --output {str(output)} \
 --device={device}
         """
 
