@@ -167,6 +167,7 @@ services:
     command: -config.file=/etc/loki/config.yml
     networks:
       - echoswarm
+      - echoswarm-external
     deploy:
       replicas: 1
   echoswarm-promtail:
@@ -175,8 +176,11 @@ services:
       - ./monitoring/promtail:/etc/promtail
       - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/config.prod.yml
+    ports:
+      - "9080:9080"
     networks:
       - echoswarm
+      - echoswarm-external
     deploy:
       mode: global
   echoswarm-grafana:
