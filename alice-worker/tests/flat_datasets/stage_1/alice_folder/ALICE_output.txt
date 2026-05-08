@@ -1,0 +1,2 @@
+FileID   phonemes        syllables       words
+1_1     117     56      36

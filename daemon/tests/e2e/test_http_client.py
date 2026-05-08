@@ -15,11 +15,15 @@ CLIENT_ID = os.environ.get("ECHOLALIA_CLIENT_ID")
 CLIENT_SECRET = os.environ.get("ECHOLALIA_CLIENT_SECRET")
 
 
-@pytest.mark.skipif(
-    not all([BASE_URL, CLIENT_ID, CLIENT_SECRET]),
-    reason="Requires environment variables: \
-ECHOLALIA_BASE_URL, ECHOLALIA_CLIENT_ID, ECHOLALIA_CLIENT_SECRET",
-)
+# @pytest.mark.skipif(
+#     not all([BASE_URL, CLIENT_ID, CLIENT_SECRET]),
+#     reason="Requires environment variables: \
+# ECHOLALIA_BASE_URL, ECHOLALIA_CLIENT_ID, ECHOLALIA_CLIENT_SECRET",
+# )
+# NOTE: skipping this test. At present the URL points to localhost, because in prod
+# ELSI is running alongside the Daemon on the same host. It seems the external site got
+# taken down, so this test simply can't be used anymore.
+@pytest.mark.skip
 def test_get_all_tasks():
     http_client = HTTPClient(
         base_url=BASE_URL, client_id=CLIENT_ID, client_secret=CLIENT_SECRET

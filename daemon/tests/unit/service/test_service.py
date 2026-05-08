@@ -49,6 +49,7 @@ def test_service():
         task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57"),
         dataset_uid_label="",
         operation=commands.Operation.RUN_VTC,
+        resume=False,
     )
 
     completion_queue.enqueue(
@@ -58,7 +59,13 @@ def test_service():
         ChannelName.UPDATE_STATUS,
         commands.ReportProgress(
             task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57"),
-            progress=1.0,
+            completed_progress=1.0,
+            completed_pass_effort=10.0,
+            partial_pass_progress=0.0,
+            partial_pass_effort=0.0,
+            total_effort=10.0,
+            completed_passes=1,
+            total_passes=1,
         ),
     )
 
@@ -73,5 +80,11 @@ def test_service():
     assert command_tester.calls[2]["type"] == commands.ReportProgress
     assert command_tester.calls[2]["message"] == commands.ReportProgress(
         task_id=UUID("c611e347-2c08-4909-b174-0e76a678ce57"),
-        progress=1.0,
+        completed_progress=1.0,
+        completed_pass_effort=10.0,
+        partial_pass_progress=0.0,
+        partial_pass_effort=0.0,
+        total_effort=10.0,
+        completed_passes=1,
+        total_passes=1,
     )

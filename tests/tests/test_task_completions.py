@@ -8,9 +8,7 @@ from analysis_service_core.src.config import Config
 @pytest.fixture
 def get_task(config: Config, authentication_token: str):
     def _get_task(task_id) -> dict | None:
-        task_url = (
-            f"{config.get('BASE_URL')}/api/analytics/services/tasks/{str(task_id)}"
-        )
+        task_url = f"{config.get('BASE_URL')}/analytics/services/tasks/{str(task_id)}"
         headers = {"Authorization": f"Bearer {authentication_token}"}
         resp = requests.get(task_url, headers=headers)
 

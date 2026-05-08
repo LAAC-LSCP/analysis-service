@@ -45,7 +45,7 @@ b8cef380-0210-467c-970b-b7254a971cff",
     client = app.test_client()
 
     resp = client.post(
-        "/api/auth/login-service",
+        "/auth/login-service",
         json={"client_id": "test_id", "client_secret": "test_secret"},
     )
     assert resp.status_code == 200
@@ -58,7 +58,7 @@ def test_get_tasks(client_and_app: Tuple[FlaskClient, Flask, str]):
     client, app, token = client_and_app
 
     resp = client.get(
-        "/api/analytics/services/tasks",
+        "/analytics/services/tasks",
         headers={"Authorization": f"Bearer \
 {token}"},
     )
@@ -73,7 +73,7 @@ def test_get_task(client_and_app: Tuple[FlaskClient, Flask, str]):
     client, app, token = client_and_app
 
     resp = client.get(
-        "/api/analytics/services/tasks/ecdd43fc-501f-453a-bb31-78aee95197c5",
+        "/analytics/services/tasks/ecdd43fc-501f-453a-bb31-78aee95197c5",
         headers={"Authorization": f"Bearer {token}"},
     )
     assert resp.status_code == 200
@@ -105,7 +105,7 @@ def test_post_task(client_and_app: Tuple[FlaskClient, Flask, str]):
     assert my_pending_task is not None
 
     resp = client.put(
-        "/api/analytics/services/tasks/c4b84d26-ac68-43de-aa5c-f166e7f75c50",
+        "/analytics/services/tasks/c4b84d26-ac68-43de-aa5c-f166e7f75c50",
         headers={"Authorization": f"Bearer {token}"},
         json={
             "status": "COMPLETED",

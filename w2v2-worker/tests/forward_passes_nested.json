@@ -1,0 +1,25 @@
+[
+    {
+        "igroup": [
+            "recordings/converted/standard"
+        ],
+        "pogroup": [
+            "output/raw/child_1_day_1_recording.csv",
+            "output/raw/child_1_day_1_hour_1_recording.csv",
+            "output/raw/child_1_day_2_recording.csv",
+            "output/raw/child_2_day_1_recording.csv",
+            "output/raw/child_2_day_1_hour_1_recording.csv",
+            "output/raw/child_2_day_1_hour_2_recording.csv"
+        ],
+        "ogroup": [
+            "output/raw/child_1_day_1_recording.csv",
+            "output/raw/child_1_day_1_hour_1_recording.csv",
+            "output/raw/child_1_day_2_recording.csv",
+            "output/raw/child_2_day_1_recording.csv",
+            "output/raw/child_2_day_1_hour_1_recording.csv",
+            "output/raw/child_2_day_1_hour_2_recording.csv"
+        ],
+        "pass_effort": 16000.0,
+        "output_effort": 0.0
+    }
+]

@@ -11,3 +11,6 @@ dist/
 
 # -- redis -- #
 dump.rdb
+
+# -- poetry -- #
+.venv

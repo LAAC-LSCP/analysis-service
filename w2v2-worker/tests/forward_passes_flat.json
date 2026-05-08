@@ -1,0 +1,19 @@
+[
+    {
+        "igroup": [
+            "recordings/converted/standard"
+        ],
+        "pogroup": [
+            "output/raw/recording_1.csv",
+            "output/raw/recording_2.csv",
+            "output/raw/recording_3.csv"
+        ],
+        "ogroup": [
+            "output/raw/recording_1.csv",
+            "output/raw/recording_2.csv",
+            "output/raw/recording_3.csv"
+        ],
+        "pass_effort": 16000.0,
+        "output_effort": 0.0
+    }
+]

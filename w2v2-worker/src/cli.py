@@ -20,18 +20,15 @@ def run_w2v2() -> None:
 
     config = Config(env_vars)
     queue = Queue(QueueName.RUN_W2V2)
-    effort_model = W2V2EffortModel()
+    effort_model = W2V2EffortModel(config=config)
 
     w2v2 = W2V2(
         queue=queue,
         config=config,
         effort_model=effort_model,
-        skip_moving_files=True,
     )
 
     w2v2.run()
-
-    return
 
 
 if __name__ == "__main__":

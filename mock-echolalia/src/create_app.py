@@ -19,7 +19,7 @@ def create_app(
     app.config[FlaskConfig.TOKENS] = set()
     auth = HTTPTokenAuth(scheme="Bearer")
 
-    @app.route("/api/auth/login-service", methods=["POST"])
+    @app.route("/auth/login-service", methods=["POST"])
     def login_service():
         data = request.json
 
@@ -44,7 +44,7 @@ def create_app(
     def verify_token(token):
         return token in app.config[FlaskConfig.TOKENS]
 
-    @app.route("/api/analytics/services/tasks", methods=["GET"])
+    @app.route("/analytics/services/tasks", methods=["GET"])
     @auth.login_required
     def get_tasks():
         logger.info("Received request to get all tasks")
@@ -55,7 +55,7 @@ def create_app(
 
         return jsonify(task_dict)
 
-    @app.route("/api/analytics/services/tasks/<task_id>", methods=["GET"])
+    @app.route("/analytics/services/tasks/<task_id>", methods=["GET"])
     @auth.login_required
     def get_task(task_id):
         logger.info(f"Received request to get task with id '{task_id}'")
@@ -70,7 +70,7 @@ def create_app(
 
         return jsonify(task.model_dump())
 
-    @app.route("/api/analytics/services/tasks/<task_id>", methods=["PUT"])
+    @app.route("/analytics/services/tasks/<task_id>", methods=["PUT"])
     @auth.login_required
     def update_task(task_id):
         logger.info(f"Received request to update task with id '{task_id}' and \
