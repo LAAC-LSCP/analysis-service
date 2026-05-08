@@ -13,3 +13,6 @@ dump.rdb
 
 # debug
 /daemon-debug
+
+# -- secrets -- #
+.env
