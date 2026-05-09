@@ -24,7 +24,6 @@ def run_vtc():
     queue = Queue(QueueName.RUN_VTC)
     effort_model = VTCEffortModel(config)
 
-    print("TEST")
     vtc = VTC(
         queue=queue,
         config=config,
