@@ -194,6 +194,7 @@ services:
     command: -config.file=/etc/loki/config.yml
     networks:
       - echoservice
+      - echoservice-external
   echoservice-promtail:
     container_name: echoservice-promtail
     image: grafana/promtail:2.9.0
@@ -201,8 +202,11 @@ services:
       - ./monitoring/promtail:/etc/promtail
       - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/config.dev.yml
+    ports:
+      - "9080:9080"
     networks:
       - echoservice
+      - echoservice-external
   echoservice-grafana:
     container_name: echoservice-grafana
     image: grafana/grafana:13.0.1
