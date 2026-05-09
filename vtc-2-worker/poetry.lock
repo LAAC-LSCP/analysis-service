@@ -2,7 +2,7 @@
 
 [[package]]
 name = "analysis-service-core"
-version = "1.11.0"
+version = "1.11.4"
 description = "a core library that different parts of the analysis service can borrow from"
 optional = false
 python-versions = ">=3.13"
@@ -18,8 +18,8 @@ testcontainers = {version = ">=4.14.2,<5.0.0", extras = ["redis"]}
 [package.source]
 type = "git"
 url = "https://github.com/LAAC-LSCP/analysis-service-core.git"
-reference = "v1.11.0"
-resolved_reference = "8c75131477d7a3d4d5b6357c84486d2462f5d3f5"
+reference = "v1.11.4"
+resolved_reference = "1746ec2e6fbfd1cf2b86f23297a29a71f19f5956"
 
 [[package]]
 name = "certifi"
@@ -678,4 +678,4 @@ dev = ["pytest", "setuptools"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "d5e550a6fab045a5933825ed5cc66797a442f6aaa6159a30f8750d82596253b6"
+content-hash = "548624b9088dd497ba97463aca75f45bc429c6ff9fd0402b165c383915196c98"
