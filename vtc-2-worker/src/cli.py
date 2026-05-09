@@ -5,6 +5,7 @@ from analysis_service_core.src.config import Config, EnvVar
 from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.effort_model import VTC2EffortModel
+from src.core.metannots_factory import VTC2MetannotsFactory
 from src.core.vtc_2 import VTC2
 
 
@@ -22,6 +23,7 @@ def run_vtc_2() -> None:
         queue=queue,
         config=config,
         effort_model=effort_model,
+        metannots_factory=VTC2MetannotsFactory(),
     )
 
     vtc_2.run()

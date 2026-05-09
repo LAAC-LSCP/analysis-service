@@ -5,6 +5,7 @@ from analysis_service_core.src.config import Config, EnvVar
 from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.effort_model import VTCEffortModel
+from src.core.metannots_factory import VTCMetannotsFactory
 from src.core.vtc import VTC
 
 
@@ -28,6 +29,7 @@ def run_vtc():
         queue=queue,
         config=config,
         effort_model=effort_model,
+        metannots_factory=VTCMetannotsFactory(),
     )
 
     vtc.run()
