@@ -1,7 +1,7 @@
 from analysis_service_core.src.redis.queue import QueueName
 from analysis_service_core.testing.mixins import ModelIntegrationTestBase
 
-from tests.integration.conftest import _NESTED_DATASETS, config
+from tests.integration.conftest import _NESTED_DATASET, config
 from tests.integration.effort_model_mock import VTCEffortModelMock
 from tests.integration.vtc_mock import VTC_Mock
 
@@ -11,4 +11,4 @@ class TestVTCNestedDataset(ModelIntegrationTestBase):
     effort_model_cls = VTCEffortModelMock
     queue_name = QueueName.RUN_VTC
     config = config
-    datasets_dir = _NESTED_DATASETS
+    datasets_dir = _NESTED_DATASET

@@ -1,7 +1,7 @@
 from analysis_service_core.src.redis.queue import QueueName
 from analysis_service_core.testing.mixins import ModelIntegrationTestBase
 
-from tests.integration.conftest import _FLAT_DATASETS, config_mock
+from tests.integration.conftest import _FLAT_DATASET, config_mock
 from tests.integration.effort_model_mock import VTC2EffortModelMock
 from tests.integration.vtc_2_mock import VTC2Mock
 
@@ -13,4 +13,4 @@ class TestVTC2FlatDataset(ModelIntegrationTestBase):
     queue_name = QueueName.RUN_VTC
     config = config_mock
 
-    datasets_dir = _FLAT_DATASETS
+    datasets_dir = _FLAT_DATASET

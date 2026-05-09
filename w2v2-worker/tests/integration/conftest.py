@@ -2,15 +2,20 @@ from pathlib import Path
 
 from analysis_service_core.testing.mocks import ConfigMock
 
-_FLAT_DATASETS = Path(__file__).parent.parent / "flat_datasets"
+TESTS = Path(__file__).parents[1]
+
+_FLAT_DATASETS = TESTS / "integration_datasets" / "flat_dataset"
 assert _FLAT_DATASETS.exists()
 
-_NESTED_DATASETS = Path(__file__).parent.parent / "nested_datasets"
+_NESTED_DATASETS = TESTS / "integration_datasets" / "nested_dataset"
 assert _NESTED_DATASETS.exists()
 
-_FORWARD_PASSES_FLAT_JSON = Path(__file__).parent.parent / "forward_passes_flat.json"
+_FORWARD_PASSES_FLAT_JSON = TESTS / "forward_passes_flat.json"
+assert _FORWARD_PASSES_FLAT_JSON.exists()
+
 _FORWARD_PASSES_NESTED_JSON = (
-    Path(__file__).parent.parent / "forward_passes_nested.json"
+    TESTS / "forward_passes_nested.json"
 )
+assert _FORWARD_PASSES_NESTED_JSON.exists()
 
 config_mock = ConfigMock()
