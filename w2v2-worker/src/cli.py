@@ -5,6 +5,7 @@ from analysis_service_core.src.config import Config, EnvVar
 from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.effort_model import W2V2EffortModel
+from src.core.metannots_factory import W2V2MetannotsFactory
 from src.core.w2v2 import W2V2
 
 
@@ -26,6 +27,7 @@ def run_w2v2() -> None:
         queue=queue,
         config=config,
         effort_model=effort_model,
+        metannots_factory=W2V2MetannotsFactory(),
     )
 
     w2v2.run()

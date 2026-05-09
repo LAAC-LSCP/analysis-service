@@ -6,6 +6,7 @@ from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.alice import ALICE
 from src.core.effort_model import ALICEEffortModel
+from src.core.metannots_factory import ALICEMetannotsFactory
 
 
 @click.command()
@@ -27,6 +28,7 @@ def run_alice():
         queue=queue,
         config=config,
         effort_model=effort_model,
+        metannots_factory=ALICEMetannotsFactory(),
     )
 
     alice.run()

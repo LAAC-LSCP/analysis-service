@@ -4,6 +4,7 @@ from analysis_service_core.src.redis.queue import Queue, QueueName
 
 from src.core.acoustics import Acoustics
 from src.core.effort_model import AcousticsEffortModel
+from src.core.metannots_factory import AcousticsMetannotsFactory
 
 
 @click.command()
@@ -20,6 +21,7 @@ def run_acoustics():
         queue=queue,
         config=config,
         effort_model=effort_model,
+        metannots_factory=AcousticsMetannotsFactory(),
     )
     acoustics.run()
 
