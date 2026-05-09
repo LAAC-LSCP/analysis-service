@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.4.0...v0.5.0) (2026-05-09)
+
+
+### Features
+
+* add acoustics ([438e688](https://github.com/LAAC-LSCP/analysis-service/commit/438e688db98473c8f467af142a710c1c48d98fde))
+* add progress reports ([62fac94](https://github.com/LAAC-LSCP/analysis-service/commit/62fac9496e928756c628fbbff78c09f8e60a0765))
+* add VTC 2 ([80de0d2](https://github.com/LAAC-LSCP/analysis-service/commit/80de0d2af7031bfa4c6ef2e6da4ba18f79b84888))
+* add w2v2 ([35fb300](https://github.com/LAAC-LSCP/analysis-service/commit/35fb30011dd286feee1055e58e53fc7683675c50))
+* complete alice and vtc-2 ([d37f8c6](https://github.com/LAAC-LSCP/analysis-service/commit/d37f8c699c7937a1b5960e6e1689382c438e52f4))
+* improve acoustics ([5c6c0f2](https://github.com/LAAC-LSCP/analysis-service/commit/5c6c0f2005352bbcfab215215251d0ab74797d87))
+* improve metannots for all models ([f5767f7](https://github.com/LAAC-LSCP/analysis-service/commit/f5767f7c2729dda7a7b9384e2e03f65c1c467d07))
+* update all models refactor ([8f4b626](https://github.com/LAAC-LSCP/analysis-service/commit/8f4b6269cf5bd51a6cba107857328ba153b38ba1))
+* update service outputs ([5c7e112](https://github.com/LAAC-LSCP/analysis-service/commit/5c7e112626dc0a441060c1e339f510d4a0a7b37a))
+* use queues ([b73a179](https://github.com/LAAC-LSCP/analysis-service/commit/b73a1793972548f7571d7a93875a440beec6e77f))
+
 ## [0.4.0](https://github.com/LAAC-LSCP/analysis-service/compare/v0.3.0...v0.4.0) (2026-05-09)
 
 
