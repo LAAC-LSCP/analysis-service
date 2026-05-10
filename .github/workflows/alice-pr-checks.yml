@@ -3,6 +3,7 @@ name: ALICE Pull Request Checks
 on:
 - pull_request
 - merge_group
+- workflow_dispatch
 
 concurrency:
   # Only allow one run at a time of this workflow per PR

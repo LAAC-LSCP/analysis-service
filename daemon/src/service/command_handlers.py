@@ -64,6 +64,8 @@ def handle_run_task(queues: Dict[QueueName, Queue]) -> CommandHandler:
             queue = queues[QueueName.RUN_VTC_2]
         elif command.operation == commands.Operation.RUN_W2V2:
             queue = queues[QueueName.RUN_W2V2]
+        elif command.operation == commands.Operation.RUN_TEST_MODEL:
+            queue = queues[QueueName.RUN_TEST_MODEL]
 
         if queue is None:
             return

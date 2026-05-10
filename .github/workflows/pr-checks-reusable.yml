@@ -73,17 +73,3 @@ jobs:
         else
           echo "No integration tests found, skipping."
         fi
-    - name: Run E2E tests
-      run: |
-        if [ -d "tests/e2e" ]; then
-          tox -e ${{ matrix.python.toxenv }} -- tests/e2e --randomly-seed=$RANDOM
-        else
-          echo "No e2e tests found, skipping."
-        fi
-      working-directory: ${{ inputs.working-directory }}
-      env:
-        REDIS_HOST: localhost
-        REDIS_PORT: 6379
-        ECHOLALIA_BASE_URL: ${{ secrets.ECHOLALIA_BASE_URL }}
-        ECHOLALIA_CLIENT_ID: ${{ secrets.ECHOLALIA_CLIENT_ID }}
-        ECHOLALIA_CLIENT_SECRET: ${{ secrets.ECHOLALIA_CLIENT_SECRET }}

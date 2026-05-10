@@ -4,7 +4,7 @@ from analysis_service_core.testing.mocks import ConfigMock
 
 from src.core.effort_model import AcousticsEffortModel
 from tests.integration.acoustics_mock import AcousticsMock
-from tests.integration.conftest import _FLAT_DATASETS
+from tests.integration.conftest import _FLAT_DATASET
 
 
 class TestAcousticsFlatDataset(ModelIntegrationTestBase):
@@ -13,5 +13,5 @@ class TestAcousticsFlatDataset(ModelIntegrationTestBase):
 
     queue_name = QueueName.RUN_VTC
 
-    datasets_dir = _FLAT_DATASETS
+    datasets_dir = _FLAT_DATASET
     config = ConfigMock()

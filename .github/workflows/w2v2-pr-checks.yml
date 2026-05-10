@@ -1,0 +1,19 @@
+name: W2V2 Pull Request Checks
+
+on:
+- pull_request
+- merge_group
+- workflow_dispatch
+
+concurrency:
+  # Only allow one run at a time of this workflow per PR
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  pr-checks:
+    uses: ./.github/workflows/pr-checks-reusable.yml
+    with:
+      working-directory: w2v2-worker
+      dockerfile: ${{ github.event_name == 'workflow_dispatch' && 'w2v2-worker/Dockerfile.dev' || '' }}
+    secrets: inherit

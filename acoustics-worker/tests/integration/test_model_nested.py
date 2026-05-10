@@ -4,7 +4,7 @@ from analysis_service_core.testing.mocks import ConfigMock
 
 from src.core.effort_model import AcousticsEffortModel
 from tests.integration.acoustics_mock import AcousticsMock
-from tests.integration.conftest import _NESTED_DATASETS
+from tests.integration.conftest import _NESTED_DATASET
 
 
 class TestAcousticsNestedDataset(ModelIntegrationTestBase):
@@ -13,5 +13,5 @@ class TestAcousticsNestedDataset(ModelIntegrationTestBase):
 
     queue_name = QueueName.RUN_VTC
 
-    datasets_dir = _NESTED_DATASETS
+    datasets_dir = _NESTED_DATASET
     config = ConfigMock()

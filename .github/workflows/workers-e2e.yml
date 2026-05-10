@@ -1,0 +1,36 @@
+name: Worker E2E Tests (Manual)
+
+on:
+  merge_group:
+  workflow_dispatch:
+
+jobs:
+  acoustics-e2e:
+    uses: ./.github/workflows/e2e-reusable.yml
+    with:
+      working-directory: acoustics-worker
+      dockerfile: acoustics-worker/Dockerfile.dev
+
+  vtc-e2e:
+    uses: ./.github/workflows/e2e-reusable.yml
+    with:
+      working-directory: vtc-worker
+      dockerfile: vtc-worker/Dockerfile.dev
+
+  vtc-2-e2e:
+    uses: ./.github/workflows/e2e-reusable.yml
+    with:
+      working-directory: vtc-2-worker
+      dockerfile: vtc-2-worker/Dockerfile.dev
+
+  alice-e2e:
+    uses: ./.github/workflows/e2e-reusable.yml
+    with:
+      working-directory: alice-worker
+      dockerfile: alice-worker/Dockerfile.dev
+
+  w2v2-e2e:
+    uses: ./.github/workflows/e2e-reusable.yml
+    with:
+      working-directory: w2v2-worker
+      dockerfile: w2v2-worker/Dockerfile.dev

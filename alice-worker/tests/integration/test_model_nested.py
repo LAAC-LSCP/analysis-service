@@ -5,7 +5,7 @@ from analysis_service_core.testing.mixins import ModelIntegrationTestBase
 from analysis_service_core.testing.mocks import ConfigMock
 
 from tests.integration.alice_mock import ALICEMock
-from tests.integration.conftest import _NESTED_DATASETS
+from tests.integration.conftest import _NESTED_DATASET
 from tests.integration.effort_model_mock import ALICEEffortModelMock
 
 
@@ -15,7 +15,7 @@ class TestALICENestedDataset(ModelIntegrationTestBase):
 
     queue_name = QueueName.RUN_VTC
 
-    datasets_dir = _NESTED_DATASETS
+    datasets_dir = _NESTED_DATASET
 
     def make_config(self, temp_dataset: Path) -> ConfigMock:
         return ConfigMock(

@@ -1,0 +1,10 @@
+ChildProject_version: 0.4.5
+date_annotation: '2026-01-11'
+derivator_object: <ChildProject.pipelines.derivations.AcousticDerivator object at
+  0x10664f8c0>
+has_acoustics: Y
+method: derivation
+parameters:
+  profile: standard
+  target_sr: 16000
+segmentation: vtc

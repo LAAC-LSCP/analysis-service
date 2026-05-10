@@ -1,0 +1,95 @@
+services:
+  echoservice-redis:
+    image: redis:7-alpine
+    container_name: echoservice-redis
+    networks:
+      - echoservice
+    command: redis-server --save ""
+
+  echoservice-mock-server:
+    container_name: echoservice-mock-server
+    build:
+      context: ./mock-echolalia
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    networks:
+      - echoservice
+    environment:
+      - EXPECTED_CLIENT_ID=${CLIENT_ID}
+      - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
+      - FLASK_PORT=${FLASK_PORT}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+    volumes:
+      - ./mock-echolalia/src:/app/src
+      - ./e2e-tests/database_e2e.yml:/app/database_e2e.yml
+    command: ["-m", "src.cli", "--db-path", "/app/database_e2e.yml"]
+
+  echoservice-daemon:
+    container_name: echoservice-daemon
+    build:
+      context: ./daemon
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - echoservice-redis
+      - echoservice-mock-server
+    networks:
+      - echoservice
+      - echoservice-external
+    environment:
+      - REDIS_HOST=echoservice-redis
+      - REDIS_PORT=6379
+      - BASE_URL=${BASE_URL}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+    volumes:
+      - ./daemon/src:/app/src
+
+  echoservice-test-model-worker:
+    container_name: echoservice-test-model-worker
+    build:
+      context: ./e2e-tests/test-model-worker
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - echoservice-redis
+      - echoservice-daemon
+    networks:
+      - echoservice
+    environment:
+      - REDIS_HOST=echoservice-redis
+      - REDIS_PORT=6379
+      - DATASETS_DIR=/app/datasets
+      - ECHOLALIA_DIR=/app/echolalia
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+    volumes:
+      - ./e2e-tests/test-model-worker/src:/app/src
+      - ./e2e-tests/dummy_datasets:/app/datasets
+      - ./e2e-tests/dummy_echolalia_folder:/app/echolalia
+
+  echoservice-e2e:
+    container_name: echoservice-e2e
+    build:
+      context: ./e2e-tests
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - echoservice-redis
+      - echoservice-daemon
+      - echoservice-mock-server
+      - echoservice-test-model-worker
+    networks:
+      - echoservice
+    environment:
+      - EXPECTED_CLIENT_ID=${CLIENT_ID}
+      - EXPECTED_CLIENT_SECRET=${CLIENT_SECRET}
+      - BASE_URL=${BASE_URL}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+    volumes:
+      - ./e2e-tests/tests:/app/tests
+
+networks:
+  echoservice:
+    driver: bridge
+    internal: true
+  echoservice-external:
+    external: true
