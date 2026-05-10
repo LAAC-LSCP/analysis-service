@@ -2,7 +2,7 @@
 
 [[package]]
 name = "analysis-service-core"
-version = "1.11.4"
+version = "1.11.5"
 description = "a core library that different parts of the analysis service can borrow from"
 optional = false
 python-versions = ">=3.13"
@@ -18,8 +18,8 @@ testcontainers = {version = ">=4.14.2,<5.0.0", extras = ["redis"]}
 [package.source]
 type = "git"
 url = "https://github.com/LAAC-LSCP/analysis-service-core.git"
-reference = "v1.11.4"
-resolved_reference = "1746ec2e6fbfd1cf2b86f23297a29a71f19f5956"
+reference = "v1.11.5"
+resolved_reference = "413b5250f595c9ff3dded72cba835c4a9da2fa29"
 
 [[package]]
 name = "asyncio"
@@ -688,4 +688,4 @@ dev = ["pytest", "setuptools"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "206ea86c00e006b2475b255fc043b486b90922001d7a5596141c690dc118625a"
+content-hash = "478ac95a1eff0a41c4ca23aa69f258b60d06e69cf85e149825792d885f37198e"
