@@ -30,6 +30,11 @@ services:
       - ${ECHOLALIA_FOLDER}:/app/echolalia
     deploy:
       replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        monitor: 10s
   echoswarm-vtc-worker:
     image: ghcr.io/laac-lscp/echoswarm-vtc:latest
     user: "${UID:-1002}:${GID:-1002}"
