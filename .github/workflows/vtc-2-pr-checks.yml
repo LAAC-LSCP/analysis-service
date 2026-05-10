@@ -3,6 +3,7 @@ name: VTC 2.0 Pull Request Checks
 on:
 - pull_request
 - merge_group
+- workflow_dispatch
 
 concurrency:
   # Only allow one run at a time of this workflow per PR
@@ -14,4 +15,5 @@ jobs:
     uses: ./.github/workflows/pr-checks-reusable.yml
     with:
       working-directory: vtc-2-worker
+      dockerfile: ${{ github.event_name == 'workflow_dispatch' && 'vtc-2-worker/Dockerfile.dev' || '' }}
     secrets: inherit

@@ -3,6 +3,7 @@ name: Acoustics Pull Request Checks
 on:
 - pull_request
 - merge_group
+- workflow_dispatch
 
 concurrency:
   # Only allow one run at a time of this workflow per PR
@@ -14,5 +15,5 @@ jobs:
     uses: ./.github/workflows/pr-checks-reusable.yml
     with:
       working-directory: acoustics-worker
-      dockerfile: acoustics-worker/Dockerfile.dev
+      dockerfile: ${{ github.event_name == 'workflow_dispatch' && 'acoustics-worker/Dockerfile.dev' || '' }}
     secrets: inherit
