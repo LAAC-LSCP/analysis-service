@@ -15,5 +15,4 @@ jobs:
     uses: ./.github/workflows/pr-checks-reusable.yml
     with:
       working-directory: alice-worker
-      dockerfile: ${{ github.event_name == 'workflow_dispatch' && 'alice-worker/Dockerfile.dev' || '' }}
     secrets: inherit

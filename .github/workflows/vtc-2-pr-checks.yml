@@ -15,5 +15,4 @@ jobs:
     uses: ./.github/workflows/pr-checks-reusable.yml
     with:
       working-directory: vtc-2-worker
-      dockerfile: ${{ github.event_name == 'workflow_dispatch' && 'vtc-2-worker/Dockerfile.dev' || '' }}
     secrets: inherit

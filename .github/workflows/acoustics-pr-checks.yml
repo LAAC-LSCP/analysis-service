@@ -15,5 +15,4 @@ jobs:
     uses: ./.github/workflows/pr-checks-reusable.yml
     with:
       working-directory: acoustics-worker
-      dockerfile: ${{ github.event_name == 'workflow_dispatch' && 'acoustics-worker/Dockerfile.dev' || '' }}
     secrets: inherit
