@@ -1,0 +1,10 @@
+tasks:
+  - task_uid: "f1a2b3c4-d5e6-7890-abcd-ef1234567890"
+    model_name: "test_model"
+    status_label: "pending"
+    user_uid: "d9c30005-ab97-4daa-bc34-c6ffc4caeeac"
+    dataset_name: "word-count-test-dataset"
+    dataset_uid_label: "aefd0d92-8d2c-47d3-89bd-b7b4475e97f5"
+    created: "2026-01-01T00:00:00.000000+00:00"
+    modified: "2026-01-01T00:00:00.000000+00:00"
+    estimated_duration: 5

@@ -23,13 +23,13 @@ jobs:
       run: python -m pip install tox
     - name: Run linting checks
       run: tox -e lint
-      working-directory: tests
+      working-directory: e2e-tests
     - name: Run formatting checks
       run: tox -e format
-      working-directory: tests
+      working-directory: e2e-tests
     - name: Run type checks
       run: tox -e typecheck
-      working-directory: tests
+      working-directory: e2e-tests
 
   test:
     name: Test
@@ -43,7 +43,7 @@ jobs:
       run: docker network create echoservice-external
     - name: Run full E2E tests with Docker Compose
       run: |
-        docker compose --env-file .env.test --profile test -f docker-compose.dev.yml up \
+        docker compose --env-file .env.test -f docker-compose.e2e-test.yml up \
         --build \
         --abort-on-container-exit \
         --exit-code-from echoservice-e2e

@@ -3,6 +3,7 @@ from typing import Mapping, Optional, Tuple
 from uuid import UUID
 
 import requests
+from tenacity import retry, stop_after_delay, wait_fixed
 
 import src.core.elsi_api as external_api
 
@@ -42,6 +43,7 @@ class HTTPClient:
             "accept": "application/json",
         }
 
+    @retry(stop=stop_after_delay(10), wait=wait_fixed(1), reraise=True)
     def _get_access_token(
         self, client_id: str, client_secret: str
     ) -> Tuple[str, int, str]:
