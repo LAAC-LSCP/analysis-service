@@ -109,7 +109,7 @@ def test_post_task(client_and_app: Tuple[FlaskClient, Flask, str]):
         headers={"Authorization": f"Bearer {token}"},
         json={
             "status": "COMPLETED",
-            "estimated_duation": 5,
+            "estimated_duration": 5,
         },
     )
     assert resp.status_code == 200
