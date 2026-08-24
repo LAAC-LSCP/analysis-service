@@ -16,3 +16,6 @@ dump.rdb
 
 # -- secrets -- #
 .env
+
+# -- pycharm -- #
+/.idea

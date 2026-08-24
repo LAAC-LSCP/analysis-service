@@ -38,6 +38,26 @@ estimated duration '{0}'")
     return send_status_update
 
 
+def report_task_failure(http_client: HTTPClient) -> CommandHandler:
+    def send_failure(command: commands.Command) -> None:
+        assert isinstance(command, commands.FailTask)
+
+        http_client.put_task(
+            command.task_id,
+            payload={
+                "status": TaskStatus.FAILED,
+                "estimated_duration": 0,
+            },
+        )
+
+        logger.info(
+            f"Sent update to ELSI for task {command.task_id!s} with status "
+            f"'{TaskStatus.FAILED!s}'. Reason: {command.reason}"
+        )
+
+    return send_failure
+
+
 def update_elsi_progress(http_client: HTTPClient) -> CommandHandler:
     def send_progress_update(command: commands.ReportProgress) -> None:
         #       TODO: NOT IMPLEMENTED
@@ -84,5 +104,6 @@ def get_command_handlers(
             update_elsi_status(http_client, TaskStatus.RUNNING),
         ],
         commands.CompleteTask: [update_elsi_status(http_client, TaskStatus.COMPLETED)],
+        commands.FailTask: [report_task_failure(http_client)],
         commands.ReportProgress: [update_elsi_progress(http_client)],
     }

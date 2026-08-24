@@ -10,15 +10,17 @@ from src.service.service import Service
 
 
 async def run() -> None:
-    completion_queue, progress_bus, command_handlers, http_client = setup()
+    completion_queue, fail_queue, progress_bus, command_handlers, http_client = setup()
 
-    service = Service(completion_queue, progress_bus, command_handlers, http_client)
+    service = Service(
+        completion_queue, progress_bus, command_handlers, http_client, fail_queue
+    )
     await service.start()
 
     return
 
 
-def setup() -> Tuple[Queue, PubSub, CommandHandlers, HTTPClient]:
+def setup() -> Tuple[Queue, Queue, PubSub, CommandHandlers, HTTPClient]:
     env_vars = {
         EnvVar("BASE_URL", str),
         EnvVar("CLIENT_ID", str),
@@ -36,4 +38,10 @@ def setup() -> Tuple[Queue, PubSub, CommandHandlers, HTTPClient]:
     command_handlers = get_command_handlers(http_client, queues)
     progress_bus = PubSub(subscribe_to=[ChannelName.UPDATE_STATUS])
 
-    return Queue(QueueName.COMPLETE_TASK), progress_bus, command_handlers, http_client
+    return (
+        Queue(QueueName.COMPLETE_TASK),
+        Queue(QueueName.FAIL_TASK),
+        progress_bus,
+        command_handlers,
+        http_client,
+    )

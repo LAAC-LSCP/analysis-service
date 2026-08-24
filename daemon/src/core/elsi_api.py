@@ -5,7 +5,7 @@ from the ELSI external endpoints
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Set, TypedDict
+from typing import Optional, Set, TypedDict
 from uuid import UUID
 
 from analysis_service_core.src.redis.commands import Operation
@@ -45,9 +45,14 @@ class Task:
     dataset_uid_label: str
     created: datetime
     modified: datetime
+    # Total duration (in seconds) of the recording(s) covered by this task. Not yet
+    # provided by the ELSI API; treated as optional/absent until it is.
+    duration_seconds: Optional[float] = None
 
     @classmethod
     def from_dict(self, task: dict) -> "Task":
+        duration_seconds = task.get("duration_seconds")
+
         return Task(
             task_uid=UUID(task["task_uid"]),
             model_name=Operation(task["model_name"]),
@@ -57,6 +62,9 @@ class Task:
             dataset_uid_label=task["dataset_uid_label"],
             created=datetime.fromisoformat(task["created"]),
             modified=datetime.fromisoformat(task["modified"]),
+            duration_seconds=(
+                float(duration_seconds) if duration_seconds is not None else None
+            ),
         )
 
     def __eq__(self, other) -> bool:
