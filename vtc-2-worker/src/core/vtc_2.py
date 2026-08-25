@@ -1,5 +1,6 @@
 import os
 import shutil
+import shlex
 import subprocess
 from pathlib import Path
 
@@ -58,7 +59,7 @@ class VTC2(ModelPlugin):
         device = self.config.get("VTC_2_DEVICE")
         bash_script = f"""
         /home/appuser/.local/bin/uv run scripts/infer.py --wavs \
-{str(input)} --output {str(output)} \
+{shlex.quote(str(input))} --output {shlex.quote(str(output))} \
 --device={device}
         """
 
