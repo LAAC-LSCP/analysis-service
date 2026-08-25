@@ -1,3 +1,4 @@
+import shlex
 import shutil
 import subprocess
 from pathlib import Path
@@ -67,7 +68,7 @@ class VTC(ModelPlugin):
         bash_script = f"""
         source {self.config.get("CONDA_ACTIVATE_FILE")}
         conda activate {self.config.get("CONDA_ENV_NAME")}
-        {str(executable)} {str(file)} {device_str}
+        {shlex.quote(str(executable))} {shlex.quote(str(file))} {device_str}
         """
 
         self._run_subprocess(bash_script, output_dir, file)
