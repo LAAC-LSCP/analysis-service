@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from typing import Mapping, Optional, Tuple
 from uuid import UUID
+import time
 
 import requests
 from tenacity import retry, stop_after_delay, wait_fixed
@@ -34,7 +35,13 @@ class HTTPClient:
         self._retry_time_s = retry_time_s or 10
 
         self._base_url = base_url
-        self._access_token, _, _ = self._get_access_token(client_id, client_secret)
+        self._access_token, self._access_token_expiration, _ = self._get_access_token(client_id, client_secret)
+
+        # set the renew window to 1min before expiration
+        self._access_token_expiration = time.time() + self._access_token_expiration -60
+
+        self._client_id = client_id
+        self._client_secret = client_secret
 
     @property
     def headers(self) -> Headers:
@@ -70,10 +77,21 @@ class HTTPClient:
             response_json["token_type"],
         )
 
+    def _check_access_token(
+        self,
+    ) -> None:
+        if time.time() > self._access_token_expiration:
+            self._access_token, self._access_token_expiration, _ = self._get_access_token(self._client_id, self._client_secret)
+
+            # set the renew window to 1min before expiration
+            self._access_token_expiration = time.time() + self._access_token_expiration -60
+
+
     def get_all_tasks(self) -> external_api.Tasks:
         uri: str = self._base_url + "/analytics/services/tasks"
 
         try:
+            self._check_access_token()
             response = requests.get(uri, headers=self.headers, timeout=self._timeout_s)
             response.raise_for_status()
             data = response.json()
@@ -88,6 +106,7 @@ class HTTPClient:
         uri: str = self._base_url + f"/analytics/services/tasks/{str(id)}"
 
         try:
+            self._check_access_token()
             response = requests.get(uri, headers=self.headers, timeout=self._timeout_s)
             response.raise_for_status()
             data = response.json()
@@ -104,6 +123,7 @@ class HTTPClient:
         uri: str = self._base_url + f"/analytics/services/tasks/{str(task_id)}"
 
         try:
+            self._check_access_token()
             response = requests.put(
                 uri,
                 json={
