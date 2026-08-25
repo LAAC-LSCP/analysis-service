@@ -13,7 +13,7 @@ dependencies = [
     "requests (>=2.32.5,<3.0.0)",
     "asyncio (>=4.0.0,<5.0.0)",
     "click (>=8.3.1,<9.0.0)",
-    "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git@v1.11.5"
+    "analysis-service-core @ git+https://github.com/LAAC-LSCP/analysis-service-core.git@34d0d57fdd5f567e7f42d58f97bb58ed5377b06c"
 ]
 
 [dependency-groups]
