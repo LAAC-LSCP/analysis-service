@@ -58,9 +58,10 @@ class Service:
         logger.info("Daemon started")
         loop = asyncio.get_event_loop()
         redis_task = loop.run_in_executor(None, self._listen_and_handle_completion)
+        progress_task = loop.run_in_executor(None, self._listen_and_handle_progress)
         api_task = self._external_api_loop()
 
-        await asyncio.gather(redis_task, api_task)
+        await asyncio.gather(redis_task, progress_task, api_task)
 
     async def _external_api_loop(self) -> None:
         while True:
@@ -100,8 +101,7 @@ class Service:
             )
 
             logger.info(f"Publishing task with id '{task.task_uid}' to redis")
-            for handler in self._command_handlers.get(RunTask, []):
-                handler(message)
+            self._invoke_handlers(RunTask, message)
 
         self._fail_stale_running_tasks(all_tasks)
 
@@ -126,14 +126,14 @@ class Service:
                 f"{age_s:.0f}s (budget: {budget_s:.0f}s). Marking as failed."
             )
 
-            for handler in self._command_handlers.get(FailTask, []):
-                handler(
-                    FailTask(
-                        task_id=task.task_uid,
-                        reason=f"No update received for {age_s:.0f}s "
-                        f"(budget: {budget_s:.0f}s); assumed stalled or crashed.",
-                    )
-                )
+            self._invoke_handlers(
+                FailTask,
+                FailTask(
+                    task_id=task.task_uid,
+                    reason=f"No update received for {age_s:.0f}s "
+                    f"(budget: {budget_s:.0f}s); assumed stalled or crashed.",
+                ),
+            )
 
     def _listen_and_handle_completion(self) -> None:
         while True:
@@ -203,5 +203,13 @@ class Service:
         logger.info(f"Handling message: {command_dict}")
         command = command_cls.from_dict(command_dict)
 
+        self._invoke_handlers(command_cls, command)
+
+    def _invoke_handlers(self, command_cls: Type[Command], command: Command) -> None:
         for handler in self._command_handlers.get(command_cls, []):
-            handler(command)
+            try:
+                handler(command)
+            except Exception:
+                logger.exception(
+                    f"Handler failed for {command_cls.__name__} command: {command}"
+                )

@@ -5,7 +5,7 @@ from the ELSI external endpoints
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Set, TypedDict
+from typing import NotRequired, Optional, Set, TypedDict
 from uuid import UUID
 
 from analysis_service_core.src.redis.commands import Operation
@@ -32,7 +32,8 @@ class Status(TypedDict):
 
 class PutPayload(TypedDict):
     status: TaskStatus
-    estimated_duration: int
+    estimated_duration: NotRequired[int]
+    progress: NotRequired[float]
 
 
 @dataclass

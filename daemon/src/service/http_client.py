@@ -122,14 +122,17 @@ class HTTPClient:
     def put_task(self, task_id: UUID, payload: external_api.PutPayload) -> None:
         uri: str = self._base_url + f"/analytics/services/tasks/{str(task_id)}"
 
+        body: dict = {"status": payload["status"].upper()}
+        if "estimated_duration" in payload:
+            body["estimated_duration"] = payload["estimated_duration"]
+        if "progress" in payload:
+            body["progress"] = payload["progress"]
+
         try:
             self._check_access_token()
             response = requests.put(
                 uri,
-                json={
-                    "status": payload["status"].upper(),
-                    "estimated_duration": payload["estimated_duration"],
-                },
+                json=body,
                 headers=self.headers,
                 timeout=self._timeout_s,
             )

@@ -1,4 +1,6 @@
+from time import monotonic
 from typing import Any, Dict, List, Protocol, Type, TypeVar
+from uuid import UUID
 
 import analysis_service_core.src.redis.commands as commands
 from analysis_service_core.src.logger import LoggerFactory
@@ -17,6 +19,12 @@ class CommandHandler(Protocol[CommandT]):
 
 
 type CommandHandlers = Dict[Type[commands.Command], List[CommandHandler[Any]]]
+
+# Workers report progress after every igroup, which can mean many messages per second
+# for large datasets. ELSI doesn't need that resolution, so updates are throttled to
+# at most one per task within this window (a generous cap since tasks rarely finish
+# in lockstep). The final update (progress >= 1.0) always goes through.
+PROGRESS_UPDATE_MIN_INTERVAL_S = 5.0
 
 
 def update_elsi_status(
@@ -58,12 +66,33 @@ def report_task_failure(http_client: HTTPClient) -> CommandHandler:
     return send_failure
 
 
-def update_elsi_progress(http_client: HTTPClient) -> CommandHandler:
+def update_elsi_progress(
+    http_client: HTTPClient, min_interval_s: float = PROGRESS_UPDATE_MIN_INTERVAL_S
+) -> CommandHandler:
+    last_sent_at: Dict[UUID, float] = {}
+
     def send_progress_update(command: commands.ReportProgress) -> None:
-        #       TODO: NOT IMPLEMENTED
-        #       logger.info(f"Sent progress update to ELSI for task \
-        # {command.task_id!s} with progress {command.progress!s}")
-        pass
+        is_complete = command.completed_progress >= 1.0
+        now = monotonic()
+        last = last_sent_at.get(command.task_id)
+
+        if last is not None and not is_complete and (now - last) < min_interval_s:
+            return
+
+        last_sent_at[command.task_id] = now
+
+        http_client.put_task(
+            command.task_id,
+            payload={
+                "status": TaskStatus.RUNNING,
+                "progress": command.completed_progress,
+            },
+        )
+
+        logger.info(
+            f"Sent progress update to ELSI for task {command.task_id!s}: "
+            f"{command.completed_progress:.1%}"
+        )
 
     return send_progress_update
 
