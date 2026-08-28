@@ -1,0 +1,92 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    name: Build and push ${{ matrix.image }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - image: echoswarm-daemon
+            context: daemon
+          - image: echoswarm-vtc
+            context: vtc-worker
+          - image: echoswarm-vtc-2
+            context: vtc-2-worker
+          - image: echoswarm-alice
+            context: alice-worker
+          - image: echoswarm-acoustics
+            context: acoustics-worker
+          - image: echoswarm-w2v2
+            context: w2v2-worker
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Log in to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        context: ${{ matrix.context }}
+        push: true
+        tags: ghcr.io/laac-lscp/${{ matrix.image }}:latest
+
+  # Requires the following secrets:
+  # - DEPLOYMENT_KEY: SSH private key for the deployment user
+  # - DEPLOY_TARGET:  user@host of the swarm manager (e.g. deployer@192.168.1.1)
+  # - DEPLOY_PATH:    Absolute path on the node with docker-compose.yml
+  # - GHCR_TOKEN:     GitHub PAT with read:packages scope (for swarm nodes to pull images)
+  deploy:
+    name: Deploy to swarm
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      KEY_FILE: swarm_deploy_key
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up SSH key
+      env:
+        DEPLOYMENT_KEY: ${{ secrets.DEPLOYMENT_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$DEPLOYMENT_KEY" > ~/.ssh/${{ env.KEY_FILE }}
+        chmod 600 ~/.ssh/${{ env.KEY_FILE }}
+
+    - name: Copy compose file to swarm manager
+      run: |
+        scp -i ~/.ssh/${{ env.KEY_FILE }} \
+            -o StrictHostKeyChecking=no \
+            docker-compose.yml \
+            ${{ secrets.DEPLOY_TARGET }}:${{ secrets.DEPLOY_PATH }}/docker-compose.yml
+
+    - name: Deploy stack
+      env:
+        GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      run: |
+        ssh -i ~/.ssh/${{ env.KEY_FILE }} \
+            -o StrictHostKeyChecking=no \
+            ${{ secrets.DEPLOY_TARGET }} \
+            "echo '${GHCR_TOKEN}' | docker login ghcr.io -u '${{ github.repository_owner }}' --password-stdin \
+             && docker stack deploy --with-registry-auth --prune -c ${{ secrets.DEPLOY_PATH }}/docker-compose.yml echoswarm"

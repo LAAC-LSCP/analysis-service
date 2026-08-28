@@ -12,7 +12,7 @@ services:
     deploy:
       replicas: 1
   echoswarm-daemon:
-    image: me/echoswarm-daemon:latest
+    image: ghcr.io/laac-lscp/echoswarm-daemon:latest
     depends_on:
       - echoswarm-redis
     networks:
@@ -30,8 +30,13 @@ services:
       - ${ECHOLALIA_FOLDER}:/app/echolalia
     deploy:
       replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        monitor: 10s
   echoswarm-vtc-worker:
-    image: me/echoswarm-vtc:latest
+    image: ghcr.io/laac-lscp/echoswarm-vtc:latest
     user: "${UID:-1002}:${GID:-1002}"
     depends_on:
       - echoswarm-redis
@@ -58,7 +63,7 @@ services:
         constraints:
           - node.labels.gpu == true
   echoswarm-vtc-2-worker:
-    image: me/echoswarm-vtc-2:latest
+    image: ghcr.io/laac-lscp/echoswarm-vtc-2:latest
     user: "${UID:-1002}:${GID:-1002}"
     depends_on:
       - echoswarm-redis
@@ -84,7 +89,7 @@ services:
         constraints:
           - node.labels.gpu == true
   echoswarm-alice-worker:
-    image: me/echoswarm-alice:latest
+    image: ghcr.io/laac-lscp/echoswarm-alice:latest
     user: "${UID:-1002}:${GID:-1002}"
     depends_on:
       - echoswarm-redis
@@ -111,7 +116,7 @@ services:
         constraints:
           - node.labels.gpu == true
   echoswarm-acoustics-worker:
-    image: me/echoswarm-acoustics:latest
+    image: ghcr.io/laac-lscp/echoswarm-acoustics:latest
     user: "${UID:-1002}:${GID:-1002}"
     depends_on:
       - echoswarm-redis
@@ -129,7 +134,7 @@ services:
     deploy:
       replicas: 1
   echoswarm-w2v2-worker:
-    image: me/echoswarm-w2v2:latest
+    image: ghcr.io/laac-lscp/echoswarm-w2v2:latest
     user: "${UID:-1002}:${GID:-1002}"
     depends_on:
       - echoswarm-redis
