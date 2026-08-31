@@ -21,6 +21,13 @@ Note that we use Swarm as our orchestrator, but that Swarm is quite opinionated 
 
 Please install the [NVIDIA container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-the-nvidia-container-toolkit)
 
+Swarm stack files can't set `runtime: nvidia` per-service (that field only exists in plain `docker-compose`, not under `deploy:`), so the node's Docker daemon must be configured to use the NVIDIA runtime by default — otherwise `NVIDIA_VISIBLE_DEVICES` in `docker-compose.yml` has no effect and GPU workers will fail with `RuntimeError: Found no NVIDIA driver on your system`, even with the toolkit installed and the node correctly labeled below.
+```bash
+sudo nvidia-ctk runtime configure --runtime=docker --set-as-default
+sudo systemctl restart docker
+```
+Verify it took effect: `docker info | grep -i "Default Runtime"` should print `nvidia`, not `runc`.
+
 Initialise Docker Swarm (only need to do this once)
 ```bash
 docker swarm init
