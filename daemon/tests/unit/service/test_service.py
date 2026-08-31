@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+import threading
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 import analysis_service_core.src.redis.commands as commands
@@ -85,7 +86,7 @@ def test_service():
     )
 
     service.get_completion_message_and_handle()
-    service._listen_and_handle_progress()
+    service.get_progress_message_and_handle()
 
     assert len(command_tester.calls) == 3
     assert command_tester.calls[1]["type"] == commands.CompleteTask
@@ -142,8 +143,10 @@ def test_tick_fails_stale_running_task_using_floor_when_no_duration():
         user_uid="",
         dataset_name="",
         dataset_uid_label="",
-        created=datetime.now() - timedelta(seconds=Service.STALE_TASK_FLOOR_S + 60),
-        modified=datetime.now() - timedelta(seconds=Service.STALE_TASK_FLOOR_S + 60),
+        created=datetime.now(timezone.utc)
+        - timedelta(seconds=Service.STALE_TASK_FLOOR_S + 60),
+        modified=datetime.now(timezone.utc)
+        - timedelta(seconds=Service.STALE_TASK_FLOOR_S + 60),
     )
     service, command_tester, _, _, _ = _make_service(
         FakeHTTPClient([{stale_task}]), command_handlers
@@ -168,8 +171,8 @@ def test_tick_does_not_fail_running_task_within_budget():
         user_uid="",
         dataset_name="",
         dataset_uid_label="",
-        created=datetime.now(),
-        modified=datetime.now(),
+        created=datetime.now(timezone.utc),
+        modified=datetime.now(timezone.utc),
     )
     service, command_tester, _, _, _ = _make_service(
         FakeHTTPClient([{fresh_task}]), command_handlers
@@ -195,8 +198,8 @@ def test_tick_uses_duration_based_budget_when_available():
         user_uid="",
         dataset_name="",
         dataset_uid_label="",
-        created=datetime.now() - timedelta(seconds=budget_s + 60),
-        modified=datetime.now() - timedelta(seconds=budget_s + 60),
+        created=datetime.now(timezone.utc) - timedelta(seconds=budget_s + 60),
+        modified=datetime.now(timezone.utc) - timedelta(seconds=budget_s + 60),
         duration_seconds=duration_seconds,
     )
     within_budget_task = Task(
@@ -206,8 +209,8 @@ def test_tick_uses_duration_based_budget_when_available():
         user_uid="",
         dataset_name="",
         dataset_uid_label="",
-        created=datetime.now() - timedelta(seconds=budget_s - 60),
-        modified=datetime.now() - timedelta(seconds=budget_s - 60),
+        created=datetime.now(timezone.utc) - timedelta(seconds=budget_s - 60),
+        modified=datetime.now(timezone.utc) - timedelta(seconds=budget_s - 60),
         duration_seconds=duration_seconds,
     )
     service, command_tester, _, _, _ = _make_service(
@@ -219,3 +222,27 @@ def test_tick_uses_duration_based_budget_when_available():
     fail_calls = [c for c in command_tester.calls if c["type"] == commands.FailTask]
     assert len(fail_calls) == 1
     assert fail_calls[0]["message"].task_id == stale_task.task_uid
+
+
+def test_listen_and_handle_completion_stops_on_request():
+    service, _, _, _, _ = _make_service(FakeHTTPClient([set()]), {})
+
+    thread = threading.Thread(target=service._listen_and_handle_completion)
+    thread.start()
+
+    service.stop()
+    thread.join(timeout=3.0)
+
+    assert not thread.is_alive()
+
+
+def test_listen_and_handle_progress_stops_on_request():
+    service, _, _, _, _ = _make_service(FakeHTTPClient([set()]), {})
+
+    thread = threading.Thread(target=service._listen_and_handle_progress)
+    thread.start()
+
+    service.stop()
+    thread.join(timeout=3.0)
+
+    assert not thread.is_alive()

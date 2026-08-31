@@ -1,6 +1,6 @@
 import asyncio
-from datetime import datetime, timedelta
-from time import sleep
+import threading
+from datetime import datetime, timedelta, timezone
 from typing import Type
 
 from analysis_service_core.src.logger import LoggerFactory
@@ -15,7 +15,7 @@ from analysis_service_core.src.redis.pubsub import PubSub
 from analysis_service_core.src.redis.queue import Queue
 from tenacity import Retrying, stop_after_attempt, wait_fixed
 
-from src.core.elsi_api import Tasks
+from src.core.elsi_api import Task, Tasks
 from src.core.types import TaskStatus
 from src.service.command_handlers import CommandHandlers
 from src.service.http_client import HTTPClient
@@ -39,6 +39,7 @@ class Service:
     _progress_bus: PubSub
     _command_handlers: CommandHandlers
     _http_client: HTTPClient
+    _stop_event: threading.Event
 
     def __init__(
         self,
@@ -53,6 +54,7 @@ class Service:
         self._progress_bus = progress_bus
         self._command_handlers = command_handlers
         self._http_client = http_client
+        self._stop_event = threading.Event()
 
     async def start(self) -> None:
         logger.info("Daemon started")
@@ -62,9 +64,15 @@ class Service:
         api_task = self._external_api_loop()
 
         await asyncio.gather(redis_task, progress_task, api_task)
+        logger.info("Daemon stopped")
+
+    def stop(self) -> None:
+        """Signal all loops to stop after their current iteration."""
+        logger.info("Stop requested; shutting down gracefully...")
+        self._stop_event.set()
 
     async def _external_api_loop(self) -> None:
-        while True:
+        while not self._stop_event.is_set():
             current_t = datetime.now()
 
             logger.info("Loading new tasks...")
@@ -74,7 +82,16 @@ class Service:
                 current_t + timedelta(seconds=self.S_PER_UPDATE) - datetime.now()
             ).total_seconds()
 
-            await asyncio.sleep(sleep_t if sleep_t > 0 else 0)
+            await self._interruptible_sleep(sleep_t if sleep_t > 0 else 0)
+
+    async def _interruptible_sleep(self, duration_s: float) -> None:
+        """Sleep in small chunks so stop() takes effect promptly, not after the
+        full interval."""
+        remaining = duration_s
+        while remaining > 0 and not self._stop_event.is_set():
+            step = min(self.S_PER_QUEUE_FETCH, remaining)
+            await asyncio.sleep(step)
+            remaining -= step
 
     def tick(self) -> None:
         try:
@@ -93,15 +110,18 @@ class Service:
             logger.info(f"Received new tasks: {new_tasks}")
 
         for task in new_tasks:
-            message: RunTask = RunTask(
-                task_id=task.task_uid,
-                dataset_uid_label=task.dataset_uid_label,
-                operation=task.model_name,
-                resume=False,
-            )
+            try:
+                message: RunTask = RunTask(
+                    task_id=task.task_uid,
+                    dataset_uid_label=task.dataset_uid_label,
+                    operation=task.model_name,
+                    resume=False,
+                )
 
-            logger.info(f"Publishing task with id '{task.task_uid}' to redis")
-            self._invoke_handlers(RunTask, message)
+                logger.info(f"Publishing task with id '{task.task_uid}' to redis")
+                self._invoke_handlers(RunTask, message)
+            except Exception:
+                logger.exception(f"Failed to dispatch new task '{task}'.")
 
         self._fail_stale_running_tasks(all_tasks)
 
@@ -111,32 +131,38 @@ class Service:
         }
 
         for task in running_tasks:
-            budget_s = self.STALE_TASK_FLOOR_S
-            if task.duration_seconds is not None:
-                budget_s = max(
-                    budget_s, task.duration_seconds * self.STALE_TASK_DURATION_FACTOR
-                )
+            try:
+                self._fail_if_stale(task)
+            except Exception:
+                logger.exception(f"Failed to check staleness for task '{task}'.")
 
-            age_s = (datetime.now() - task.modified).total_seconds()
-            if age_s <= budget_s:
-                continue
-
-            logger.warning(
-                f"Task '{task.task_uid}' has been RUNNING with no update for "
-                f"{age_s:.0f}s (budget: {budget_s:.0f}s). Marking as failed."
+    def _fail_if_stale(self, task: Task) -> None:
+        budget_s = self.STALE_TASK_FLOOR_S
+        if task.duration_seconds is not None:
+            budget_s = max(
+                budget_s, task.duration_seconds * self.STALE_TASK_DURATION_FACTOR
             )
 
-            self._invoke_handlers(
-                FailTask,
-                FailTask(
-                    task_id=task.task_uid,
-                    reason=f"No update received for {age_s:.0f}s "
-                    f"(budget: {budget_s:.0f}s); assumed stalled or crashed.",
-                ),
-            )
+        age_s = (datetime.now(timezone.utc) - task.modified).total_seconds()
+        if age_s <= budget_s:
+            return
+
+        logger.warning(
+            f"Task '{task.task_uid}' has been RUNNING with no update for "
+            f"{age_s:.0f}s (budget: {budget_s:.0f}s). Marking as failed."
+        )
+
+        self._invoke_handlers(
+            FailTask,
+            FailTask(
+                task_id=task.task_uid,
+                reason=f"No update received for {age_s:.0f}s "
+                f"(budget: {budget_s:.0f}s); assumed stalled or crashed.",
+            ),
+        )
 
     def _listen_and_handle_completion(self) -> None:
-        while True:
+        while not self._stop_event.is_set():
             completion_message = self._completion_queue.dequeue()
             if completion_message:
                 self._handle_message(completion_message, CompleteTask)
@@ -145,11 +171,16 @@ class Service:
             if fail_message:
                 self._handle_message(fail_message, FailTask)
 
-            if completion_message or fail_message:
-                sleep(self.S_PER_QUEUE_FETCH)
+            if not completion_message and not fail_message:
+                # Bounded, interruptible wait: avoids a busy loop while idle, and
+                # lets stop() take effect promptly instead of spinning forever.
+                self._stop_event.wait(timeout=self.S_PER_QUEUE_FETCH)
 
     def _listen_and_handle_progress(self) -> None:
-        for message in self._progress_bus.listen():
+        while not self._stop_event.is_set():
+            # get_message(timeout=...) polls with a bound, unlike listen() which
+            # blocks on the socket indefinitely and can't observe stop().
+            message = self._progress_bus.get_message(timeout=self.S_PER_QUEUE_FETCH)
             if not message:
                 continue
 
@@ -174,6 +205,29 @@ class Service:
         self._get_message_and_handle(
             self._fail_queue, FailTask, max_attempts, wait_seconds
         )
+
+    def get_progress_message_and_handle(
+        self, max_attempts: int = 3, wait_seconds: float = 0.1
+    ) -> None:
+        """
+        Looks for next progress message, mostly for testing purposes
+        """
+        for attempt in Retrying(
+            stop=stop_after_attempt(max_attempts),
+            wait=wait_fixed(wait_seconds),
+            reraise=True,
+        ):
+            with attempt:
+                message = self._progress_bus.get_message()
+
+                if message:
+                    self._handle_message(message["data"], ReportProgress)
+
+                    return
+                else:
+                    raise Exception("Retrying...")
+
+        return
 
     def _get_message_and_handle(
         self,

@@ -1,3 +1,5 @@
+import asyncio
+import signal
 from typing import Tuple
 
 from analysis_service_core.src.config import Config, EnvVar
@@ -15,6 +17,11 @@ async def run() -> None:
     service = Service(
         completion_queue, progress_bus, command_handlers, http_client, fail_queue
     )
+
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        loop.add_signal_handler(sig, service.stop)
+
     await service.start()
 
     return

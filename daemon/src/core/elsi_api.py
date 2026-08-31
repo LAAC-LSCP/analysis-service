@@ -4,7 +4,7 @@ from the ELSI external endpoints
 """
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import NotRequired, Optional, Set, TypedDict
 from uuid import UUID
 
@@ -14,6 +14,15 @@ from src.core.types import TaskStatus
 
 type Tasks = Set["Task"]
 type Statuses = Set["Status"]
+
+
+def _parse_aware_datetime(value: str) -> datetime:
+    """Parse an ISO datetime, assuming UTC if the ELSI API omits a timezone."""
+    parsed = datetime.fromisoformat(value)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+
+    return parsed
 
 
 class AuthResponse(TypedDict):
@@ -61,8 +70,8 @@ class Task:
             user_uid=UUID(task["user_uid"]),
             dataset_name=task["dataset_name"],
             dataset_uid_label=task["dataset_uid_label"],
-            created=datetime.fromisoformat(task["created"]),
-            modified=datetime.fromisoformat(task["modified"]),
+            created=_parse_aware_datetime(task["created"]),
+            modified=_parse_aware_datetime(task["modified"]),
             duration_seconds=(
                 float(duration_seconds) if duration_seconds is not None else None
             ),
