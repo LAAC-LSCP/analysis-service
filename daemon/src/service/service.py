@@ -1,7 +1,7 @@
 import asyncio
 import threading
 from datetime import datetime, timedelta, timezone
-from typing import Type
+from typing import Optional, Type
 
 from analysis_service_core.src.logger import LoggerFactory
 from analysis_service_core.src.model import RunTask
@@ -61,10 +61,24 @@ class Service:
         loop = asyncio.get_event_loop()
         redis_task = loop.run_in_executor(None, self._listen_and_handle_completion)
         progress_task = loop.run_in_executor(None, self._listen_and_handle_progress)
-        api_task = self._external_api_loop()
+        api_task = asyncio.ensure_future(self._external_api_loop())
 
-        await asyncio.gather(redis_task, progress_task, api_task)
-        logger.info("Daemon stopped")
+        try:
+            await asyncio.gather(redis_task, progress_task, api_task)
+        except Exception:
+            # Whatever crashed, make sure the other two loops wind down instead of
+            # hanging around: stop() lets them notice and exit within ~1s, and we
+            # wait for that here so the process doesn't linger before dying (and
+            # the executor doesn't spend minutes failing to join a thread that
+            # never got the memo to stop).
+            logger.exception("Unhandled error in daemon main loop; shutting down.")
+            self.stop()
+            await asyncio.gather(
+                redis_task, progress_task, api_task, return_exceptions=True
+            )
+            raise
+        finally:
+            logger.info("Daemon stopped")
 
     def stop(self) -> None:
         """Signal all loops to stop after their current iteration."""
@@ -163,11 +177,11 @@ class Service:
 
     def _listen_and_handle_completion(self) -> None:
         while not self._stop_event.is_set():
-            completion_message = self._completion_queue.dequeue()
+            completion_message = self._dequeue_safely(self._completion_queue)
             if completion_message:
                 self._handle_message(completion_message, CompleteTask)
 
-            fail_message = self._fail_queue.dequeue()
+            fail_message = self._dequeue_safely(self._fail_queue)
             if fail_message:
                 self._handle_message(fail_message, FailTask)
 
@@ -175,6 +189,13 @@ class Service:
                 # Bounded, interruptible wait: avoids a busy loop while idle, and
                 # lets stop() take effect promptly instead of spinning forever.
                 self._stop_event.wait(timeout=self.S_PER_QUEUE_FETCH)
+
+    def _dequeue_safely(self, queue: Queue) -> Optional[dict]:
+        try:
+            return queue.dequeue()
+        except Exception:
+            logger.exception("Failed to dequeue message, dropping it.")
+            return None
 
     def _listen_and_handle_progress(self) -> None:
         while not self._stop_event.is_set():
@@ -184,7 +205,15 @@ class Service:
             if not message:
                 continue
 
-            self._handle_message(message["data"], ReportProgress)
+            try:
+                data = self._progress_bus.get_data_from_message(message)
+            except Exception:
+                logger.exception(
+                    f"Failed to decode progress message, dropping it: {message!r}"
+                )
+                continue
+
+            self._handle_message(data, ReportProgress)
 
     def get_completion_message_and_handle(
         self, max_attempts: int = 3, wait_seconds: float = 0.1
@@ -221,7 +250,8 @@ class Service:
                 message = self._progress_bus.get_message()
 
                 if message:
-                    self._handle_message(message["data"], ReportProgress)
+                    data = self._progress_bus.get_data_from_message(message)
+                    self._handle_message(data, ReportProgress)
 
                     return
                 else:
@@ -255,7 +285,15 @@ class Service:
 
     def _handle_message(self, command_dict: dict, command_cls: Type[Command]) -> None:
         logger.info(f"Handling message: {command_dict}")
-        command = command_cls.from_dict(command_dict)
+
+        try:
+            command = command_cls.from_dict(command_dict)
+        except Exception:
+            logger.exception(
+                f"Failed to parse {command_cls.__name__} message, dropping it: "
+                f"{command_dict!r}"
+            )
+            return
 
         self._invoke_handlers(command_cls, command)
 

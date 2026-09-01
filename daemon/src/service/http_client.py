@@ -4,11 +4,20 @@ from uuid import UUID
 import time
 
 import requests
-from tenacity import retry, stop_after_delay, wait_fixed
+from tenacity import Retrying, retry, retry_if_exception, stop_after_delay, wait_fixed
 
 import src.core.elsi_api as external_api
 
 Headers = Mapping[str, str]
+
+
+def _is_transient_request_error(exc: BaseException) -> bool:
+    """Network hiccups and 5xx responses are worth retrying; 4xx responses
+    (bad payload, auth, not found) will just fail the same way again."""
+    if isinstance(exc, requests.HTTPError):
+        return exc.response is not None and exc.response.status_code >= 500
+
+    return isinstance(exc, (requests.ConnectionError, requests.Timeout))
 
 
 class HTTPClient:
@@ -129,13 +138,20 @@ class HTTPClient:
             body["progress"] = payload["progress"]
 
         try:
-            self._check_access_token()
-            response = requests.put(
-                uri,
-                json=body,
-                headers=self.headers,
-                timeout=self._timeout_s,
-            )
-            response.raise_for_status()
+            for attempt in Retrying(
+                stop=stop_after_delay(self._retry_time_s),
+                wait=wait_fixed(1),
+                retry=retry_if_exception(_is_transient_request_error),
+                reraise=True,
+            ):
+                with attempt:
+                    self._check_access_token()
+                    response = requests.put(
+                        uri,
+                        json=body,
+                        headers=self.headers,
+                        timeout=self._timeout_s,
+                    )
+                    response.raise_for_status()
         except requests.RequestException as exc:
             raise RuntimeError(f"Failed to post task: {exc}") from exc

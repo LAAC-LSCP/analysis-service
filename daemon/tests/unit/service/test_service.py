@@ -1,3 +1,4 @@
+import json
 import threading
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
@@ -222,6 +223,76 @@ def test_tick_uses_duration_based_budget_when_available():
     fail_calls = [c for c in command_tester.calls if c["type"] == commands.FailTask]
     assert len(fail_calls) == 1
     assert fail_calls[0]["message"].task_id == stale_task.task_uid
+
+
+class _BytesPubSubStub:
+    """Mimics real redis-py PubSub behavior: `data` comes back as raw bytes,
+    unlike PubSubMock which stores already-decoded dicts and so can't catch a
+    bytes-vs-dict bug in the code that consumes it."""
+
+    def __init__(self, messages):
+        self._messages = list(messages)
+
+    def get_message(self, timeout: float = 0.0):
+        if self._messages:
+            return self._messages.pop(0)
+        return None
+
+    def get_data_from_message(self, message):
+        return json.loads(message["data"].decode("utf-8"))
+
+
+def test_listen_and_handle_progress_decodes_real_redis_bytes_payload():
+    command_handlers = {
+        commands.ReportProgress: [lambda event: None],
+    }
+    command_tester = CommandTester(command_handlers)
+    task_id = UUID("c611e347-2c08-4909-b174-0e76a678ce57")
+    payload = commands.ReportProgress(
+        task_id=task_id,
+        completed_progress=0.5,
+        completed_pass_effort=1.0,
+        partial_pass_progress=0.5,
+        partial_pass_effort=1.0,
+        total_effort=2.0,
+        completed_passes=1,
+        total_passes=2,
+    ).to_dict()
+    raw_message = {
+        "type": "message",
+        "channel": b"update_status",
+        "data": json.dumps(payload).encode("utf-8"),
+    }
+    progress_bus = _BytesPubSubStub([raw_message])
+    service = Service(
+        QueueMock(QueueName.COMPLETE_TASK),
+        progress_bus,
+        command_tester.command_handlers,
+        FakeHTTPClient([set()]),
+        QueueMock(QueueName.FAIL_TASK),
+    )
+
+    service.get_progress_message_and_handle()
+
+    assert len(command_tester.calls) == 1
+    assert command_tester.calls[0]["type"] == commands.ReportProgress
+    assert command_tester.calls[0]["message"].task_id == task_id
+    assert command_tester.calls[0]["message"].completed_progress == 0.5
+
+
+def test_handle_message_drops_unparseable_payload_without_crashing():
+    command_handlers = {
+        commands.ReportProgress: [lambda event: None],
+    }
+    service, command_tester, _, _, _ = _make_service(
+        FakeHTTPClient([set()]), command_handlers
+    )
+
+    # Same shape of bug as the bytes-payload issue: something that can't be
+    # indexed/parsed like the expected dict.
+    service._handle_message(b'{"task_id": "irrelevant"}', commands.ReportProgress)
+
+    assert len(command_tester.calls) == 0
 
 
 def test_listen_and_handle_completion_stops_on_request():
