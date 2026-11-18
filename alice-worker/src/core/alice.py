@@ -21,7 +21,7 @@ class ALICE(ModelPlugin):
     def run_model(
         self, dataset_dir: Path, output_dir: Path, igroup: InputGroup
     ) -> None:
-        final_output_dir = output_dir / "output"
+        final_output_dir = output_dir
         conv_std_recs = ALICEEffortModel.get_conv_std_recs(dataset_dir)
         audio_file = igroup[0]
         self._run_alice_on_audio_file(conv_std_recs, final_output_dir, audio_file)
@@ -71,7 +71,7 @@ class ALICE(ModelPlugin):
         conv_std_recs = ALICEEffortModel.get_conv_std_recs(dataset_dir)
         audio_file = igroup[0]
         rel_path: Path = audio_file.relative_to(conv_std_recs)
-        final_output_dir = output_dir / "output"
+        final_output_dir = output_dir
 
         rel_path_dir = rel_path.parent
         base_name = rel_path.stem

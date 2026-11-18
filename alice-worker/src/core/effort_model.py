@@ -43,12 +43,10 @@ class ALICEEffortModel(EffortModel):
 
         return [
             output_dir
-            / "output"
             / audio_file.parent.relative_to(converted_recs)
             / "raw"
             / audio_file.with_suffix(".csv").name,
             output_dir
-            / "output"
             / audio_file.parent.relative_to(converted_recs)
             / "extra"
             / audio_file.with_suffix(".txt").with_stem(audio_file.stem + "_sum").name,
